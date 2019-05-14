@@ -1,5 +1,7 @@
 package iut2.forbiddenisland.model;
 
+import iut2.forbiddenisland.controller.Request;
+
 import java.util.*;
 
 public class Board {

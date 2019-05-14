@@ -1,5 +1,7 @@
 package iut2.forbiddenisland.controller;
 
+import iut2.forbiddenisland.controller.observer.Observable;
+
 public class Controller {
 
 	GameEngine engine;

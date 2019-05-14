@@ -6,8 +6,8 @@ import java.util.*;
 
 public class ModelProxy {
 
-	Collection<Middleware> middlewares;
-	Board board;
+	private List<Middleware> middlewares;
+	private Board board;
 
 	/**
 	 * 

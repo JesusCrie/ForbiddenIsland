@@ -2,7 +2,15 @@ package iut2.forbiddenisland.model;
 
 public class TreasureCell extends Cell {
 
-	Treasure treasure;
+	private Treasure treasure;
+
+	/**
+	 * @param name
+	 * @param loc
+	 */
+	public TreasureCell(String name, Location loc) {
+		super(name, loc);
+	}
 
 	/**
 	 * 

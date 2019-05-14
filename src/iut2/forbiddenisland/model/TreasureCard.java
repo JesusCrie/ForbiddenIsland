@@ -2,6 +2,12 @@ package iut2.forbiddenisland.model;
 
 public abstract class TreasureCard extends Card {
 
-	Treasure treasure;
+	private Treasure treasure;
 
+	/**
+	 * @param name
+	 */
+	public TreasureCard(String name) {
+		super(name);
+	}
 }

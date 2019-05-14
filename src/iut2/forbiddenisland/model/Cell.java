@@ -4,21 +4,21 @@ import java.util.*;
 
 public abstract class Cell {
 
-	Collection<Adventurer> adventurers;
-	CellState state;
-	private string name;
+	private List<Adventurer> adventurers;
+	private CellState state;
+	private String name;
 
 	/**
 	 * 
 	 * @param name
 	 * @param loc
 	 */
-	public Cell(string name, Location loc) {
+	public Cell(String name, Location loc) {
 		// TODO - implement iut2.forbiddenisland.model.Cell.iut2.forbiddenisland.model.Cell
 		throw new UnsupportedOperationException();
 	}
 
-	public string getName() {
+	public String getName() {
 		return this.name;
 	}
 

@@ -7,9 +7,9 @@ public class Adventurer {
 	Collection<Treasure> treasures;
 	Cell cell;
 	Collection<Power> powers;
-	private string name;
+	private String name;
 
-	public string getName() {
+	public String getName() {
 		return this.name;
 	}
 

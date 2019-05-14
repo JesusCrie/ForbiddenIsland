@@ -3,6 +3,7 @@
 cmake-build-debug/
 cmake-build-release/
 *.iws
+*.iml
 out/
 .idea_modules/
 atlassian-ide-plugin.xml

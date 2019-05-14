@@ -4,7 +4,22 @@ import java.util.*;
 
 public class TreasureDeck implements Deck {
 
-	Collection<TreasureCard> deck;
-	Collection<TreasureCard> discardingDeck;
+	private List<TreasureCard> deck;
+	private List<TreasureCard> discardingDeck;
 
+	@Override
+	public Card drawCard() {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public void reset() {
+		// TODO
+	}
+
+	@Override
+	public void shuffle() {
+		// TODO
+	}
 }

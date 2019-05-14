@@ -2,6 +2,8 @@ package iut2.forbiddenisland.controller;
 
 import iut2.forbiddenisland.model.Adventurer;
 
+import java.util.Map;
+
 public class Request {
 
 	RequestType type;
@@ -21,7 +23,7 @@ public class Request {
 	 * 
 	 * @param key
 	 */
-	public Object getData(string key) {
+	public Object getData(String key) {
 		// TODO - implement iut2.forbiddenisland.controller.Request.getData
 		throw new UnsupportedOperationException();
 	}

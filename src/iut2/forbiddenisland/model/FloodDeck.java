@@ -4,7 +4,22 @@ import java.util.*;
 
 public class FloodDeck implements Deck {
 
-	Collection<FloodCard> deck;
-	Collection<FloodCard> discardingDeck;
+	private List<FloodCard> deck;
+	private List<FloodCard> discardingDeck;
 
+	@Override
+	public Card drawCard() {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public void reset() {
+		//TODO
+	}
+
+	@Override
+	public void shuffle() {
+		// TODO
+	}
 }

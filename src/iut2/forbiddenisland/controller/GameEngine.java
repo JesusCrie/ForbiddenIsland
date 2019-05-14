@@ -1,8 +1,11 @@
 package iut2.forbiddenisland.controller;
 
+import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.model.Adventurer;
 import iut2.forbiddenisland.model.Cell;
 import iut2.forbiddenisland.model.TreasureCell;
+
+import java.util.List;
 
 public class GameEngine {
 
@@ -19,7 +22,7 @@ public class GameEngine {
 		throw new UnsupportedOperationException();
 	}
 
-	public Collection getCells() {
+	public List<Cell> getCells() {
 		// TODO - implement iut2.forbiddenisland.controller.GameEngine.getCells
 		throw new UnsupportedOperationException();
 	}
