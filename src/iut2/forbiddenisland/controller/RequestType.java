@@ -1,14 +1,21 @@
 package iut2.forbiddenisland.controller;
 
 public enum RequestType {
+	// Player related requests
+	PLAYERS_ALL,
 	PLAYER_MOVE_AMOUNT,
+	PLAYER_MOVE,
+	PLAYER_SEND,
+	PLAYERS_SENDABLE,
+
+	// Cells related requests,
+	CELLS_ALL,
 	CELLS_REACHABLE,
 	CELLS_DRYABLE,
-	PLAYERS_SENDABLE,
-	TREASURES_CLAIMABLE,
-	PLAYER_MOVE,
 	CELL_DRY,
-	PLAYER_SEND,
-	PLAYER_CLAIM_TREASURE,
+	CELL_CLAIM_TREASURE,
+
+	// Game related requests
+	TREASURES_CLAIMABLE,
 	FLOODING
 }

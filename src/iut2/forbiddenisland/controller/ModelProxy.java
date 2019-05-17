@@ -2,20 +2,50 @@ package iut2.forbiddenisland.controller;
 
 import iut2.forbiddenisland.model.Board;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class ModelProxy {
 
-	private List<Middleware> middlewares;
-	private Board board;
+    private final List<Middleware> middlewares;
+    private final Board board;
 
-	/**
-	 * 
-	 * @param r
-	 */
-	public void request(Request r) {
-		// TODO - implement iut2.forbiddenisland.controller.ModelProxy.request
-		throw new UnsupportedOperationException();
-	}
+    public ModelProxy(final Board board) {
+        this.board = board;
+
+        // Configure middlewares
+        middlewares = Arrays.asList(
+                new PowerMiddleware()
+        );
+    }
+
+    /**
+     * Issue a request to the model.
+     * The request and response will first travel through every registered
+     * middleware.
+     *
+     * @param request - The request to issue.
+     */
+    public <T> Response<T> request(Request request) {
+        final ListIterator<Middleware> iterator = middlewares.listIterator();
+
+        // Pass through every middleware in the order
+        // they were registered
+        while (iterator.hasNext()) {
+            request = iterator.next().handleRequest(request);
+        }
+
+        // Call the board
+        Response<T> response = board.handleRequest(request);
+
+        // Pass through every middleware in the reverse order
+        while (iterator.hasPrevious()) {
+            response = iterator.previous().handleResponse(response);
+        }
+
+        return response;
+    }
 
 }

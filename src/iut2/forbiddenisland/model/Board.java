@@ -1,6 +1,7 @@
 package iut2.forbiddenisland.model;
 
 import iut2.forbiddenisland.controller.Request;
+import iut2.forbiddenisland.controller.Response;
 
 import java.util.*;
 
@@ -13,7 +14,7 @@ public class Board {
 	 * 
 	 * @param r
 	 */
-	public Object handleRequest(Request r) {
+	public <T> Response<T> handleRequest(Request r) {
 		// TODO - implement iut2.forbiddenisland.model.Board.handleRequest
 		throw new UnsupportedOperationException();
 	}

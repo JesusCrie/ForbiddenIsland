@@ -1,17 +1,22 @@
 package iut2.forbiddenisland.controller;
 
-public abstract class Middleware {
+public interface Middleware {
 
-	/**
-	 * 
-	 * @param request
-	 */
-	public abstract Request handleRequest(Request request);
+    /**
+     * Action to perform before the request is issued to the model.
+     *
+     * @param request - The request that will continue his way.
+     */
+    default Request handleRequest(final Request request) {
+        return request;
+    }
 
-	/**
-	 * 
-	 * @param response
-	 */
-	public abstract Response handleResponse(Response response);
+    /**
+     * Action to perform before the response returns to the engine.
+     * @param response - The request that will continue his way.
+     */
+    default <T> Response<T> handleResponse(final Response<T> response) {
+        return response;
+    }
 
 }

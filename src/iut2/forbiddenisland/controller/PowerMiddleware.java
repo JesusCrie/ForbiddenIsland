@@ -1,23 +1,26 @@
 package iut2.forbiddenisland.controller;
 
-public class PowerMiddleware extends Middleware {
+/**
+ * A middleware that will alter the requests and responses using
+ * the powers of the current player.
+ */
+public class PowerMiddleware implements Middleware {
 
-	/**
-	 * 
-	 * @param request
-	 */
-	public Request handleRequest(Request request) {
-		// TODO - implement iut2.forbiddenisland.controller.PowerMiddleware.handleRequest
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public Request handleRequest(final Request request) {
+        request.getCurrentPlayer().getPowers().forEach(
+                power -> power.alterRequest(request)
+        );
 
-	/**
-	 * 
-	 * @param response
-	 */
-	public Response handleResponse(Response response) {
-		// TODO - implement iut2.forbiddenisland.controller.PowerMiddleware.handleResponse
-		throw new UnsupportedOperationException();
-	}
+        return request;
+    }
 
+    @Override
+    public <T> Response<T> handleResponse(final Response<T> response) {
+        response.getOriginRequest().getCurrentPlayer().getPowers().forEach(
+                power -> power.alterResponse(response)
+        );
+
+        return response;
+    }
 }
