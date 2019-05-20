@@ -28,6 +28,10 @@ public abstract class Cell {
         return state;
     }
 
+    public void setState(CellState state) {
+        this.state = state;
+    }
+
     /**
      * @return The list of adventurers on this cell.
      */

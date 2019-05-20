@@ -10,6 +10,7 @@ public abstract class Adventurer {
     private final List<Power> powers;
     private Cell position;
     private final List<Treasure> treasures = new ArrayList<>();
+    private List<Card> cards;
 
     public Adventurer(final String name, final Cell position, final Power... powers) {
         this.name = name;
@@ -35,5 +36,21 @@ public abstract class Adventurer {
 
     public List<Treasure> getTreasures() {
         return treasures;
+    }
+
+    public void addTrasure(Treasure t){
+        getTreasures().add(t);
+    }
+
+    public List<Card> getCards() {
+        return cards;
+    }
+
+    public void addCard(Card c) {
+        getCards().add(c);
+    }
+
+    public void removeCard(Card c){
+        getCards().remove(c);
     }
 }

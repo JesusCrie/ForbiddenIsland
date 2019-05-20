@@ -22,4 +22,7 @@ public class TreasureCell extends Cell {
 		throw new UnsupportedOperationException();
 	}
 
+	public Treasure getTreasure() {
+		return treasure;
+	}
 }

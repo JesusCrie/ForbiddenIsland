@@ -10,6 +10,12 @@ public interface Deck {
     Card drawCard();
 
     /**
+     * place the floodCard in the discardingDeck
+     *
+     */
+    void discardCard(FloodCard f);
+
+    /**
      * Reset the deck in its initial state.
      */
     void reset();
@@ -18,5 +24,7 @@ public interface Deck {
      * Shuffle the deck.
      */
     void shuffle();
+
+
 
 }

@@ -4,11 +4,18 @@ import iut2.forbiddenisland.controller.Request;
 import iut2.forbiddenisland.controller.Response;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Board {
 
-	Collection<Cell> cells;
+	private final List<Cell> cells;
 	WaterLevel waterLevel;
+	private FloodDeck floodDeck;
+	private TreasureDeck treasureDeck;
+
+	public Board(List<Cell> cells) {
+		this.cells = cells;
+	}
 
 	/**
 	 * 
@@ -24,8 +31,7 @@ public class Board {
 	 * @param p
 	 */
 	public int getPlayerMoveAmount(Adventurer p) {
-		// TODO - implement iut2.forbiddenisland.model.Board.getPlayerMoveAmount
-		throw new UnsupportedOperationException();
+		return 3;
 	}
 
 	/**
@@ -34,8 +40,17 @@ public class Board {
 	 * @param c
 	 */
 	public List<Cell> getReachableCells(Adventurer p, Cell c) {
-		// TODO - implement iut2.forbiddenisland.model.Board.getReachableCells
-		throw new UnsupportedOperationException();
+		return cells.stream()
+				.filter(cell -> {
+					if (c.getLocation().getX() - 1 == cell.getLocation().getX() && c.getLocation().getY() == cell.getLocation().getY()){
+						return true;
+					} else if (c.getLocation().getX() + 1 == cell.getLocation().getX() && c.getLocation().getY() == cell.getLocation().getY()){
+						return true;
+					} else if (c.getLocation().getX() == cell.getLocation().getX() && c.getLocation().getY() + 1 == cell.getLocation().getY()){
+						return true;
+					} else return c.getLocation().getX() == cell.getLocation().getX() && c.getLocation().getY() - 1 == cell.getLocation().getY();
+				})
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -43,8 +58,14 @@ public class Board {
 	 * @param p
 	 */
 	public List<Cell> getCellsDryable(Adventurer p) {
-		// TODO - implement iut2.forbiddenisland.model.Board.getCellsDryable
-		throw new UnsupportedOperationException();
+		List<Cell> recheableCell = getReachableCells(p, p.getPosition());
+		ArrayList<Cell> dryableCell = new ArrayList<>();
+		for(Cell aCell : recheableCell){
+			if (aCell.getState() == CellState.WET){
+				dryableCell.add(aCell);
+			}
+		}
+		return dryableCell;
 	}
 
 	/**
@@ -52,8 +73,12 @@ public class Board {
 	 * @param p
 	 */
 	public List<Adventurer> getPlayersSendable(Adventurer p) {
-		// TODO - implement iut2.forbiddenisland.model.Board.getPlayersSendable
-		throw new UnsupportedOperationException();
+		List<Cell> recheableCell = getReachableCells(p, p.getPosition());
+		ArrayList<Adventurer> sendablePlayer = new ArrayList<>();
+		for (Cell aCell : recheableCell){
+			sendablePlayer.addAll(aCell.getAdventurers());
+		}
+		return sendablePlayer;
 	}
 
 	/**
@@ -61,8 +86,14 @@ public class Board {
 	 * @param p
 	 */
 	public List<TreasureCell> getTreasuresClaimable(Adventurer p) {
-		// TODO - implement iut2.forbiddenisland.model.Board.getTreasuresClaimable
-		throw new UnsupportedOperationException();
+		List<Cell> recheableCell = getReachableCells(p, p.getPosition());
+		ArrayList<TreasureCell> claimableTreasure = new ArrayList<>();
+		for (Cell aCell : recheableCell){
+			if (aCell instanceof TreasureCell){
+				claimableTreasure.add((TreasureCell) aCell);
+			}
+		}
+		return claimableTreasure;
 	}
 
 	/**
@@ -71,8 +102,12 @@ public class Board {
 	 * @param c
 	 */
 	public boolean movePlayer(Adventurer p, Cell c) {
-		// TODO - implement iut2.forbiddenisland.model.Board.movePlayer
-		throw new UnsupportedOperationException();
+		Cell oldCell = p.getPosition();
+		p.getPosition().removeAdventurer(p);
+		p.move(c);
+		c.getAdventurers().add(p);
+		Cell newCell = p.getPosition();
+		return oldCell != newCell;
 	}
 
 	/**
@@ -81,8 +116,10 @@ public class Board {
 	 * @param c
 	 */
 	public boolean dryCell(Adventurer p, Cell c) {
-		// TODO - implement iut2.forbiddenisland.model.Board.dryCell
-		throw new UnsupportedOperationException();
+		if (c.getState() == CellState.WET){
+			c.setState(CellState.DRY);
+			return c.getState() == CellState.DRY;
+		} else return false;
 	}
 
 	/**
@@ -90,9 +127,12 @@ public class Board {
 	 * @param p
 	 * @param to
 	 */
-	public boolean sendCard(Adventurer p, Adventurer to) {
-		// TODO - implement iut2.forbiddenisland.model.Board.sendCard
-		throw new UnsupportedOperationException();
+	public boolean sendCard(Adventurer from, Adventurer to, Card c) {
+		if (from.getCards().contains(c)){
+			from.removeCard(c);
+			to.addCard(c);
+			return true;
+		} else return false;
 	}
 
 	/**
@@ -101,13 +141,26 @@ public class Board {
 	 * @param c
 	 */
 	public boolean claimTreasure(Adventurer p, TreasureCell c) {
-		// TODO - implement iut2.forbiddenisland.model.Board.claimTreasure
-		throw new UnsupportedOperationException();
+		if (c.getTreasure().isClaimable()){
+			p.addTrasure(c.getTreasure());
+			return true;
+		} else return false;
 	}
 
 	public boolean flood() {
-		// TODO - implement iut2.forbiddenisland.model.Board.flood
-		throw new UnsupportedOperationException();
+		int numberCard = 1;
+		for (int i = 1; i <= getWaterLevel().computeAmountFloodCards()){
+			getFloodDeck().discardCard((FloodCard) getFloodDeck().drawCard());
+			numberCard++;
+		}
+		return numberCard == getWaterLevel().computeAmountFloodCards();
 	}
 
+	public WaterLevel getWaterLevel() {
+		return waterLevel;
+	}
+
+	public FloodDeck getFloodDeck() {
+		return floodDeck;
+	}
 }
