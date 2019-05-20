@@ -14,6 +14,11 @@ public class FloodDeck implements Deck {
 	}
 
 	@Override
+	public void discardCard(FloodCard f) {
+		discardingDeck.addLast(f);
+	}
+
+	@Override
 	public void reset() {
 
 	}
@@ -22,4 +27,6 @@ public class FloodDeck implements Deck {
 	public void shuffle() {
 		Collections.shuffle(deck);
 	}
+
+
 }

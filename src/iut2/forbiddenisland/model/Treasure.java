@@ -4,7 +4,8 @@ import java.util.List;
 
 public class Treasure {
 
-    private final String name;
+	private String name;
+	private boolean claimable = true;
     private final List<TreasureCell> cells;
 
     public Treasure(final String name, final List<TreasureCell> cells) {
@@ -15,6 +16,10 @@ public class Treasure {
     public String getName() {
         return name;
     }
+
+	public boolean isClaimable(){
+		return claimable;
+	}
 
     public List<TreasureCell> getCells() {
         return cells;
