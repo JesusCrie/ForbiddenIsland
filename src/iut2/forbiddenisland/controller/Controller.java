@@ -1,23 +1,30 @@
 package iut2.forbiddenisland.controller;
 
 import iut2.forbiddenisland.controller.observer.Observable;
+import iut2.forbiddenisland.model.Adventurer;
+import iut2.forbiddenisland.model.Board;
+import iut2.forbiddenisland.model.Cell;
+
+import java.util.List;
 
 public class Controller {
 
-	GameEngine engine;
+	private final GameEngine engine;
 
-	public Observable getCells() {
-		// TODO - implement iut2.forbiddenisland.controller.Controller.getCells
-		throw new UnsupportedOperationException();
+	public Controller(final Board board, final Adventurer... adventurers) {
+		engine = new GameEngine(board, adventurers);
 	}
 
-	public Observable getRemainingActions() {
-		// TODO - implement iut2.forbiddenisland.controller.Controller.getRemainingActions
-		throw new UnsupportedOperationException();
+	public Observable<List<Cell>> getCells() {
+		return engine.getCells();
+	}
+
+	public Observable<Integer> getRemainingActions() {
+		return engine.getRemainingActions();
 	}
 
 	public Observable getAdventurers() {
-		// TODO - implement iut2.forbiddenisland.controller.Controller.getAdventurers
+		// TODO
 		throw new UnsupportedOperationException();
 	}
 

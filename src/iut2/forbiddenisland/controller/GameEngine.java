@@ -15,13 +15,43 @@ public class GameEngine {
 
     private final PlayerManagement players;
     private final ModelProxy modelProxy;
+
     private final Observable<GameMode> mode;
+    private final Observable<List<Cell>> cells;
+    private final Observable<Integer> remainingActions;
 
     public GameEngine(final Board board, final Adventurer... players) {
         this.players = new PlayerManagement(Arrays.asList(players));
 
         modelProxy = new ModelProxy(board);
         mode = new NotifyOnSubscribeObservable<>(GameMode.IDLE);
+
+        cells = createCellsObs();
+
+        remainingActions = new NotifyOnSubscribeObservable<>(0);
+    }
+
+    /**
+     * Create an observable that will query the list of cells
+     * at each update.
+     *
+     * @return An observable that auto updates it self when it changes.
+     */
+    private Observable<List<Cell>> createCellsObs() {
+        return new Observable<>(null) {
+            @Override
+            public void notifyChanges() {
+                // Query all cells
+                final Response<List<Cell>> allCells = modelProxy.request(
+                        new Request(RequestType.CELLS_ALL, getCurrentPlayer().get())
+                );
+
+                // Should always be successful
+                value = allCells.getData();
+
+                super.notifyChanges();
+            }
+        };
     }
 
     /**
@@ -34,18 +64,22 @@ public class GameEngine {
     }
 
     /**
+     * Expose the updated number of actions left for the current player
+     * this turn.
+     *
+     * @return The amount of actions left updated via an observable.
+     */
+    public Observable<Integer> getRemainingActions() {
+        return remainingActions;
+    }
+
+    /**
      * Get all cells from board.
      *
-     * @return A list of every cells currently on the board.
+     * @return An list of every cells currently on the board.
      */
-    public List<Cell> getCells() {
-        // Query all cells
-        final Response<List<Cell>> allCells = modelProxy.request(
-                new Request(RequestType.CELLS_ALL, getCurrentPlayer().get())
-        );
-
-        // Should always be successful
-        return allCells.getData();
+    public Observable<List<Cell>> getCells() {
+        return cells;
     }
 
     /**
