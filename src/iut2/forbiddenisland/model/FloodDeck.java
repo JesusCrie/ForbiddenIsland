@@ -4,22 +4,22 @@ import java.util.*;
 
 public class FloodDeck implements Deck {
 
-	private List<FloodCard> deck;
-	private List<FloodCard> discardingDeck;
+	private final List<FloodCard> originalCards = new ArrayList<>();
+	private final LinkedList<FloodCard> deck = new LinkedList<>();
+	private final LinkedList<FloodCard> discardingDeck = new LinkedList<>();
 
 	@Override
 	public Card drawCard() {
-		// TODO
-		return null;
+		return deck.pop();
 	}
 
 	@Override
 	public void reset() {
-		//TODO
+
 	}
 
 	@Override
 	public void shuffle() {
-		// TODO
+		Collections.shuffle(deck);
 	}
 }

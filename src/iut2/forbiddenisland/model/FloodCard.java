@@ -2,12 +2,19 @@ package iut2.forbiddenisland.model;
 
 public class FloodCard extends Card {
 
-	private Cell cell;
+    private final Cell cell;
 
-	/**
-	 * @param name
-	 */
-	public FloodCard(String name) {
-		super(name);
-	}
+    public FloodCard(final Cell cell) {
+        super(cell.getName());
+        this.cell = cell;
+    }
+
+    /**
+     * Get the cell targeted by this flood card.
+     *
+     * @return The targeted cell.
+     */
+    public Cell getTargetedCell() {
+        return cell;
+    }
 }

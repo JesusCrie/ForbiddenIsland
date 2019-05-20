@@ -1,13 +1,22 @@
 package iut2.forbiddenisland.model;
 
-import iut2.forbiddenisland.model.Card;
-
 public interface Deck {
 
-	abstract Card drawCard();
+    /**
+     * Pop a card from this deck and returns it.
+     *
+     * @return The next card.
+     */
+    Card drawCard();
 
-	abstract void reset();
+    /**
+     * Reset the deck in its initial state.
+     */
+    void reset();
 
-	abstract void shuffle();
+    /**
+     * Shuffle the deck.
+     */
+    void shuffle();
 
 }

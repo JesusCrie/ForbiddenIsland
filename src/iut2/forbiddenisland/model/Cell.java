@@ -1,30 +1,41 @@
 package iut2.forbiddenisland.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Cell {
 
-	private List<Adventurer> adventurers;
-	private CellState state;
-	private String name;
+    private final String name;
+    private CellState state = CellState.DRY;
+    private final Location location;
 
-	/**
-	 * 
-	 * @param name
-	 * @param loc
-	 */
-	public Cell(String name, Location loc) {
-		// TODO - implement iut2.forbiddenisland.model.Cell.iut2.forbiddenisland.model.Cell
-		throw new UnsupportedOperationException();
-	}
+    private List<Adventurer> adventurers = new ArrayList<>();
 
-	public String getName() {
-		return this.name;
-	}
+    public Cell(final String name, final Location location) {
+        this.name = name;
+        this.location = location;
+    }
 
-	public Location getLocation() {
-		// TODO - implement iut2.forbiddenisland.model.Cell.getLocation
-		throw new UnsupportedOperationException();
-	}
+    public String getName() {
+        return this.name;
+    }
 
+    public Location getLocation() {
+        return location;
+    }
+
+    public CellState getState() {
+        return state;
+    }
+
+    /**
+     * @return The list of adventurers on this cell.
+     */
+    public List<Adventurer> getAdventurers() {
+        return adventurers;
+    }
+
+    public void removeAdventurer(final Adventurer player) {
+        adventurers.remove(player);
+    }
 }

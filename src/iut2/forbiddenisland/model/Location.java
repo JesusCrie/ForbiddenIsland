@@ -1,27 +1,42 @@
 package iut2.forbiddenisland.model;
 
+/**
+ * Represent a pair of (x, y) coordinates.
+ * Two locations are equals if they have the same coordinates.
+ */
 public class Location {
 
-	private int x;
-	private int y;
+    private final int x;
+    private final int y;
 
-	/**
-	 * 
-	 * @param x
-	 * @param y
-	 */
-	public Location(int x, int y) {
-		// TODO - implement iut2.forbiddenisland.model.Location.iut2.forbiddenisland.model.Location
-		throw new UnsupportedOperationException();
-	}
+    /**
+     * Create a new location from the given coordintes.
+     *
+     * @param x - Horizontal position.
+     * @param y - Vertical position.
+     * @return The associated location.
+     */
+    public static Location from(final int x, final int y) {
+        return new Location(x, y);
+    }
 
-	/**
-	 * 
-	 * @param l
-	 */
-	public boolean equals(Location l) {
-		// TODO - implement iut2.forbiddenisland.model.Location.equals
-		throw new UnsupportedOperationException();
-	}
+    public Location(final int x, final int y) {
+        this.x = x;
+        this.y = y;
+    }
 
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof Location))
+            return false;
+        return ((Location) obj).x == x && ((Location) obj).y == y;
+    }
 }
