@@ -1,19 +1,22 @@
 package iut2.forbiddenisland.model;
 
-import java.util.*;
+import java.util.List;
 
 public class Treasure {
 
-	Collection<TreasureCell> cells;
-	private String name;
+    private final String name;
+    private final List<TreasureCell> cells;
 
-	/**
-	 * 
-	 * @param name
-	 */
-	public Treasure(String name) {
-		// TODO - implement iut2.forbiddenisland.model.Treasure.iut2.forbiddenisland.model.Treasure
-		throw new UnsupportedOperationException();
-	}
+    public Treasure(final String name, final List<TreasureCell> cells) {
+        this.name = name;
+        this.cells = cells;
+    }
 
+    public String getName() {
+        return name;
+    }
+
+    public List<TreasureCell> getCells() {
+        return cells;
+    }
 }

@@ -2,10 +2,10 @@ package iut2.forbiddenisland.model;
 
 public class TreasurePartCard extends TreasureCard {
 
-    /**
-     * @param name
-     */
-    public TreasurePartCard(String name) {
+    private final Treasure treasure;
+
+    public TreasurePartCard(final String name, final Treasure treasure) {
         super(name);
+        this.treasure = treasure;
     }
 }
