@@ -1,85 +1,148 @@
 package iut2.forbiddenisland.controller;
 
+import iut2.forbiddenisland.controller.observer.NotifyOnSubscribeObservable;
 import iut2.forbiddenisland.controller.observer.Observable;
-import iut2.forbiddenisland.model.Adventurer;
-import iut2.forbiddenisland.model.Board;
-import iut2.forbiddenisland.model.Cell;
+import iut2.forbiddenisland.model.*;
 
 import java.util.List;
 
 public class Controller {
 
-	private final GameEngine engine;
+    private final GameEngine engine;
+    private final Observable<GameMode> gameMode;
+    private Adventurer selectedAdventurer;
+    private Card selectedCard;
 
-	public Controller(final Board board, final Adventurer... adventurers) {
-		engine = new GameEngine(board, adventurers);
-	}
+    public Controller(final Board board, final Adventurer... adventurers) {
+        engine = new GameEngine(board, adventurers);
+        gameMode = new NotifyOnSubscribeObservable<>(GameMode.IDLE);
+    }
 
-	public Observable<List<Cell>> getCells() {
-		return engine.getCells();
-	}
+    public Observable<GameMode> getGameMode() {
+        return gameMode;
+    }
 
-	public Observable<Integer> getRemainingActions() {
-		return engine.getRemainingActions();
-	}
+    public Observable<List<Cell>> getCells() {
+        return engine.getCells();
+    }
 
-	public Observable getAdventurers() {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
+    public Observable<Integer> getRemainingActions() {
+        return engine.getRemainingActions();
+    }
 
-	/**
-	 * 
-	 * @param o
-	 */
-	public void observeModeMove(Observable o) {
-		// TODO - implement iut2.forbiddenisland.controller.Controller.observeModeMove
-		throw new UnsupportedOperationException();
-	}
+    public Observable<List<Adventurer>> getAdventurers() {
+        return engine.getAdventurers();
+    }
 
-	/**
-	 * 
-	 * @param o
-	 */
-	public void observeModeDry(Observable o) {
-		// TODO - implement iut2.forbiddenisland.controller.Controller.observeModeDry
-		throw new UnsupportedOperationException();
-	}
+    /**
+     * The controller will subscribe to the provided observable
+     * and enable the move mode of the engine when triggered.
+     *
+     * @param o - The observable to observe.
+     */
+    public void observeModeMove(final Observable<Void> o) {
+        o.subscribe(value -> gameMode.set(GameMode.MOVE));
+    }
 
-	/**
-	 * 
-	 * @param o
-	 */
-	public void observeModeTreasureClaim(Observable o) {
-		// TODO - implement iut2.forbiddenisland.controller.Controller.observeModeTreasureClaim
-		throw new UnsupportedOperationException();
-	}
+    /**
+     * The controller will subscribe to the provided observable
+     * and enable the dry mode of the engine when triggered.
+     *
+     * @param o - The observable to observe.
+     */
+    public void observeModeDry(final Observable<Void> o) {
+        o.subscribe(value -> gameMode.set(GameMode.DRY));
+    }
 
-	/**
-	 * 
-	 * @param o
-	 */
-	public void observeModeSend(Observable o) {
-		// TODO - implement iut2.forbiddenisland.controller.Controller.observeModeSend
-		throw new UnsupportedOperationException();
-	}
+    /**
+     * The controller will subscribe to the provided observable
+     * and enable the treasure claiming mode of the engine when triggered.
+     *
+     * @param o - The observable to observe.
+     */
+    public void observeModeTreasureClaim(final Observable<Void> o) {
+        o.subscribe(value -> gameMode.set(GameMode.TREASURE));
+    }
 
-	/**
-	 * 
-	 * @param o
-	 */
-	public void observeClickCell(Observable o) {
-		// TODO - implement iut2.forbiddenisland.controller.Controller.observeClickCell
-		throw new UnsupportedOperationException();
-	}
+    /**
+     * The controller will subscribe to the provided observable
+     * and enable the sending mode of the engine when triggered.
+     *
+     * @param o - The observable to observe.
+     */
+    public void observeModeSend(final Observable<Void> o) {
+        o.subscribe(value -> gameMode.set(GameMode.SEND));
+    }
 
-	/**
-	 * 
-	 * @param o
-	 */
-	public void observeClickPlayer(Observable o) {
-		// TODO - implement iut2.forbiddenisland.controller.Controller.observeClickPlayer
-		throw new UnsupportedOperationException();
-	}
+    /**
+     * The controller will subscribe to the provided observable
+     * and communicate the click of a cell to the engine when triggered.
+     *
+     * @param o - The observable to observe.
+     */
+    public void observeClickCell(final Observable<Cell> o) {
+        o.subscribe(cell -> {
+            switch (gameMode.get()) {
+                case MOVE:
+                    engine.movePlayer(cell, selectedAdventurer);
+                    break;
+                case DRY:
+                    engine.dryCell(cell);
+                    break;
+                case TREASURE:
+                    if (cell instanceof TreasureCell)
+                        engine.claimTreasure((TreasureCell) cell);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
+    /**
+     * The controller will subscribe to the provided observable
+     * and communicate the click of a player to the engine when triggered.
+     *
+     * @param o - The observable to observe.
+     */
+    public void observeClickPlayer(final Observable<Adventurer> o) {
+        o.subscribe(adventurer -> {
+            switch (gameMode.get()) {
+                case SEND:
+                    selectedAdventurer = adventurer;
+
+                    if (selectedCard != null)
+                        engine.sendCard(selectedAdventurer, selectedCard);
+                    break;
+                case MOVE:
+                    selectedAdventurer = adventurer;
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
+    /**
+     * The controller will subscribe to the provided observable
+     * and communicate the click of a card to the engine when triggered.
+     *
+     * @param o - The observable to observe.
+     */
+    public void observeClickCard(final Observable<Card> o) {
+        o.subscribe(card -> {
+            switch (gameMode.get()) {
+                case SEND:
+                    selectedCard = card;
+
+                    if (selectedAdventurer != null)
+                        engine.sendCard(selectedAdventurer, selectedCard);
+                    break;
+                default:
+                    engine.useCard(card);
+                    break;
+            }
+        });
+    }
 
 }

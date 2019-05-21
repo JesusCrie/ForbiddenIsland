@@ -2,10 +2,7 @@ package iut2.forbiddenisland.controller;
 
 import iut2.forbiddenisland.controller.observer.NotifyOnSubscribeObservable;
 import iut2.forbiddenisland.controller.observer.Observable;
-import iut2.forbiddenisland.model.Adventurer;
-import iut2.forbiddenisland.model.Board;
-import iut2.forbiddenisland.model.Cell;
-import iut2.forbiddenisland.model.TreasureCell;
+import iut2.forbiddenisland.model.*;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -16,17 +13,17 @@ public class GameEngine {
     private final PlayerManagement players;
     private final ModelProxy modelProxy;
 
-    private final Observable<GameMode> mode;
     private final Observable<List<Cell>> cells;
+    private final Observable<List<Adventurer>> adventurers;
     private final Observable<Integer> remainingActions;
 
     public GameEngine(final Board board, final Adventurer... players) {
         this.players = new PlayerManagement(Arrays.asList(players));
 
         modelProxy = new ModelProxy(board);
-        mode = new NotifyOnSubscribeObservable<>(GameMode.IDLE);
 
         cells = createCellsObs();
+        adventurers = createAdventurersObs();
 
         remainingActions = new NotifyOnSubscribeObservable<>(0);
     }
@@ -55,6 +52,15 @@ public class GameEngine {
     }
 
     /**
+     * Create an observable that will be notify each time an adventurer changes.
+     *
+     * @return An observable that will be notified when an adventurer changes.
+     */
+    private Observable<List<Adventurer>> createAdventurersObs() {
+        return new Observable<>(players.players);
+    }
+
+    /**
      * Expose the current player.
      *
      * @return The current player's observable.
@@ -74,12 +80,23 @@ public class GameEngine {
     }
 
     /**
-     * Get all cells from board.
+     * Expose the cells of the board.
+     * Updated when the state of a cell need a visual update.
      *
-     * @return An list of every cells currently on the board.
+     * @return An observable of every cells currently on the board.
      */
     public Observable<List<Cell>> getCells() {
         return cells;
+    }
+
+    /**
+     * Expose the adventurers of the board.
+     * Updated when the state of an adventurer need a visual update.
+     *
+     * @return An observable of every adventurer of the board.
+     */
+    public Observable<List<Adventurer>> getAdventurers() {
+        return adventurers;
     }
 
     /**
@@ -117,12 +134,14 @@ public class GameEngine {
      * @return True if the action was successful, otherwise false.
      */
     public boolean movePlayer(final Cell cell, final Adventurer player) {
-        final Response<Void> res = modelProxy.request(
+        final Response<Integer> res = modelProxy.request(
                 new Request(RequestType.PLAYER_MOVE, getCurrentPlayer().get())
                         .putData(Request.DATA_CELL, cell)
                         .putData(Request.DATA_PLAYER, player)
         );
 
+        decrementActions(res.getData());
+        cells.notifyChanges();
         return res.isOk();
     }
 
@@ -132,11 +151,12 @@ public class GameEngine {
      * @param cell - The cell to dry
      */
     public boolean dryCell(final Cell cell) {
-        final Response<Void> res = modelProxy.request(
+        final Response<Integer> res = modelProxy.request(
                 new Request(RequestType.CELL_DRY, getCurrentPlayer().get())
                         .putData(Request.DATA_CELL, cell)
         );
 
+        cells.notifyChanges();
         return res.isOk();
     }
 
@@ -146,11 +166,48 @@ public class GameEngine {
      * @param cell - The cell to claim.
      */
     public boolean claimTreasure(final TreasureCell cell) {
-        final Response<Void> res = modelProxy.request(
+        final Response<Integer> res = modelProxy.request(
                 new Request(RequestType.CELL_CLAIM_TREASURE, getCurrentPlayer().get())
                         .putData(Request.DATA_CELL, cell)
         );
 
+        decrementActions(res.getData());
+        adventurers.notifyChanges();
+        cells.notifyChanges();
+        return res.isOk();
+    }
+
+    /**
+     * Try to send a card to another adventurer.
+     *
+     * @param to   - The target adventurer.
+     * @param card - The card to send.
+     */
+    public boolean sendCard(final Adventurer to, final Card card) {
+        final Response<Integer> res = modelProxy.request(
+                new Request(RequestType.PLAYER_SEND, getCurrentPlayer().get())
+                        .putData(Request.DATA_PLAYER, to)
+                        .putData(Request.DATA_CARD, card)
+        );
+
+        decrementActions(res.getData());
+        adventurers.notifyChanges();
+        return res.isOk();
+    }
+
+    /**
+     * Use a card // TODO
+     * @param card
+     * @return
+     */
+    public boolean useCard(final Card card) {
+        final Response<Void> res = modelProxy.request(
+                new Request(RequestType.PLAYER_USE_CARD, getCurrentPlayer().get())
+                        .putData(Request.DATA_CARD, card)
+        );
+
+        adventurers.notifyChanges();
+        cells.notifyChanges();
         return res.isOk();
     }
 
@@ -159,23 +216,10 @@ public class GameEngine {
      */
     public void newRound() {
         players.next();
-        mode.set(GameMode.IDLE);
     }
 
-    public void enableModeMove() {
-        mode.set(GameMode.MOVE);
-    }
-
-    public void enableModeDry() {
-        mode.set(GameMode.DRY);
-    }
-
-    public void enableModeTreasureClaim() {
-        mode.set(GameMode.TREASURE);
-    }
-
-    public void enableModeSend() {
-        mode.set(GameMode.SEND);
+    private void decrementActions(final int amount) {
+        remainingActions.set(remainingActions.get() - amount);
     }
 
     /**
