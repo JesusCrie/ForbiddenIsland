@@ -11,6 +11,7 @@ public class Request {
 
     public static final int DATA_PLAYER = 1;
     public static final int DATA_CELL = 2;
+    public static final int DATA_CARD = 3;
 
     private final RequestType type;
     private final Adventurer currentPlayer;

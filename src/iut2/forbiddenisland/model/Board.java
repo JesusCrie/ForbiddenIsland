@@ -1,8 +1,10 @@
 package iut2.forbiddenisland.model;
 
 import iut2.forbiddenisland.controller.Request;
+import iut2.forbiddenisland.controller.RequestType;
 import iut2.forbiddenisland.controller.Response;
 
+import java.time.format.ResolverStyle;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,9 +23,34 @@ public class Board {
 	 * 
 	 * @param r
 	 */
+	@SuppressWarnings("unchecked")
 	public <T> Response<T> handleRequest(Request r) {
-		// TODO - implement iut2.forbiddenisland.model.Board.handleRequest
-		throw new UnsupportedOperationException();
+		switch (r.getType()) {
+			case PLAYER_MOVE:
+				return (Response<T>) new Response<Integer>(r, this.movePlayer(r.getCurrentPlayer(), r.getData(Request.DATA_CELL))).setData(1);
+			case PLAYER_MOVE_AMOUNT:
+				return (Response<T>) new Response<Integer>(r, true).setData(this.getPlayerMoveAmount(r.getCurrentPlayer()));
+			case PLAYER_SEND:
+				return (Response<T>) new Response<Integer>(r, sendCard(r.getCurrentPlayer(), r.getData(Request.DATA_PLAYER), r.getData(Request.DATA_PLAYER))).setData(1);
+			case PLAYERS_SENDABLE:
+				return (Response<T>) new Response<List<Adventurer>>(r, true).setData(this.getPlayersSendable(r.getCurrentPlayer()));
+			case CELLS_ALL:
+				return (Response<T>) new Response<List<Cell>>(r, true).setData(cells);
+			case CELLS_REACHABLE:
+				return (Response<T>) new Response<List<Cell>>(r, true).setData(this.getReachableCells(r.getCurrentPlayer(), r.getData(Request.DATA_CELL)));
+			case CELLS_DRYABLE:
+				return (Response<T>) new Response<List<Cell>>(r, true).setData(this.getCellsDryable(r.getCurrentPlayer()));
+			case CELL_DRY:
+				return (Response<T>) new Response<Integer>(r, this.dryCell(r.getCurrentPlayer(), r.getData(Request.DATA_CELL))).setData(1);
+			case CELL_CLAIM_TREASURE:
+				return (Response<T>) new Response<Integer>(r, this.claimTreasure(r.getCurrentPlayer(), r.getData(Request.DATA_CELL))).setData(1);
+			case TREASURES_CLAIMABLE:
+				return (Response<T>) new Response<List<TreasureCell>>(r, true).setData(this.getTreasuresClaimable(r.getCurrentPlayer()));
+			case FLOODING:
+				return (Response<T>) new Response<>(r, this.flood()).setData(null);
+			default:
+				throw new IllegalStateException();
+		}
 	}
 
 	/**
@@ -59,7 +86,7 @@ public class Board {
 	 */
 	public List<Cell> getCellsDryable(Adventurer p) {
 		List<Cell> recheableCell = getReachableCells(p, p.getPosition());
-		ArrayList<Cell> dryableCell = new ArrayList<>();
+		List<Cell> dryableCell = new ArrayList<>();
 		for(Cell aCell : recheableCell){
 			if (aCell.getState() == CellState.WET){
 				dryableCell.add(aCell);
@@ -94,6 +121,7 @@ public class Board {
 			}
 		}
 		return claimableTreasure;
+		// TODO IL EST PAS COMPLET PUTAIN
 	}
 
 	/**
@@ -148,6 +176,7 @@ public class Board {
 	}
 
 	public boolean flood() {
+		//TODO JE CROIS CEST DE LA MERDE
 		int numberCard = 1;
 		for (int i = 1; i <= getWaterLevel().computeAmountFloodCards()){
 			getFloodDeck().discardCard((FloodCard) getFloodDeck().drawCard());
@@ -162,5 +191,17 @@ public class Board {
 
 	public FloodDeck getFloodDeck() {
 		return floodDeck;
+	}
+
+	public Cell getCell(Location l){
+		//TODO
+	}
+
+	public Cell getCellIfDry(Location l){
+		// TODO
+	}
+
+	public Cell getCellIfWet(Location l){
+		//TODO
 	}
 }
