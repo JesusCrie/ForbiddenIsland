@@ -36,10 +36,11 @@ public class Response<T> {
      *
      * @param d - The data to carry.
      */
-    public void setData(final T d) {
+    public Response<T> setData(final T d) {
         if (data != null)
-            return;
+            return this;
         this.data = d;
+        return this;
     }
 
     /**
