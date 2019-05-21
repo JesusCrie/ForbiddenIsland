@@ -1,4 +1,6 @@
-package iut2.forbiddenisland.model;
+package iut2.forbiddenisland.model.card;
+
+import iut2.forbiddenisland.model.cell.Cell;
 
 public class FloodCard extends Card {
 

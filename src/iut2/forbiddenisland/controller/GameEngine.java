@@ -2,7 +2,11 @@ package iut2.forbiddenisland.controller;
 
 import iut2.forbiddenisland.controller.observer.NotifyOnSubscribeObservable;
 import iut2.forbiddenisland.controller.observer.Observable;
-import iut2.forbiddenisland.model.*;
+import iut2.forbiddenisland.model.Board;
+import iut2.forbiddenisland.model.adventurer.Adventurer;
+import iut2.forbiddenisland.model.card.Card;
+import iut2.forbiddenisland.model.cell.Cell;
+import iut2.forbiddenisland.model.cell.TreasureCell;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -136,6 +140,7 @@ public class GameEngine {
     public boolean movePlayer(final Cell cell, final Adventurer player) {
         final Response<Integer> res = modelProxy.request(
                 new Request(RequestType.PLAYER_MOVE, getCurrentPlayer().get())
+                        .putData(Request.DATA_REMAINING_ACTIONS, remainingActions.get())
                         .putData(Request.DATA_CELL, cell)
                         .putData(Request.DATA_PLAYER, player)
         );
@@ -153,6 +158,7 @@ public class GameEngine {
     public boolean dryCell(final Cell cell) {
         final Response<Integer> res = modelProxy.request(
                 new Request(RequestType.CELL_DRY, getCurrentPlayer().get())
+                        .putData(Request.DATA_REMAINING_ACTIONS, remainingActions.get())
                         .putData(Request.DATA_CELL, cell)
         );
 
@@ -168,6 +174,7 @@ public class GameEngine {
     public boolean claimTreasure(final TreasureCell cell) {
         final Response<Integer> res = modelProxy.request(
                 new Request(RequestType.CELL_CLAIM_TREASURE, getCurrentPlayer().get())
+                        .putData(Request.DATA_REMAINING_ACTIONS, remainingActions.get())
                         .putData(Request.DATA_CELL, cell)
         );
 
@@ -186,6 +193,7 @@ public class GameEngine {
     public boolean sendCard(final Adventurer to, final Card card) {
         final Response<Integer> res = modelProxy.request(
                 new Request(RequestType.PLAYER_SEND, getCurrentPlayer().get())
+                        .putData(Request.DATA_REMAINING_ACTIONS, remainingActions.get())
                         .putData(Request.DATA_PLAYER, to)
                         .putData(Request.DATA_CARD, card)
         );
@@ -196,13 +204,14 @@ public class GameEngine {
     }
 
     /**
-     * Use a card // TODO
-     * @param card
-     * @return
+     * Use a card.
+     *
+     * @param card - The card to use.
      */
     public boolean useCard(final Card card) {
         final Response<Void> res = modelProxy.request(
                 new Request(RequestType.PLAYER_USE_CARD, getCurrentPlayer().get())
+                        .putData(Request.DATA_REMAINING_ACTIONS, remainingActions.get())
                         .putData(Request.DATA_CARD, card)
         );
 
@@ -216,6 +225,37 @@ public class GameEngine {
      */
     public void newRound() {
         players.next();
+
+        // Query AP
+        final Response<Integer> res = modelProxy.request(
+                new Request(RequestType.PLAYER_MOVE_AMOUNT, getCurrentPlayer().get())
+        );
+        remainingActions.set(res.getData());
+
+        adventurers.notifyChanges();
+    }
+
+    public void finishRound() {
+        // Draw treasure cards
+        final Response<Void> resDraw = modelProxy.request(
+                new Request(RequestType.PLAYER_DRAW_CARD, getCurrentPlayer().get())
+        );
+
+        if (!resDraw.isOk())
+            throw new IllegalStateException("Failed to draw cards !");
+
+        // Island turn
+        final Response<Void> resFlood = modelProxy.request(
+                new Request(RequestType.FLOODING, getCurrentPlayer().get())
+        );
+
+        if (!resDraw.isOk())
+            throw new IllegalStateException("Can't flood the board !");
+
+        // TODO check victory somewhere here
+
+        cells.notifyChanges();
+        players.notify();
     }
 
     private void decrementActions(final int amount) {

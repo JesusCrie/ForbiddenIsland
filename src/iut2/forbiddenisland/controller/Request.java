@@ -1,6 +1,6 @@
 package iut2.forbiddenisland.controller;
 
-import iut2.forbiddenisland.model.Adventurer;
+import iut2.forbiddenisland.model.adventurer.Adventurer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,9 +9,11 @@ public class Request {
 
     // *** Data constants ***
 
-    public static final int DATA_PLAYER = 1;
-    public static final int DATA_CELL = 2;
-    public static final int DATA_CARD = 3;
+    public static final int DATA_REMAINING_ACTIONS = 1;
+    public static final int DATA_AMOUNT = 2;
+    public static final int DATA_PLAYER = 3;
+    public static final int DATA_CELL = 4;
+    public static final int DATA_CARD = 5;
 
     private final RequestType type;
     private final Adventurer currentPlayer;

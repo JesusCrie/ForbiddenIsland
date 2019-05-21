@@ -1,4 +1,4 @@
-package iut2.forbiddenisland.model;
+package iut2.forbiddenisland.model.adventurer;
 
 import iut2.forbiddenisland.controller.Request;
 import iut2.forbiddenisland.controller.Response;

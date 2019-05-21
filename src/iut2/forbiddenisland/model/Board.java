@@ -2,6 +2,9 @@ package iut2.forbiddenisland.model;
 
 import iut2.forbiddenisland.controller.Request;
 import iut2.forbiddenisland.controller.Response;
+import iut2.forbiddenisland.model.adventurer.Adventurer;
+import iut2.forbiddenisland.model.cell.Cell;
+import iut2.forbiddenisland.model.cell.TreasureCell;
 
 import java.util.*;
 

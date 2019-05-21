@@ -1,4 +1,4 @@
-package iut2.forbiddenisland.model;
+package iut2.forbiddenisland.model.card;
 
 public class TreasurePartCard extends TreasureCard {
 

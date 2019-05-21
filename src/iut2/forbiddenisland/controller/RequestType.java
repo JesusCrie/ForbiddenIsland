@@ -8,6 +8,7 @@ public enum RequestType {
 	PLAYER_MOVE,
 	PLAYER_SEND,
 	PLAYER_USE_CARD,
+	PLAYER_DRAW_CARD,
 
 	// Cells related requests,
 	CELLS_ALL,

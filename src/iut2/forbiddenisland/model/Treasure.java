@@ -1,5 +1,7 @@
 package iut2.forbiddenisland.model;
 
+import iut2.forbiddenisland.model.cell.TreasureCell;
+
 import java.util.*;
 
 public class Treasure {

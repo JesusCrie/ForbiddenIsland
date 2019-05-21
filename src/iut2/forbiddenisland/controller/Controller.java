@@ -3,6 +3,10 @@ package iut2.forbiddenisland.controller;
 import iut2.forbiddenisland.controller.observer.NotifyOnSubscribeObservable;
 import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.model.*;
+import iut2.forbiddenisland.model.adventurer.Adventurer;
+import iut2.forbiddenisland.model.card.Card;
+import iut2.forbiddenisland.model.cell.Cell;
+import iut2.forbiddenisland.model.cell.TreasureCell;
 
 import java.util.List;
 
@@ -144,5 +148,7 @@ public class Controller {
             }
         });
     }
+
+    public void observeClickEndRound() {}
 
 }

@@ -1,4 +1,4 @@
-package iut2.forbiddenisland.model;
+package iut2.forbiddenisland.model.card;
 
 public abstract class Card {
 
@@ -9,7 +9,7 @@ public abstract class Card {
 	 * @param name
 	 */
 	public Card(String name) {
-		// TODO - implement iut2.forbiddenisland.model.Card.iut2.forbiddenisland.model.Card
+		// TODO - implement iut2.forbiddenisland.model.card.Card.iut2.forbiddenisland.model.card.Card
 		throw new UnsupportedOperationException();
 	}
 

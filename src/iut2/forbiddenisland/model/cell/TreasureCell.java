@@ -1,4 +1,7 @@
-package iut2.forbiddenisland.model;
+package iut2.forbiddenisland.model.cell;
+
+import iut2.forbiddenisland.model.Location;
+import iut2.forbiddenisland.model.Treasure;
 
 public class TreasureCell extends Cell {
 
@@ -18,7 +21,7 @@ public class TreasureCell extends Cell {
 	 * @param loc
 	 */
 	public void Cell(String name, Location loc) {
-		// TODO - implement iut2.forbiddenisland.model.TreasureCell.iut2.forbiddenisland.model.Cell
+		// TODO - implement iut2.forbiddenisland.model.cell.TreasureCell.iut2.forbiddenisland.model.cell.Cell
 		throw new UnsupportedOperationException();
 	}
 

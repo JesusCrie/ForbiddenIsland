@@ -1,4 +1,7 @@
-package iut2.forbiddenisland.model;
+package iut2.forbiddenisland.model.cell;
+
+import iut2.forbiddenisland.model.Location;
+import iut2.forbiddenisland.model.adventurer.Adventurer;
 
 import java.util.ArrayList;
 import java.util.List;
