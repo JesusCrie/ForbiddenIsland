@@ -151,9 +151,10 @@ public class Board {
 	}
 
 	/**
-	 * 
-	 * @param p
+	 *
+	 * @param from
 	 * @param to
+     * @param c
 	 */
 	public boolean sendCard(Adventurer from, Adventurer to, Card c) {
 		if (from.getCards().contains(c)){
