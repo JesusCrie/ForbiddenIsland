@@ -178,11 +178,11 @@ public class Board {
 	public boolean flood() {
 		//TODO JE CROIS CEST DE LA MERDE
 		int numberCard = 1;
-		for (int i = 1; i <= getWaterLevel().computeAmountFloodCards()){
+		for (int i = 1; i <= /*getWaterLevel().computeAmountFloodCards()*/ 2; i++){
 			getFloodDeck().discardCard((FloodCard) getFloodDeck().drawCard());
 			numberCard++;
 		}
-		return numberCard == getWaterLevel().computeAmountFloodCards();
+		return numberCard == /*getWaterLevel().computeAmountFloodCards()*/ 2;
 	}
 
 	public WaterLevel getWaterLevel() {
@@ -194,14 +194,29 @@ public class Board {
 	}
 
 	public Cell getCell(Location l){
-		//TODO
+        for(Cell aCell : cells){
+            if (aCell.getLocation() == l){
+                return aCell;
+            }
+        }
+        return null;
 	}
 
 	public Cell getCellIfDry(Location l){
-		// TODO
+        for(Cell aCell : cells){
+            if (aCell.getLocation() == l && aCell.getState()==CellState.DRY){
+                return aCell;
+            }
+        }
+        return null;
 	}
 
 	public Cell getCellIfWet(Location l){
-		//TODO
+        for(Cell aCell : cells){
+            if (aCell.getLocation() == l && aCell.getState()==CellState.WET){
+                return aCell;
+            }
+        }
+        return null;
 	}
 }
