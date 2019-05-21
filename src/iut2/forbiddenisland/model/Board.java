@@ -179,11 +179,11 @@ public class Board {
 	public boolean flood() {
 		//TODO JE CROIS CEST DE LA MERDE
 		int numberCard = 1;
-		for (int i = 1; i <= /*getWaterLevel().computeAmountFloodCards()*/ 2; i++){
+		for (int i = 1; i <= getWaterLevel().computeAmountFloodCards(); i++){
 			getFloodDeck().discardCard((FloodCard) getFloodDeck().drawCard());
 			numberCard++;
 		}
-		return numberCard == /*getWaterLevel().computeAmountFloodCards()*/ 2;
+		return numberCard == getWaterLevel().computeAmountFloodCards();
 	}
 
 	public WaterLevel getWaterLevel() {
