@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="100.99999999999999" y="159.0">iut2.forbiddenisland.model.cell.Cell</node>
+    <node x="187.0" y="0.0">iut2.forbiddenisland.model.cell.CellState</node>
+    <node x="0.0" y="562.0">iut2.forbiddenisland.model.cell.HeliportCell</node>
+    <node x="12.0" y="415.0">iut2.forbiddenisland.model.cell.StartCell</node>
+    <node x="257.0" y="401.0">iut2.forbiddenisland.model.cell.TreasureCell</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="iut2.forbiddenisland.model.cell.TreasureCell" target="iut2.forbiddenisland.model.cell.Cell">
+      <point x="-63.25" y="-55.5" />
+      <point x="320.25" y="376.0" />
+      <point x="287.875" y="376.0" />
+      <point x="37.375" y="96.0" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.cell.Cell" target="iut2.forbiddenisland.model.cell.CellState">
+      <point x="-74.75" y="-96.0" />
+      <point x="175.75" y="134.0" />
+      <point x="218.75" y="134.0" />
+      <point x="-31.75" y="54.5" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.cell.StartCell" target="iut2.forbiddenisland.model.cell.Cell">
+      <point x="56.25" y="-41.5" />
+      <point x="180.75" y="376.0" />
+      <point x="213.125" y="376.0" />
+      <point x="-37.375" y="96.0" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.cell.HeliportCell" target="iut2.forbiddenisland.model.cell.StartCell">
+      <point x="-62.25" y="-27.5" />
+      <point x="62.25" y="537.0" />
+      <point x="68.25" y="537.0" />
+      <point x="-56.25" y="41.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="255.0" y="308.5" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Constructors</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+    <Category>Inner Classes</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
