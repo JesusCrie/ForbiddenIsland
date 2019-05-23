@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
 
 public class Board {
 
-	private final List<Cell> cells;
+	private final Map<Location, Cell> cells;
 	WaterLevel waterLevel;
 	private FloodDeck floodDeck;
 	private TreasureDeck treasureDeck;
 
-	public Board(List<Cell> cells) {
+	public Board(Map<Location, Cell> cells) {
 		this.cells = cells;
 	}
 
@@ -35,7 +35,7 @@ public class Board {
 			case PLAYERS_SENDABLE:
 				return (Response<T>) new Response<List<Adventurer>>(r, true).setData(this.getPlayersSendable(r.getCurrentPlayer()));
 			case CELLS_ALL:
-				return (Response<T>) new Response<List<Cell>>(r, true).setData(cells);
+				return (Response<T>) new Response<Map<Location, Cell>>(r, true).setData(cells);
 			case CELLS_REACHABLE:
 				return (Response<T>) new Response<List<Cell>>(r, true).setData(this.getReachableCells(r.getCurrentPlayer(), r.getData(Request.DATA_CELL)));
 			case CELLS_DRYABLE:
@@ -67,17 +67,20 @@ public class Board {
 	 * @param c
 	 */
 	public List<Cell> getReachableCells(Adventurer p, Cell c) {
-		return cells.stream()
-				.filter(cell -> {
-					if (c.getLocation().getX() - 1 == cell.getLocation().getX() && c.getLocation().getY() == cell.getLocation().getY()){
-						return true;
-					} else if (c.getLocation().getX() + 1 == cell.getLocation().getX() && c.getLocation().getY() == cell.getLocation().getY()){
-						return true;
-					} else if (c.getLocation().getX() == cell.getLocation().getX() && c.getLocation().getY() + 1 == cell.getLocation().getY()){
-						return true;
-					} else return c.getLocation().getX() == cell.getLocation().getX() && c.getLocation().getY() - 1 == cell.getLocation().getY();
-				})
-				.collect(Collectors.toList());
+	    List<Cell> reachable = new ArrayList<>();
+	    Location reach = new Location(c.getLocation().getX()+1, c.getLocation().getY());
+		reachable.add(cells.get(reach));
+
+        reach = new Location(c.getLocation().getX()-1, c.getLocation().getY());
+        reachable.add(cells.get(reach));
+
+        reach = new Location(c.getLocation().getX(), c.getLocation().getY()+1);
+        reachable.add(cells.get(reach));
+
+        reach = new Location(c.getLocation().getX(), c.getLocation().getY()-1);
+        reachable.add(cells.get(reach));
+
+        return reachable;
 	}
 
 	/**
@@ -85,14 +88,32 @@ public class Board {
 	 * @param p
 	 */
 	public List<Cell> getCellsDryable(Adventurer p) {
-		List<Cell> recheableCell = getReachableCells(p, p.getPosition());
-		List<Cell> dryableCell = new ArrayList<>();
-		for(Cell aCell : recheableCell){
-			if (aCell.getState() == CellState.WET){
-				dryableCell.add(aCell);
-			}
+        List<Cell> dryable = new ArrayList<>();
+        Location reach = new Location(p.getPosition().getLocation().getX(), p.getPosition().getLocation().getY());
+        if (cells.get(reach).getState() == CellState.WET){
+        	dryable.add(cells.get(reach));
 		}
-		return dryableCell;
+
+		reach = new Location(p.getPosition().getLocation().getX()+1, p.getPosition().getLocation().getY());
+		if (cells.get(reach).getState() == CellState.WET){
+			dryable.add(cells.get(reach));
+		}
+
+		reach = new Location(p.getPosition().getLocation().getX()-1, p.getPosition().getLocation().getY());
+		if (cells.get(reach).getState() == CellState.WET){
+			dryable.add(cells.get(reach));
+		}
+
+		reach = new Location(p.getPosition().getLocation().getX(), p.getPosition().getLocation().getY()+1);
+		if (cells.get(reach).getState() == CellState.WET){
+			dryable.add(cells.get(reach));
+		}
+
+		reach = new Location(p.getPosition().getLocation().getX(), p.getPosition().getLocation().getY()-1);
+		if (cells.get(reach).getState() == CellState.WET){
+			dryable.add(cells.get(reach));
+		}
+	 	return dryable;
 	}
 
 	/**
@@ -100,12 +121,16 @@ public class Board {
 	 * @param p
 	 */
 	public List<Adventurer> getPlayersSendable(Adventurer p) {
-		List<Cell> recheableCell = getReachableCells(p, p.getPosition());
 		ArrayList<Adventurer> sendablePlayer = new ArrayList<>();
-		for (Cell aCell : recheableCell){
-			sendablePlayer.addAll(aCell.getAdventurers());
+
+		Location reach = new Location(p.getPosition().getLocation().getX(), p.getPosition().getLocation().getY());
+		for (Adventurer anAdventurer : cells.get(reach).getAdventurers()){
+			if(anAdventurer != p && !sendablePlayer.contains(anAdventurer)){
+				sendablePlayer.add(anAdventurer);
+			}
 		}
-		return sendablePlayer;
+
+		return null;
 	}
 
 	/**
@@ -121,7 +146,7 @@ public class Board {
 			}
 		}
 		return claimableTreasure;
-		// TODO IL EST PAS COMPLET PUTAIN
+		// TODO IL EST PAS COMPLET PUTAIN IL EST FAUX WESH
 	}
 
 	/**
@@ -130,12 +155,15 @@ public class Board {
 	 * @param c
 	 */
 	public boolean movePlayer(Adventurer p, Cell c) {
-		Cell oldCell = p.getPosition();
-		p.getPosition().removeAdventurer(p);
-		p.move(c);
-		c.getAdventurers().add(p);
-		Cell newCell = p.getPosition();
-		return oldCell != newCell;
+		if (getReachableCells(p, p.getPosition()).contains(c)) {
+			Cell oldCell = p.getPosition();
+			p.getPosition().removeAdventurer(p);
+			p.move(c);
+			c.getAdventurers().add(p);
+			Cell newCell = p.getPosition();
+			return oldCell != newCell;
+		}
+		return false;
 	}
 
 	/**
@@ -144,10 +172,13 @@ public class Board {
 	 * @param c
 	 */
 	public boolean dryCell(Adventurer p, Cell c) {
-		if (c.getState() == CellState.WET){
-			c.setState(CellState.DRY);
-			return c.getState() == CellState.DRY;
-		} else return false;
+		if(getReachableCells(p, p.getPosition()).contains(c)) {
+			if (c.getState() == CellState.WET) {
+				c.setState(CellState.DRY);
+				return c.getState() == CellState.DRY;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -157,11 +188,14 @@ public class Board {
      * @param c
 	 */
 	public boolean sendCard(Adventurer from, Adventurer to, Card c) {
-		if (from.getCards().contains(c)){
-			from.removeCard(c);
-			to.addCard(c);
-			return true;
-		} else return false;
+		if (getReachableCells(from, from.getPosition()).contains(to.getPosition())){
+			if (from.getCards().contains(c)){
+				from.removeCard(c);
+				to.addCard(c);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -170,10 +204,13 @@ public class Board {
 	 * @param c
 	 */
 	public boolean claimTreasure(Adventurer p, TreasureCell c) {
-		if (c.getTreasure().isClaimable()){
-			p.addTrasure(c.getTreasure());
-			return true;
-		} else return false;
+		if (getReachableCells(p, p.getPosition()).contains(c)) {
+			if (c.getTreasure().isClaimable()) {
+				p.addTrasure(c.getTreasure());
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public boolean flood() {
@@ -195,29 +232,18 @@ public class Board {
 	}
 
 	public Cell getCell(Location l){
-        for(Cell aCell : cells){
-            if (aCell.getLocation() == l){
-                return aCell;
-            }
-        }
-        return null;
+        return cells.get(l);
 	}
 
 	public Cell getCellIfDry(Location l){
-        for(Cell aCell : cells){
-            if (aCell.getLocation() == l && aCell.getState()==CellState.DRY){
-                return aCell;
-            }
-        }
-        return null;
+        if (cells.get(l).getState() == CellState.DRY){
+            return cells.get(l);
+        } else return null;
 	}
 
 	public Cell getCellIfWet(Location l){
-        for(Cell aCell : cells){
-            if (aCell.getLocation() == l && aCell.getState()==CellState.WET){
-                return aCell;
-            }
-        }
-        return null;
+        if (cells.get(l).getState() == CellState.WET){
+            return cells.get(l);
+        } else return null;
 	}
 }
