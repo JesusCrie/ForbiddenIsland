@@ -4,22 +4,29 @@ import java.util.*;
 
 public class TreasureDeck implements Deck {
 
-	private List<TreasureCard> deck;
-	private List<TreasureCard> discardingDeck;
+	private final List<TreasureCard> originalCards = new ArrayList<>();
+	private final LinkedList<TreasureCard> deck = new LinkedList<>();
+	private final LinkedList<TreasureCard> discardingDeck = new LinkedList<>();
 
 	@Override
 	public Card drawCard() {
-		// TODO
-		return null;
+		return deck.pop();
 	}
 
 	@Override
+	public void discardCard(Card f) {
+		discardingDeck.addLast((TreasureCard) f);
+	}
+
+
+
+	@Override
 	public void reset() {
-		// TODO
+
 	}
 
 	@Override
 	public void shuffle() {
-		// TODO
+		Collections.shuffle(deck);
 	}
 }

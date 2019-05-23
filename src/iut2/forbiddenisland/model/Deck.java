@@ -13,7 +13,7 @@ public interface Deck {
      * place the floodCard in the discardingDeck
      *
      */
-    void discardCard(FloodCard f);
+    void discardCard(Card f);
 
     /**
      * Reset the deck in its initial state.
