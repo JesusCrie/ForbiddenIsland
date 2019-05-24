@@ -28,8 +28,15 @@ public abstract class Cell {
         return state;
     }
 
-    public void setState(CellState state) {
+    public void setState(final CellState state) {
         this.state = state;
+    }
+
+    public void waterUp() {
+        if (state == CellState.DRY)
+            setState(CellState.WET);
+        else if (state == CellState.WET)
+            setState(CellState.FLOODED);
     }
 
     /**
@@ -41,5 +48,9 @@ public abstract class Cell {
 
     public void removeAdventurer(final Adventurer player) {
         adventurers.remove(player);
+    }
+
+    public void addAdventurer(final Adventurer player) {
+        adventurers.add(player);
     }
 }
