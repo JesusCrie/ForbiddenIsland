@@ -127,7 +127,7 @@ public class GameEngine {
      */
     public List<Cell> getDryableCells() {
         final Response<List<Cell>> dryableCells = modelProxy.request(
-                new Request(RequestType.CELLS_DRYABLE, getCurrentPlayer().get())
+                new Request(RequestType.CELLS_DRAINABLE, getCurrentPlayer().get())
         );
 
         return dryableCells.getData();

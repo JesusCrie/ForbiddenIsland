@@ -50,13 +50,13 @@ public class Board {
                 return (Response<T>) new Response<Map<Location, Cell>>(r, true).setData(cells);
             case CELLS_REACHABLE:
                 return (Response<T>) new Response<List<Cell>>(r, true).setData(this.getReachableCells(r.getCurrentPlayer(), r.getData(Request.DATA_CELL)));
-            case CELLS_DRYABLE:
+            case CELLS_DRAINABLE:
                 return (Response<T>) new Response<List<Cell>>(r, true).setData(this.getCellsDryable(r.getCurrentPlayer()));
             case CELL_DRY:
                 return (Response<T>) new Response<Integer>(r, this.dryCell(r.getCurrentPlayer(), r.getData(Request.DATA_CELL))).setData(1);
             case CELL_CLAIM_TREASURE:
                 return (Response<T>) new Response<Integer>(r, this.claimTreasure(r.getCurrentPlayer(), r.getData(Request.DATA_CELL))).setData(1);
-            case TREASURES_CLAIMABLE:
+            case CELLS_CLAIMABLE:
                 return (Response<T>) new Response<List<Treasure>>(r, true).setData(this.getTreasuresClaimable(r.getCurrentPlayer()));
             case FLOODING:
                 return (Response<T>) new Response<>(r, this.flood()).setData(null);
