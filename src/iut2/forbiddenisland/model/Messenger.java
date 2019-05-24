@@ -1,4 +1,14 @@
 package iut2.forbiddenisland.model;
 
-public class Messenger {
+import iut2.forbiddenisland.controller.RequestType;
+import iut2.forbiddenisland.controller.Response;
+
+public class Messenger implements Power {
+
+    @Override
+    public void alterResponse(final Response res) {
+        if(res.getOriginRequest().getType() == RequestType.PLAYER_SEND){
+            res.setData(true);
+        }
+    }
 }
