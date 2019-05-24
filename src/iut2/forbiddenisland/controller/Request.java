@@ -1,6 +1,6 @@
 package iut2.forbiddenisland.controller;
 
-import iut2.forbiddenisland.model.Adventurer;
+import iut2.forbiddenisland.model.adventurer.Adventurer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,13 +9,16 @@ public class Request {
 
     // *** Data constants ***
 
-    public static final int DATA_PLAYER = 1;
-    public static final int DATA_CELL = 2;
-    public static final int DATA_CARD = 3;
+    public static final int DATA_REMAINING_ACTIONS = 1;
+    public static final int DATA_AMOUNT = 2;
+    public static final int DATA_PLAYER = 3;
+    public static final int DATA_CELL = 4;
+    public static final int DATA_CARD = 5;
 
     private final RequestType type;
     private final Adventurer currentPlayer;
     private final Map<Integer, Object> data = new HashMap<>();
+    private boolean bypass = false;
 
     public Request(final RequestType type, final Adventurer currentPlayer) {
         this.type = type;
@@ -42,6 +45,16 @@ public class Request {
     }
 
     /**
+     * Check whether this request can bypass any checks of the board
+     * and force the board to act.
+     *
+     * @return True if the request need to be executed regardless of its data.
+     */
+    public boolean canBypass() {
+        return bypass;
+    }
+
+    /**
      * Add some data to carry with this Request.
      *
      * @param key - The identifier to use to identify the data.
@@ -50,6 +63,16 @@ public class Request {
      */
     public Request putData(final int key, final Object obj) {
         data.put(key, obj);
+        return this;
+    }
+
+    /**
+     * Bypass every checks that will usually be performed for this request.
+     *
+     * @return This object for chaining.
+     */
+    public Request bypassChecks() {
+        bypass = true;
         return this;
     }
 

@@ -3,6 +3,8 @@ package iut2.forbiddenisland.model;
 import iut2.forbiddenisland.controller.Request;
 import iut2.forbiddenisland.controller.RequestType;
 import iut2.forbiddenisland.controller.Response;
+import iut2.forbiddenisland.model.adventurer.Power;
+import iut2.forbiddenisland.model.cell.Cell;
 
 import java.util.List;
 

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="846.75" y="156.0">iut2.forbiddenisland.model.card.TreasureCard</node>
+    <node x="256.41666666666663" y="0.0">iut2.forbiddenisland.model.card.Card</node>
+    <node x="888.0" y="380.0">iut2.forbiddenisland.model.card.TreasurePartCard</node>
+    <node x="1129.0" y="380.0">iut2.forbiddenisland.model.card.HelicopterCard</node>
+    <node x="645.0" y="380.0">iut2.forbiddenisland.model.card.RisingWatersCard</node>
+    <node x="0.0" y="312.0">iut2.forbiddenisland.model.card.FloodDeck</node>
+    <node x="335.0" y="325.5">iut2.forbiddenisland.model.card.TreasureDeck</node>
+    <node x="243.41666666666663" y="143.0">iut2.forbiddenisland.model.card.Deck</node>
+    <node x="54.875" y="156.0">iut2.forbiddenisland.model.card.FloodCard</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="iut2.forbiddenisland.model.card.FloodDeck" target="iut2.forbiddenisland.model.card.FloodCard">
+      <point x="-5.6843418860808015E-14" y="-95.5" />
+      <point x="157.49999999999994" y="292.0" />
+      <point x="132.875" y="292.0" />
+      <point x="0.0" y="41.5" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.card.HelicopterCard" target="iut2.forbiddenisland.model.card.TreasureCard">
+      <point x="51.0" y="-27.5" />
+      <point x="1282.0" y="272.0" />
+      <point x="1025.9642857142858" y="272.0" />
+      <point x="82.71428571428567" y="41.5" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.card.FloodDeck" target="iut2.forbiddenisland.model.card.Card">
+      <point x="-105.00000000000006" y="-95.5" />
+      <point x="52.49999999999994" y="292.0" />
+      <point x="44.375" y="292.0" />
+      <point x="44.375" y="103.0" />
+      <point x="265.91666666666663" y="103.0" />
+      <point x="-57.0" y="41.5" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.card.TreasureCard" target="iut2.forbiddenisland.model.card.Card">
+      <point x="-48.25" y="-41.5" />
+      <point x="895.0" y="113.0" />
+      <point x="360.91666666666663" y="113.0" />
+      <point x="38.0" y="41.5" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.card.TreasureDeck" target="iut2.forbiddenisland.model.card.Deck">
+      <point x="-96.66666666666669" y="-82.0" />
+      <point x="383.3333333333333" y="292.0" />
+      <point x="362.66666666666663" y="292.0" />
+      <point x="39.75" y="54.5" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.card.TreasurePartCard" target="iut2.forbiddenisland.model.card.TreasureCard">
+      <point x="-55.25" y="-27.5" />
+      <point x="0.0" y="41.5" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.card.Deck" target="iut2.forbiddenisland.model.card.Card">
+      <point x="0.0" y="-54.5" />
+      <point x="0.0" y="41.5" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.card.RisingWatersCard" target="iut2.forbiddenisland.model.card.TreasureCard">
+      <point x="-55.75" y="-27.5" />
+      <point x="700.75" y="282.0" />
+      <point x="888.1071428571429" y="282.0" />
+      <point x="-55.14285714285717" y="41.5" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.card.TreasureDeck" target="iut2.forbiddenisland.model.card.Card">
+      <point x="0.0" y="-82.0" />
+      <point x="480.0" y="292.0" />
+      <point x="456.79166666666663" y="292.0" />
+      <point x="456.79166666666663" y="123.0" />
+      <point x="341.91666666666663" y="123.0" />
+      <point x="19.0" y="41.5" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.card.TreasureDeck" target="iut2.forbiddenisland.model.card.TreasureCard">
+      <point x="96.66666666666669" y="-82.0" />
+      <point x="576.6666666666667" y="272.0" />
+      <point x="860.5357142857142" y="272.0" />
+      <point x="-82.71428571428572" y="41.5" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.card.FloodDeck" target="iut2.forbiddenisland.model.card.Deck">
+      <point x="104.99999999999994" y="-95.5" />
+      <point x="262.49999999999994" y="292.0" />
+      <point x="283.16666666666663" y="292.0" />
+      <point x="-39.75" y="54.5" />
+    </edge>
+    <edge source="iut2.forbiddenisland.model.card.FloodCard" target="iut2.forbiddenisland.model.card.Card">
+      <point x="39.0" y="-41.5" />
+      <point x="171.875" y="123.0" />
+      <point x="303.91666666666663" y="123.0" />
+      <point x="-19.0" y="41.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="666.5" y="251.5" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Constructors</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+    <Category>Inner Classes</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

@@ -4,9 +4,11 @@ public enum RequestType {
 	// Player related requests
 	PLAYERS_ALL,
 	PLAYER_MOVE_AMOUNT,
+	PLAYERS_SENDABLE,
 	PLAYER_MOVE,
 	PLAYER_SEND,
-	PLAYERS_SENDABLE,
+	PLAYER_USE_CARD,
+	PLAYER_DRAW_CARD,
 
 	// Cells related requests,
 	CELLS_ALL,

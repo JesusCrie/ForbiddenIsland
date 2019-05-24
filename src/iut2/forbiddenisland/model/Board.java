@@ -2,6 +2,14 @@ package iut2.forbiddenisland.model;
 
 import iut2.forbiddenisland.controller.Request;
 import iut2.forbiddenisland.controller.Response;
+import iut2.forbiddenisland.model.adventurer.Adventurer;
+import iut2.forbiddenisland.model.card.Card;
+import iut2.forbiddenisland.model.card.FloodCard;
+import iut2.forbiddenisland.model.card.FloodDeck;
+import iut2.forbiddenisland.model.card.TreasureDeck;
+import iut2.forbiddenisland.model.cell.Cell;
+import iut2.forbiddenisland.model.cell.CellState;
+import iut2.forbiddenisland.model.cell.TreasureCell;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,12 +21,15 @@ import java.util.stream.Stream;
 public class Board {
 
     private final Map<Location, Cell> cells;
-    WaterLevel waterLevel;
-    private FloodDeck floodDeck;
-    private TreasureDeck treasureDeck;
+    private final WaterLevel waterLevel;
+    private final FloodDeck floodDeck;
+    private final TreasureDeck treasureDeck;
 
-    public Board(Map<Location, Cell> cells) {
+    public Board(final Map<Location, Cell> cells, final WaterLevel waterLevel) {
         this.cells = cells;
+        this.waterLevel = waterLevel;
+        this.floodDeck = new FloodDeck();
+        this.treasureDeck = new TreasureDeck();
     }
 
     /**
@@ -67,10 +78,10 @@ public class Board {
      */
     public List<Cell> getReachableCells(final Adventurer p, final Cell c) {
         return Stream.of( // TODO when utils
-                new Location(c.getLocation().getX() + 1, c.getLocation().getY()),
-                new Location(c.getLocation().getX() - 1, c.getLocation().getY()),
-                new Location(c.getLocation().getX(), c.getLocation().getY() + 1),
-                new Location(c.getLocation().getX(), c.getLocation().getY() - 1)
+                Location.from(c.getLocation().getX() + 1, c.getLocation().getY()),
+                Location.from(c.getLocation().getX() - 1, c.getLocation().getY()),
+                Location.from(c.getLocation().getX(), c.getLocation().getY() + 1),
+                Location.from(c.getLocation().getX(), c.getLocation().getY() - 1)
         )
                 .map(this::getCell)
                 .collect(Collectors.toList());
@@ -83,10 +94,10 @@ public class Board {
         final Location loc = p.getPosition().getLocation();
 
         return Stream.of( // TODO when utils
-                new Location(loc.getX() + 1, loc.getY()),
-                new Location(loc.getX() - 1, loc.getY()),
-                new Location(loc.getX(), loc.getY() + 1),
-                new Location(loc.getX(), loc.getY() - 1)
+                Location.from(loc.getX() + 1, loc.getY()),
+                Location.from(loc.getX() - 1, loc.getY()),
+                Location.from(loc.getX(), loc.getY() + 1),
+                Location.from(loc.getX(), loc.getY() - 1)
         )
                 .filter(location -> cells.get(location).getState() == CellState.WET)
                 .map(this::getCell)

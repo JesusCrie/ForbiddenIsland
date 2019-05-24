@@ -10,7 +10,7 @@ public class Location {
     private final int y;
 
     /**
-     * Create a new location from the given coordintes.
+     * Create a new location from the given coordinates.
      *
      * @param x - Horizontal position.
      * @param y - Vertical position.
@@ -20,7 +20,7 @@ public class Location {
         return new Location(x, y);
     }
 
-    public Location(final int x, final int y) {
+    private Location(final int x, final int y) {
         this.x = x;
         this.y = y;
     }

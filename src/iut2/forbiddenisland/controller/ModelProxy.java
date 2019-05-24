@@ -3,7 +3,6 @@ package iut2.forbiddenisland.controller;
 import iut2.forbiddenisland.model.Board;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
