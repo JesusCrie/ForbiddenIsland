@@ -15,7 +15,7 @@ public abstract class Adventurer {
     public Adventurer(final String name, final Cell position, final Power... powers) {
         this.name = name;
         this.powers = Arrays.asList(powers);
-        move(position);
+        this.position = position;
     }
 
     public String getName() {
@@ -27,7 +27,10 @@ public abstract class Adventurer {
     }
 
     public void move(final Cell to) {
-        this.position = to;
+        position.removeAdventurer(this);
+        position = to;
+        to.addAdventurer(this);
+
     }
 
     public List<Power> getPowers() {
