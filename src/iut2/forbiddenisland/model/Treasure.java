@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Treasure {
 
-	private String name;
+    private String name;
 	private boolean claimable = true;
     private final List<TreasureCell> cells;
 
