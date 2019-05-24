@@ -1,4 +1,4 @@
-package iut2.forbiddenisland.controller;
+package iut2.forbiddenisland.controller.request;
 
 public enum RequestType {
 	// Player related requests

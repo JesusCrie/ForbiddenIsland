@@ -1,5 +1,8 @@
 package iut2.forbiddenisland.controller;
 
+import iut2.forbiddenisland.controller.request.Request;
+import iut2.forbiddenisland.controller.request.Response;
+
 /**
  * A middleware that will alter the requests and responses using
  * the powers of the current player.

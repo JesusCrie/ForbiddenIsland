@@ -1,5 +1,7 @@
 package iut2.forbiddenisland.controller;
 
+import iut2.forbiddenisland.controller.request.Request;
+import iut2.forbiddenisland.controller.request.Response;
 import iut2.forbiddenisland.model.Board;
 
 import java.util.Arrays;

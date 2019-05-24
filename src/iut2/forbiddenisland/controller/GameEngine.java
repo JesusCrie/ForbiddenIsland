@@ -2,6 +2,9 @@ package iut2.forbiddenisland.controller;
 
 import iut2.forbiddenisland.controller.observer.NotifyOnSubscribeObservable;
 import iut2.forbiddenisland.controller.observer.Observable;
+import iut2.forbiddenisland.controller.request.Request;
+import iut2.forbiddenisland.controller.request.RequestType;
+import iut2.forbiddenisland.controller.request.Response;
 import iut2.forbiddenisland.model.Board;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.Card;

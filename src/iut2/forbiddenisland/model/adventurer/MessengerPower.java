@@ -1,7 +1,7 @@
-package iut2.forbiddenisland.model;
+package iut2.forbiddenisland.model.adventurer;
 
-import iut2.forbiddenisland.controller.RequestType;
-import iut2.forbiddenisland.controller.Response;
+import iut2.forbiddenisland.controller.request.RequestType;
+import iut2.forbiddenisland.controller.request.Response;
 import iut2.forbiddenisland.model.adventurer.Power;
 
 public class MessengerPower implements Power {

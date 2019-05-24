@@ -1,7 +1,7 @@
 package iut2.forbiddenisland.model.adventurer;
 
-import iut2.forbiddenisland.controller.Request;
-import iut2.forbiddenisland.controller.Response;
+import iut2.forbiddenisland.controller.request.Request;
+import iut2.forbiddenisland.controller.request.Response;
 
 public interface Power {
 

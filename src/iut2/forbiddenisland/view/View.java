@@ -1,4 +1,4 @@
-package iut2.forbiddenisland;
+package iut2.forbiddenisland.view;
 
 import iut2.forbiddenisland.controller.Controller;
 
