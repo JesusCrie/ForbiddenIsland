@@ -2,6 +2,7 @@ package iut2.forbiddenisland.model;
 
 import java.util.*;
 
+// TODO generalize
 public class FloodDeck implements Deck {
 
 	private final List<FloodCard> originalCards = new ArrayList<>();
@@ -10,6 +11,7 @@ public class FloodDeck implements Deck {
 
 	@Override
 	public Card drawCard() {
+		// TODO check if deck empty
 		return deck.pop();
 	}
 
