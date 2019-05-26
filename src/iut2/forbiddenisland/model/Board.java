@@ -36,39 +36,75 @@ public class Board {
      * @param r
      */
     @SuppressWarnings("unchecked")
-    public <T> Response<T> handleRequest(Request r) {
+    public <T> Response<T> handleRequest(final Request r) {
         switch (r.getType()) {
-            case PLAYER_MOVE:
-                return (Response<T>) new Response<Integer>(r, this.movePlayer(r.getCurrentPlayer(), r.getData(Request.DATA_CELL))).setData(1);
-            case PLAYER_MOVE_AMOUNT:
-                return (Response<T>) new Response<Integer>(r, true).setData(this.getPlayerMoveAmount(r.getCurrentPlayer()));
-            case PLAYER_SEND:
-                return (Response<T>) new Response<Integer>(r, sendCard(r.getCurrentPlayer(), r.getData(Request.DATA_PLAYER), r.getData(Request.DATA_PLAYER))).setData(1);
-            case PLAYERS_SENDABLE:
-                return (Response<T>) new Response<List<Adventurer>>(r, true).setData(this.getPlayersSendable(r.getCurrentPlayer()));
+            // *** Cells related requests ***
             case CELLS_ALL:
                 return (Response<T>) new Response<Map<Location, Cell>>(r, true).setData(cells);
             case CELLS_REACHABLE:
-                return (Response<T>) new Response<List<Cell>>(r, true).setData(this.getReachableCells(r.getCurrentPlayer(), r.getData(Request.DATA_CELL)));
+                return (Response<T>) new Response<List<Cell>>(r, true)
+                        .setData(getReachableCells(r.getCurrentPlayer(), r.getData(Request.DATA_CELL)));
             case CELLS_DRAINABLE:
-                return (Response<T>) new Response<List<Cell>>(r, true).setData(this.getCellsDryable(r.getCurrentPlayer()));
-            case CELL_DRY:
-                return (Response<T>) new Response<Integer>(r, this.dryCell(r.getCurrentPlayer(), r.getData(Request.DATA_CELL))).setData(1);
-            case CELL_CLAIM_TREASURE:
-                return (Response<T>) new Response<Integer>(r, this.claimTreasure(r.getCurrentPlayer(), r.getData(Request.DATA_CELL))).setData(1);
+                return (Response<T>) new Response<List<Cell>>(r, true)
+                        .setData(getCellsDryable(r.getCurrentPlayer()));
             case CELLS_CLAIMABLE:
-                return (Response<T>) new Response<List<Treasure>>(r, true).setData(this.getTreasuresClaimable(r.getCurrentPlayer()));
-            case FLOODING:
-                return (Response<T>) new Response<>(r, this.flood()).setData(null);
+                return (Response<T>) new Response<List<Treasure>>(r, true).setData(getTreasuresClaimable(r.getCurrentPlayer()));
+
+            // *** Cards related requests ***
+            case CARD_DRAW_AMOUNT:
+                break; // TODO
+            case CARD_DRAW:
+                break; // TODO
+            case CARD_USE:
+                break; // TODO
+            case CARD_TRASH:
+                break; // TODO
+
+            // *** Player related requests ***
+            case PLAYER_MOVE:
+                return (Response<T>) new Response<Integer>(
+                        r, movePlayer(r.getCurrentPlayer(), r.getData(Request.DATA_CELL))
+                ).setData(1);
+            case PLAYER_DRY:
+                return (Response<T>) new Response<Integer>(
+                        r, dryCell(r.getCurrentPlayer(), r.getData(Request.DATA_CELL))
+                ).setData(1);
+            case PLAYER_CLAIM:
+                return (Response<T>) new Response<Integer>(r, claimTreasure(r.getCurrentPlayer(), r.getData(Request.DATA_CELL))).setData(1);
+            case PLAYER_SEND:
+                return (Response<T>) new Response<Integer>(
+                        r, sendCard(r.getCurrentPlayer(), r.getData(Request.DATA_PLAYER), r.getData(Request.DATA_PLAYER))
+                ).setData(1);
+            case PLAYERS_SENDABLE:
+                return (Response<T>) new Response<List<Adventurer>>(r, true)
+                        .setData(getPlayersSendable(r.getCurrentPlayer()));
+
+            // *** Island related requests ***
+            case ISLAND_DRAW:
+                break; // TODO
+            case ISLAND_APPLY:
+                break; // TODO
+            case ISLAND_WATER_LEVEL:
+                break; // TODO
+            case ISLAND_WATER_UP:
+                break; // TODO
+
+            // *** Game related requests ***
+            case GAME_NEW_ROUND:
+                break; // Nothing to do
+            case GAME_MOVE_AMOUNT:
+                return (Response<T>) new Response<Integer>(r, true)
+                        .setData(getPlayerMoveAmount());
             default:
-                throw new IllegalStateException();
+                throw new IllegalStateException("Unknown request !");
         }
+
+        return Response.EMPTY;
     }
 
     /**
-     * @param p
      */
-    public int getPlayerMoveAmount(final Adventurer p) {
+    public int getPlayerMoveAmount() {
         return 3;
     }
 

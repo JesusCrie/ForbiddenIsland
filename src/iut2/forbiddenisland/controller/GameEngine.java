@@ -1,13 +1,16 @@
 package iut2.forbiddenisland.controller;
 
+import iut2.forbiddenisland.controller.observer.NotifyOnCreateObservable;
 import iut2.forbiddenisland.controller.observer.NotifyOnSubscribeObservable;
 import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.controller.request.Request;
 import iut2.forbiddenisland.controller.request.RequestType;
 import iut2.forbiddenisland.controller.request.Response;
 import iut2.forbiddenisland.model.Board;
+import iut2.forbiddenisland.model.WaterLevel;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.Card;
+import iut2.forbiddenisland.model.card.SpecialCard;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
@@ -22,6 +25,7 @@ public class GameEngine {
 
     private final Observable<List<Cell>> cells;
     private final Observable<List<Adventurer>> adventurers;
+    private final Observable<WaterLevel> waterLevel;
     private final Observable<Integer> remainingActions;
 
     public GameEngine(final Board board, final Adventurer... players) {
@@ -31,9 +35,12 @@ public class GameEngine {
 
         cells = createCellsObs();
         adventurers = createAdventurersObs();
+        waterLevel = createWaterLevelObs();
 
         remainingActions = new NotifyOnSubscribeObservable<>(0);
     }
+
+    // *** Factory methods for complex observables ***
 
     /**
      * Create an observable that will query the list of cells
@@ -42,7 +49,7 @@ public class GameEngine {
      * @return An observable that auto updates it self when it changes.
      */
     private Observable<List<Cell>> createCellsObs() {
-        return new Observable<>(null) {
+        return new NotifyOnCreateObservable<List<Cell>>() {
             @Override
             public void notifyChanges() {
                 // Query all cells
@@ -50,7 +57,6 @@ public class GameEngine {
                         new Request(RequestType.CELLS_ALL, getCurrentPlayer().get())
                 );
 
-                // Should always be successful
                 value = allCells.getData();
 
                 super.notifyChanges();
@@ -66,6 +72,29 @@ public class GameEngine {
     private Observable<List<Adventurer>> createAdventurersObs() {
         return new Observable<>(players.players);
     }
+
+    /**
+     * Create an observable that will keep an updated version of the water level.
+     *
+     * @return An observable for the current water level.
+     */
+    private Observable<WaterLevel> createWaterLevelObs() {
+        return new NotifyOnCreateObservable<WaterLevel>() {
+            @Override
+            public void notifyChanges() {
+                // Query water level
+                final Response<WaterLevel> waterLevel = modelProxy.request(
+                        new Request(RequestType.ISLAND_WATER_LEVEL, getCurrentPlayer().get())
+                );
+
+                value = waterLevel.getData();
+
+                super.notifyChanges();
+            }
+        };
+    }
+
+    // *** Various getters used to expose some fields ***
 
     /**
      * Expose the current player.
@@ -106,6 +135,8 @@ public class GameEngine {
         return adventurers;
     }
 
+    // *** More getters that will trigger a request to the board ***
+
     /**
      * Get all cells reachable by the player from the board.
      * The player can move to any of them successfully.
@@ -115,6 +146,7 @@ public class GameEngine {
     public List<Cell> getReachableCells() {
         final Response<List<Cell>> reachableCells = modelProxy.request(
                 new Request(RequestType.CELLS_REACHABLE, getCurrentPlayer().get())
+                        .putData(Request.DATA_CELL, getCurrentPlayer().get().getPosition())
         );
 
         return reachableCells.getData();
@@ -128,24 +160,44 @@ public class GameEngine {
     public List<Cell> getDryableCells() {
         final Response<List<Cell>> dryableCells = modelProxy.request(
                 new Request(RequestType.CELLS_DRAINABLE, getCurrentPlayer().get())
+                        .putData(Request.DATA_CELL, getCurrentPlayer().get().getPosition())
         );
 
         return dryableCells.getData();
     }
 
+    // *** Player round related methods ***
+
+    /**
+     * Start a new player round by settings up the needed variables of the engine.
+     */
+    public void newPlayerRound() {
+        players.next();
+
+        // Notify new round
+        modelProxy.request(new Request(RequestType.GAME_NEW_ROUND, getCurrentPlayer().get()));
+
+        // Query AP
+        final Response<Integer> res = modelProxy.request(
+                new Request(RequestType.GAME_MOVE_AMOUNT, getCurrentPlayer().get())
+        );
+        remainingActions.set(res.getData());
+
+        adventurers.notifyChanges();
+    }
+
     /**
      * Try to move the desired player to the desired cell.
      *
-     * @param cell   - The cell to move the player to.
      * @param player - The player to move.
+     * @param cell   - The cell to move the player to.
      * @return True if the action was successful, otherwise false.
      */
-    public boolean movePlayer(final Cell cell, final Adventurer player) {
+    public boolean movePlayer(final Adventurer player, final Cell cell) {
         final Response<Integer> res = modelProxy.request(
                 new Request(RequestType.PLAYER_MOVE, getCurrentPlayer().get())
-                        .putData(Request.DATA_REMAINING_ACTIONS, remainingActions.get())
-                        .putData(Request.DATA_CELL, cell)
                         .putData(Request.DATA_PLAYER, player)
+                        .putData(Request.DATA_CELL, cell)
         );
 
         decrementActions(res.getData());
@@ -160,11 +212,11 @@ public class GameEngine {
      */
     public boolean dryCell(final Cell cell) {
         final Response<Integer> res = modelProxy.request(
-                new Request(RequestType.CELL_DRY, getCurrentPlayer().get())
-                        .putData(Request.DATA_REMAINING_ACTIONS, remainingActions.get())
+                new Request(RequestType.PLAYER_DRY, getCurrentPlayer().get())
                         .putData(Request.DATA_CELL, cell)
         );
 
+        decrementActions(res.getData());
         cells.notifyChanges();
         return res.isOk();
     }
@@ -176,8 +228,7 @@ public class GameEngine {
      */
     public boolean claimTreasure(final TreasureCell cell) {
         final Response<Integer> res = modelProxy.request(
-                new Request(RequestType.CELL_CLAIM_TREASURE, getCurrentPlayer().get())
-                        .putData(Request.DATA_REMAINING_ACTIONS, remainingActions.get())
+                new Request(RequestType.PLAYER_CLAIM, getCurrentPlayer().get())
                         .putData(Request.DATA_CELL, cell)
         );
 
@@ -196,8 +247,8 @@ public class GameEngine {
     public boolean sendCard(final Adventurer to, final Card card) {
         final Response<Integer> res = modelProxy.request(
                 new Request(RequestType.PLAYER_SEND, getCurrentPlayer().get())
-                        .putData(Request.DATA_REMAINING_ACTIONS, remainingActions.get())
-                        .putData(Request.DATA_PLAYER, to)
+                        .putData(Request.DATA_PLAYER, getCurrentPlayer().get())
+                        .putData(Request.DATA_PLAYER_EXTRA, to)
                         .putData(Request.DATA_CARD, card)
         );
 
@@ -211,10 +262,10 @@ public class GameEngine {
      *
      * @param card - The card to use.
      */
-    public boolean useCard(final Card card) {
+    public boolean useCard(final SpecialCard card) {
         final Response<Void> res = modelProxy.request(
-                new Request(RequestType.PLAYER_USE_CARD, getCurrentPlayer().get())
-                        .putData(Request.DATA_REMAINING_ACTIONS, remainingActions.get())
+                new Request(RequestType.CARD_USE, getCurrentPlayer().get())
+                        .putData(Request.DATA_PLAYER, getCurrentPlayer().get())
                         .putData(Request.DATA_CARD, card)
         );
 
@@ -224,45 +275,39 @@ public class GameEngine {
     }
 
     /**
-     * End the round and start another one.
+     * End the 'manual' part of the current player's round.
      */
-    public void newRound() {
-        players.next();
-
-        // Query AP
-        final Response<Integer> res = modelProxy.request(
-                new Request(RequestType.PLAYER_MOVE_AMOUNT, getCurrentPlayer().get())
-        );
-        remainingActions.set(res.getData());
-
-        adventurers.notifyChanges();
-    }
-
-    public void finishRound() {
+    public void endPlayerRound() {
         // Draw treasure cards
-        final Response<Void> resDraw = modelProxy.request(
-                new Request(RequestType.PLAYER_DRAW_CARD, getCurrentPlayer().get())
-        );
+        final int drawAmount = modelProxy.<Integer>request(
+                new Request(RequestType.CARD_DRAW_AMOUNT, getCurrentPlayer().get())
+        ).getData();
 
-        if (!resDraw.isOk())
-            throw new IllegalStateException("Failed to draw cards !");
-
-        // Island turn
-        final Response<Void> resFlood = modelProxy.request(
-                new Request(RequestType.FLOODING, getCurrentPlayer().get())
-        );
-
-        if (!resDraw.isOk())
-            throw new IllegalStateException("Can't flood the board !");
-
-        // TODO check victory somewhere here
+        for (int i = 0; i < drawAmount; i++) {
+            modelProxy.request(new Request(RequestType.CARD_DRAW, getCurrentPlayer().get()));
+        }
 
         cells.notifyChanges();
-        players.notify();
+        adventurers.notifyChanges();
     }
 
     private void decrementActions(final int amount) {
         remainingActions.set(remainingActions.get() - amount);
+    }
+
+    // *** Island turn related methods ***
+
+    public void startIslandTurn() {
+        // Draw flood card
+        final int drawAmount = modelProxy.<WaterLevel>request(
+                new Request(RequestType.ISLAND_WATER_LEVEL, null)
+        ).getData().computeAmountFloodCards();
+
+        for (int i = 0; i < drawAmount; i++) {
+            modelProxy.request(new Request(RequestType.ISLAND_DRAW, null));
+        }
+
+
     }
 
     /**

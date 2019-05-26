@@ -88,7 +88,7 @@ public class Controller {
         o.subscribe(cell -> {
             switch (gameMode.get()) {
                 case MOVE:
-                    engine.movePlayer(cell, selectedAdventurer);
+                    engine.movePlayer(selectedAdventurer, cell);
                     break;
                 case DRY:
                     engine.dryCell(cell);
