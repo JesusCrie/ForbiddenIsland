@@ -1,19 +1,15 @@
 package iut2.forbiddenisland.controller.request;
 
-import iut2.forbiddenisland.model.Board;
-
 public class Response<T> {
 
     private final Request origin;
-    private final Board board;
     private T data;
     private final boolean success;
 
-    public static final Response EMPTY = new Response(null, null, true);
+    public static final Response EMPTY = new Response(null, true);
 
-    public Response(final Request origin, final Board board, final boolean success) {
+    public Response(final Request origin, final boolean success) {
         this.origin = origin;
-        this.board = board;
         this.success = success;
     }
 
@@ -24,16 +20,6 @@ public class Response<T> {
      */
     public Request getOriginRequest() {
         return origin;
-    }
-
-    /**
-     * Get the board, can be used by the middleware to avoid sending useless
-     * requests.
-     *
-     * @return The board.
-     */
-    public Board getBoard() {
-        return board;
     }
 
     /**
