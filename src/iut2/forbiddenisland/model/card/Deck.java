@@ -1,30 +1,57 @@
 package iut2.forbiddenisland.model.card;
 
-public interface Deck {
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+
+public abstract class Deck<T extends Card> {
+
+    protected final LinkedList<T> deck = new LinkedList<>();
+    protected final LinkedList<T> discardingDeck = new LinkedList<>();
+
+    public Deck(final Collection<T> initialCards) {
+        deck.addAll(initialCards);
+        shuffle();
+    }
 
     /**
      * Pop a card from this deck and returns it.
      *
      * @return The next card.
      */
-    Card drawCard();
+    public T drawCard() {
+        if (deck.isEmpty())
+            reset();
+
+        return deck.pop();
+    }
 
     /**
-     * place the floodCard in the discardingDeck
+     * Discard a card into the discarding deck.
      *
+     * @param card - The card to discard.
      */
-    void discardCard(Card f);
+    public void discardCard(final T card) {
+        discardingDeck.push(card);
+    }
 
     /**
-     * Reset the deck in its initial state.
+     * Reset the deck by placing the discarding deck on top
+     * of it and shuffling.
      */
-    void reset();
+    public void reset() {
+        deck.addAll(discardingDeck);
+        discardingDeck.clear();
+
+        shuffle();
+    }
 
     /**
      * Shuffle the deck.
      */
-    void shuffle();
-
+    public void shuffle() {
+        Collections.shuffle(deck);
+    }
 
 
 }

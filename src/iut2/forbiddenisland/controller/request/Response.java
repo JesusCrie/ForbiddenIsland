@@ -6,6 +6,8 @@ public class Response<T> {
     private T data;
     private final boolean success;
 
+    public static final Response EMPTY = new Response(null, true);
+
     public Response(final Request origin, final boolean success) {
         this.origin = origin;
         this.success = success;
@@ -40,6 +42,7 @@ public class Response<T> {
         if (data != null)
             return this;
         this.data = d;
+
         return this;
     }
 

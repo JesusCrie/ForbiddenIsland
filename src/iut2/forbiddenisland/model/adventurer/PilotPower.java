@@ -4,7 +4,6 @@ import iut2.forbiddenisland.controller.request.Request;
 import iut2.forbiddenisland.controller.request.RequestType;
 import iut2.forbiddenisland.controller.request.Response;
 import iut2.forbiddenisland.model.Board;
-import iut2.forbiddenisland.model.adventurer.Power;
 import iut2.forbiddenisland.model.cell.Cell;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public class PilotPower implements Power {
 
     @Override
     public void alterRequest(Request req) {
-        if (req.getType() == RequestType.PLAYER_MOVE_AMOUNT) {
+        if (req.getType() == RequestType.GAME_MOVE_AMOUNT) {
             canUsePower = true;
         }
     }
