@@ -2,6 +2,7 @@ package iut2.forbiddenisland.model.adventurer;
 
 import iut2.forbiddenisland.controller.request.Request;
 import iut2.forbiddenisland.controller.request.Response;
+import iut2.forbiddenisland.model.Board;
 
 public interface Power {
 
@@ -10,19 +11,21 @@ public interface Power {
      * Can alter the request by adding/removing/modifying
      * his data.
      *
-     * @param req - The incoming request.
+     * @param req   - The incoming request.
+     * @param board - The board
      */
-    default void alterRequest(final Request req) {
+    default void alterRequest(final Request req, final Board board) {
     }
 
     /**
-     * Aplly the power to the outgoing response.
+     * Apply the power to the outgoing response.
      * Can alter the response by adding/removing/modifying
      * his data.
      *
-     * @param res - The outgoing response.
+     * @param res   - The outgoing response.
+     * @param board - The board.
      */
-    default void alterResponse(final Response res) {
+    default void alterResponse(final Response res, final Board board) {
     }
 
 }

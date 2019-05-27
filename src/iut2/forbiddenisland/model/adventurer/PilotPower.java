@@ -10,25 +10,21 @@ import java.util.List;
 
 public class PilotPower implements Power {
 
-    private final Board board;
     private boolean canUsePower;
 
-    public PilotPower(Board board) {
-        this.board = board;
-    }
-
     @Override
-    public void alterRequest(Request req) {
+    public void alterRequest(final Request req, final Board board) {
         if (req.getType() == RequestType.GAME_MOVE_AMOUNT) {
             canUsePower = true;
         }
     }
 
     @Override
-    public void alterResponse(final Response res) {
+    @SuppressWarnings("unchecked")
+    public void alterResponse(final Response res, final Board board) {
         if (res.getOriginRequest().getType() == RequestType.CELLS_REACHABLE && canUsePower) {
-            List<Cell> cells = /*board.getCell*/ null;
-            res.setData(cells);
+            final Response<List<Cell>> castedRes = (Response<List<Cell>>) res;
+            // TODO query all cells and add to data
             canUsePower = false;
         }
     }
