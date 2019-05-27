@@ -1,29 +1,45 @@
-package iut2.forbiddenisland.model;
-import iut2.forbiddenisland.Utils.Utils;
-import iut2.forbiddenisland.controller.RequestType;
-import iut2.forbiddenisland.controller.Response;
+package iut2.forbiddenisland.model.adventurer;
 
-import java.util.ArrayList;
+import iut2.forbiddenisland.Utils;
+import iut2.forbiddenisland.controller.request.Request;
+import iut2.forbiddenisland.controller.request.RequestType;
+import iut2.forbiddenisland.controller.request.Response;
+import iut2.forbiddenisland.model.Board;
+import iut2.forbiddenisland.model.Location;
+import iut2.forbiddenisland.model.cell.Cell;
+import iut2.forbiddenisland.model.cell.CellState;
+
 import java.util.List;
 
 
 public class ExplorerMovePower implements Power {
-    private final Board board;
-
-    public ExplorerMovePower(Board board) {
-        this.board = board;
-    }
 
     @Override
-    public void alterResponse(final Response<?> res) {
-        if (res.getOriginRequest().getType() == RequestType.CELLS_REACHABLE) {
-            List<Cell> cells = (List<Cell>) res.getData();
-            Location position = res.getOriginRequest().getCurrentPlayer().getPosition().getLocation();
+    public void alterRequest(final Request req, final Board board) {
+        if (req.getType() == RequestType.PLAYER_MOVE) {
+            final Location position = req.getCurrentPlayer().getPosition().getLocation();
+
             for (Location loc : Utils.getCornerCells(position)) {
-                //todo getCell(Location loc) return la cell a la location loc, si elle n'est pas coulée (donc si elle est sèche ou inondée), sinon return null
-                Cell cell = /* board.getCell(loc) */ null;
-                if (cell != null){
-                    cells.add(cell);
+
+                if (req.<Cell>getData(Request.DATA_CELL).getLocation().equals(loc)) {
+                    req.bypassChecks();
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void alterResponse(final Response res, final Board board) {
+        if (res.getOriginRequest().getType() == RequestType.CELLS_REACHABLE) {
+            final Response<List<Cell>> castedRes = (Response<List<Cell>>) res;
+
+            final Location position = res.getOriginRequest().getCurrentPlayer().getPosition().getLocation();
+            for (Location loc : Utils.getCornerCells(position)) {
+
+                final Cell cell = board.getCell(loc);
+                if (cell != null && cell.getState() != CellState.FLOODED) {
+                    castedRes.getData().add(cell);
                 }
             }
         }

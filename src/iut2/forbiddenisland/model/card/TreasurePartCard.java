@@ -10,4 +10,8 @@ public class TreasurePartCard extends TreasureCard {
         super(name);
         this.treasure = treasure;
     }
+
+    public Treasure getTreasure() {
+        return treasure;
+    }
 }

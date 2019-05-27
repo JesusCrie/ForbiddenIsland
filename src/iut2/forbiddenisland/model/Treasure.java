@@ -23,6 +23,10 @@ public class Treasure {
         return claimable;
     }
 
+    public void setClaimable(boolean b){
+        claimable = b;
+    }
+
     public List<TreasureCell> getCells() {
         return cells;
     }

@@ -53,7 +53,7 @@ public enum RequestType {
      * player's hand.
      * - DATA_PLAYER: Adventurer
      * - DATA_AMOUNT: int
-     * = boolean
+     * = void
      */
     CARD_DRAW,
 
@@ -61,7 +61,7 @@ public enum RequestType {
      * Used to make a player use a specific card of its hand.
      * - DATA_PLAYER: Adventurer
      * - DATA_CARD: SpecialCard
-     * = boolean
+     * = void
      */
     CARD_USE,
 
@@ -69,7 +69,7 @@ public enum RequestType {
      * Used to allow a player to throw away one of its cards when its hand is full.
      * - DATA_PLAYER: Adventurer
      * - DATA_CARD: TreasureCard
-     * = boolean
+     * = void
      */
     CARD_TRASH,
 

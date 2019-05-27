@@ -45,7 +45,7 @@ public abstract class Adventurer {
         return treasures;
     }
 
-    public void addTrasure(Treasure t){
+    public void addTreasure(Treasure t){
         getTreasures().add(t);
     }
 
