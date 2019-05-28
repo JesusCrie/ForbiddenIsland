@@ -4,16 +4,20 @@ import iut2.forbiddenisland.controller.request.Request;
 import iut2.forbiddenisland.controller.request.RequestType;
 import iut2.forbiddenisland.controller.request.Response;
 import iut2.forbiddenisland.model.Board;
-import iut2.forbiddenisland.model.adventurer.Power;
-import iut2.forbiddenisland.model.cell.Cell;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+/**
+ * This power allow the current player to send cards to any player.
+ */
 public class MessengerPower implements Power {
 
     @Override
     public void alterRequest(final Request req, final Board board) {
-        if (req.getType() == RequestType.PLAYER_SEND) {
+        if (req.getType() == RequestType.PLAYER_SEND
+                && req.getCurrentPlayer().equals(req.getData(Request.DATA_PLAYER))
+                && !req.getData(Request.DATA_PLAYER).equals(req.getData(Request.DATA_PLAYER_EXTRA))) {
             req.bypassChecks();
         }
     }
@@ -23,7 +27,13 @@ public class MessengerPower implements Power {
     public void alterResponse(final Response res, final Board board) {
         if (res.getOriginRequest().getType() == RequestType.PLAYERS_SENDABLE) {
             final Response<List<Adventurer>> castedRes = (Response<List<Adventurer>>) res;
-            castedRes.getData().add(null /* TODO add player cells */);
+
+            final List<Adventurer> players = board.getCells().values().stream()
+                    .flatMap(c -> c.getAdventurers().stream())
+                    .filter(pl -> !pl.equals(res.getOriginRequest().getCurrentPlayer()))
+                    .collect(Collectors.toList());
+
+            castedRes.setData(players);
         }
     }
 }

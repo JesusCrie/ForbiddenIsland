@@ -18,7 +18,7 @@ public class ModelProxy {
 
         // Configure middlewares
         middlewares = Arrays.asList(
-                new PowerMiddleware()
+                new PowerMiddleware(board)
         );
     }
 

@@ -1,5 +1,7 @@
 package iut2.forbiddenisland.model;
 
+import java.util.Objects;
+
 /**
  * Represent a pair of (x, y) coordinates.
  * Two locations are equals if they have the same coordinates.
@@ -31,6 +33,11 @@ public class Location {
 
     public int getY() {
         return y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 
     @Override

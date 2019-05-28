@@ -14,6 +14,7 @@ public enum RequestType {
 
     /**
      * Used to query every cells on the board.
+     * = Map&lt;Location, Cell&gt;
      */
     CELLS_ALL,
 

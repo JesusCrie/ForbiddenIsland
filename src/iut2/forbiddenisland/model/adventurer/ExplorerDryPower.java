@@ -7,9 +7,13 @@ import iut2.forbiddenisland.controller.request.Response;
 import iut2.forbiddenisland.model.Board;
 import iut2.forbiddenisland.model.Location;
 import iut2.forbiddenisland.model.cell.Cell;
+import iut2.forbiddenisland.model.cell.CellState;
 
 import java.util.List;
 
+/**
+ * Allow the current player to dry cells in the diagonals.
+ */
 public class ExplorerDryPower implements Power {
 
     @Override
@@ -18,8 +22,9 @@ public class ExplorerDryPower implements Power {
             final Location position = req.getCurrentPlayer().getPosition().getLocation();
 
             for (Location loc : Utils.getCornerCells(position)) {
+                final Cell cell = req.getData(Request.DATA_CELL);
 
-                if (req.<Cell>getData(Request.DATA_CELL).getLocation().equals(loc)) {
+                if (cell.getLocation().equals(loc) && cell.getState() == CellState.WET) {
                     req.bypassChecks();
                 }
             }

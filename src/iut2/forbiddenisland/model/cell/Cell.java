@@ -6,7 +6,7 @@ import iut2.forbiddenisland.model.adventurer.Adventurer;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Cell {
+public class Cell {
 
     private final String name;
     private CellState state = CellState.DRY;

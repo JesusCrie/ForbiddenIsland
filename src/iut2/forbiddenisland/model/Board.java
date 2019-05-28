@@ -4,7 +4,6 @@ import iut2.forbiddenisland.controller.request.Request;
 import iut2.forbiddenisland.controller.request.Response;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.Card;
-import iut2.forbiddenisland.model.card.FloodCard;
 import iut2.forbiddenisland.model.card.FloodDeck;
 import iut2.forbiddenisland.model.card.TreasureDeck;
 import iut2.forbiddenisland.model.cell.Cell;
@@ -40,7 +39,7 @@ public class Board {
         switch (r.getType()) {
             // *** Cells related requests ***
             case CELLS_ALL:
-                return (Response<T>) new Response<Map<Location, Cell>>(r, true).setData(cells);
+                return (Response<T>) new Response<Map<Location, Cell>>(r, true).setData(getCells());
             case CELLS_REACHABLE:
                 return (Response<T>) new Response<List<Cell>>(r, true)
                         .setData(getReachableCells(r.getCurrentPlayer(), r.getData(Request.DATA_CELL)));
@@ -102,16 +101,12 @@ public class Board {
         return Response.EMPTY;
     }
 
-    /**
-     */
+    // *** Responses logic ***
+
     public int getPlayerMoveAmount() {
         return 3;
     }
 
-    /**
-     * @param p
-     * @param c
-     */
     public List<Cell> getReachableCells(final Adventurer p, final Cell c) {
         return Stream.of( // TODO when utils
                 Location.from(c.getLocation().getX() + 1, c.getLocation().getY()),
@@ -123,9 +118,6 @@ public class Board {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * @param p
-     */
     public List<Cell> getCellsDryable(final Adventurer p) {
         final Location loc = p.getPosition().getLocation();
 
@@ -140,28 +132,18 @@ public class Board {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * @param p
-     */
     public List<Adventurer> getPlayersSendable(final Adventurer p) {
         return cells.get(p.getPosition().getLocation()).getAdventurers().stream()
                 .filter(anAdventurer -> anAdventurer != p)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * @param p
-     */
     public List<Treasure> getTreasuresClaimable(final Adventurer p) {
         return p.getPosition() instanceof TreasureCell ?
                 new ArrayList<>(Collections.singletonList(((TreasureCell) p.getPosition()).getTreasure()))
                 : new ArrayList<>();
     }
 
-    /**
-     * @param p
-     * @param c
-     */
     public boolean movePlayer(final Adventurer p, final Cell c) {
         if (getReachableCells(p, p.getPosition()).contains(c)) {
             p.move(c);
@@ -171,10 +153,6 @@ public class Board {
         return false;
     }
 
-    /**
-     * @param p
-     * @param c
-     */
     public boolean dryCell(final Adventurer p, final Cell c) {
         if (getReachableCells(p, p.getPosition()).contains(c) && c.getState() == CellState.WET) {
             c.setState(CellState.DRY);
@@ -184,11 +162,6 @@ public class Board {
         return false;
     }
 
-    /**
-     * @param from
-     * @param to
-     * @param c
-     */
     public boolean sendCard(final Adventurer from, final Adventurer to, final Card c) {
         if (getReachableCells(from, from.getPosition()).contains(to.getPosition())
                 && from.getCards().contains(c)) {
@@ -200,10 +173,6 @@ public class Board {
         return false;
     }
 
-    /**
-     * @param p
-     * @param c
-     */
     public boolean claimTreasure(final Adventurer p, final TreasureCell c) {
         if (getReachableCells(p, p.getPosition()).contains(c)
                 && c.getTreasure().isClaimable()) {
@@ -214,17 +183,7 @@ public class Board {
         return false;
     }
 
-    public boolean flood() {
-        final int cardAmount = getWaterLevel().computeAmountFloodCards();
-
-        for (int i = 0; i < cardAmount; i++) {
-            final FloodCard card = (FloodCard) getFloodDeck().drawCard();
-            card.getTargetedCell().waterUp();
-            getFloodDeck().discardCard(card);
-        }
-
-        return true;
-    }
+    // *** Game state related getters ***
 
     public WaterLevel getWaterLevel() {
         return waterLevel;
@@ -234,19 +193,39 @@ public class Board {
         return floodDeck;
     }
 
+    public Map<Location, Cell> getCells() {
+        return cells;
+    }
+
     public Cell getCell(final Location l) {
         return cells.get(l);
     }
 
     public Cell getCellIfDry(final Location l) {
-        return cells.get(l).getState() == CellState.DRY ? cells.get(l) : null;
+        final Cell c = getCell(l);
+        if (c != null && c.getState() == CellState.DRY)
+            return c;
+        return null;
     }
 
     public Cell getCellIfWet(final Location l) {
-        return cells.get(l).getState() == CellState.WET ? cells.get(l) : null;
+        final Cell c = getCell(l);
+        if (c != null && c.getState() == CellState.WET)
+            return c;
+        return null;
     }
 
     public Cell getCellIfFlooded(final Location l) {
-        return cells.get(l).getState() == CellState.FLOODED ? cells.get(l) : null;
+        final Cell c = getCell(l);
+        if (c != null && c.getState() == CellState.FLOODED)
+            return c;
+        return null;
+    }
+
+    public Cell getCellIfNotFlooded(final Location l) {
+        final Cell c = getCell(l);
+        if (c != null && c.getState() != CellState.FLOODED)
+            return c;
+        return null;
     }
 }
