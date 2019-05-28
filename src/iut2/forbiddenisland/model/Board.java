@@ -85,11 +85,13 @@ public class Board {
                 return (Response<T>) new Response<FloodCard>(r, true)
                         .setData(islandDrawCard());
             case ISLAND_APPLY:
-                break; // TODO
+                break; // TODO c'est quoi ce truc je comprend pas
             case ISLAND_WATER_LEVEL:
-                break; // TODO
+                return (Response<T>) new Response<Integer>(r, true)
+                        .setData(getWaterLevel().computeAmountFloodCards());
             case ISLAND_WATER_UP:
-                break; // TODO
+                return (Response<T>) new Response<Boolean>(r, true)
+                        .setData(incrementWaterLevel(r.getData(Request.DATA_AMOUNT)));
 
             // *** Game related requests ***
             case GAME_NEW_ROUND:
@@ -315,6 +317,13 @@ public class Board {
 
     public FloodCard islandDrawCard(){
         return floodDeck.drawCard();
+    }
+
+    public boolean incrementWaterLevel(int i){
+        for(int j = 0; j < i; i++){
+            getWaterLevel().incrementWater();
+        }
+        return true;
     }
 
 }
