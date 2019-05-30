@@ -9,12 +9,11 @@ public class Request {
 
     // *** Data constants ***
 
-    public static final int DATA_REMAINING_ACTIONS = 1;
-    public static final int DATA_AMOUNT = 2;
-    public static final int DATA_PLAYER = 3;
-    public static final int DATA_PLAYER_EXTRA = 4;
-    public static final int DATA_CELL = 5;
-    public static final int DATA_CARD = 6;
+    public static final int DATA_AMOUNT = 1;
+    public static final int DATA_PLAYER = 2;
+    public static final int DATA_PLAYER_EXTRA = 3;
+    public static final int DATA_CELL = 4;
+    public static final int DATA_CARD = 5;
 
     private final RequestType type;
     private final Adventurer currentPlayer;

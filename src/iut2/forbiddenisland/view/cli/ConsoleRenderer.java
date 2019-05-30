@@ -10,20 +10,25 @@ public class ConsoleRenderer {
         StringBuilder line;
         final StringBuilder output = new StringBuilder();
 
+        // Header line
+        line = newLine()
+                .append(" 0 1 2 3 4 5\n");
+        output.append(line);
+
         // First line
 
         // Padd 2 cells (4 spaces)
-        line = newLine()
+        line = newLine(0)
                 .append("    ")
                 .append(stateToAnsi(board.getCell(Location.from(2, 0)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(3, 0)).getState()))
                 .append("    \n");
-        
+
         // Append 2 times because each cell is 2 character wide
         output.append(line);
 
         // Second line
-        line = newLine()
+        line = newLine(1)
                 .append("  ")
                 .append(stateToAnsi(board.getCell(Location.from(1, 1)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(2, 1)).getState()))
@@ -33,7 +38,7 @@ public class ConsoleRenderer {
         output.append(line);
 
         // Third line
-        line = newLine()
+        line = newLine(2)
                 .append(stateToAnsi(board.getCell(Location.from(0, 2)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(1, 2)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(2, 2)).getState()))
@@ -44,7 +49,7 @@ public class ConsoleRenderer {
         output.append(line);
 
         // Fourth line
-        line = newLine()
+        line = newLine(3)
                 .append(stateToAnsi(board.getCell(Location.from(0, 3)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(1, 3)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(2, 3)).getState()))
@@ -55,7 +60,7 @@ public class ConsoleRenderer {
         output.append(line);
 
         // Fifth line
-        line = newLine()
+        line = newLine(4)
                 .append("  ").append(stateToAnsi(board.getCell(Location.from(1, 4)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(2, 4)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(3, 4)).getState()))
@@ -64,7 +69,7 @@ public class ConsoleRenderer {
         output.append(line);
 
         // Sixth line
-        line = newLine()
+        line = newLine(5)
                 .append("    ").append(stateToAnsi(board.getCell(Location.from(2, 5)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(3, 5)).getState()))
                 .append("    \n");
@@ -74,7 +79,15 @@ public class ConsoleRenderer {
     }
 
     private static StringBuilder newLine() {
-        return new StringBuilder("  ");
+        return newLine(null);
+    }
+
+    private static StringBuilder newLine(final Integer lineHeader) {
+        if (lineHeader == null) {
+            return new StringBuilder("  ");
+        } else {
+            return new StringBuilder(String.valueOf(lineHeader)).append(" ");
+        }
     }
 
     private static String stateToAnsi(final CellState state) {

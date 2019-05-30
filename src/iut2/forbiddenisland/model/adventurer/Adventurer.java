@@ -1,8 +1,8 @@
 package iut2.forbiddenisland.model.adventurer;
 
-import iut2.forbiddenisland.model.card.Card;
-import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.Treasure;
+import iut2.forbiddenisland.model.card.TreasureCard;
+import iut2.forbiddenisland.model.cell.Cell;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +14,7 @@ public abstract class Adventurer {
     private final List<Power> powers;
     private Cell position;
     private final List<Treasure> treasures = new ArrayList<>();
-    private List<Card> cards;
+    private List<TreasureCard> cards;
 
     public Adventurer(final String name, final Cell position, final Power... powers) {
         this.name = name;
@@ -45,19 +45,19 @@ public abstract class Adventurer {
         return treasures;
     }
 
-    public void addTreasure(Treasure t){
-        getTreasures().add(t);
+    public boolean addTreasure(Treasure t) {
+        return getTreasures().add(t);
     }
 
-    public List<Card> getCards() {
+    public List<TreasureCard> getCards() {
         return cards;
     }
 
-    public void addCard(Card c) {
-        getCards().add(c);
+    public boolean addCard(TreasureCard c) {
+        return getCards().add(c);
     }
 
-    public void removeCard(Card c){
-        getCards().remove(c);
+    public boolean removeCard(TreasureCard c) {
+        return getCards().remove(c);
     }
 }

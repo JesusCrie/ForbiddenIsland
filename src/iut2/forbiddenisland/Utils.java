@@ -21,4 +21,8 @@ public class Utils {
                 Location.from(loc.getX() - 1, loc.getY() - 1)
         };
     }
+
+    public static boolean isAdjacent(final Location loc1, final Location loc2) {
+        return Math.abs(loc1.getX() - loc2.getX()) + Math.abs(loc1.getY() - loc2.getY()) <= 1;
+    }
 }

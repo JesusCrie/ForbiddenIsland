@@ -5,24 +5,11 @@ import iut2.forbiddenisland.model.Treasure;
 
 public class TreasureCell extends Cell {
 
-	private Treasure treasure;
+	private final Treasure treasure;
 
-	/**
-	 * @param name
-	 * @param loc
-	 */
-	public TreasureCell(String name, Location loc) {
+	public TreasureCell(final String name, final Location loc, final Treasure treasure) {
 		super(name, loc);
-	}
-
-	/**
-	 * 
-	 * @param name
-	 * @param loc
-	 */
-	public void Cell(String name, Location loc) {
-		// TODO - implement iut2.forbiddenisland.model.cell.TreasureCell.iut2.forbiddenisland.model.cell.Cell
-		throw new UnsupportedOperationException();
+		this.treasure = treasure;
 	}
 
 	public Treasure getTreasure() {

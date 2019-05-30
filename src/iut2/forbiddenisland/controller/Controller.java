@@ -147,6 +147,14 @@ public class Controller {
         });
     }
 
-    public void observeClickEndRound() {}
+    /**
+     * The controller will subscribe to the provided observable
+     * and communicate the click of the new round to the engine when triggered.
+     *
+     * @param o - The observable to observe.
+     */
+    public void observeClickEndRound(final Observable<Void> o) {
+
+    }
 
 }
