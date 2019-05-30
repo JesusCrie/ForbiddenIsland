@@ -7,11 +7,12 @@ import iut2.forbiddenisland.controller.request.Response;
 import iut2.forbiddenisland.model.Board;
 import iut2.forbiddenisland.model.Location;
 import iut2.forbiddenisland.model.cell.Cell;
-import iut2.forbiddenisland.model.cell.CellState;
 
 import java.util.List;
 
-
+/**
+ * This power allow the current player to move in diagonals.
+ */
 public class ExplorerMovePower implements Power {
 
     @Override
@@ -20,7 +21,6 @@ public class ExplorerMovePower implements Power {
             final Location position = req.getCurrentPlayer().getPosition().getLocation();
 
             for (Location loc : Utils.getCornerCells(position)) {
-
                 if (req.<Cell>getData(Request.DATA_CELL).getLocation().equals(loc)) {
                     req.bypassChecks();
                 }
@@ -35,12 +35,10 @@ public class ExplorerMovePower implements Power {
             final Response<List<Cell>> castedRes = (Response<List<Cell>>) res;
 
             final Location position = res.getOriginRequest().getCurrentPlayer().getPosition().getLocation();
-            for (Location loc : Utils.getCornerCells(position)) {
 
-                final Cell cell = board.getCell(loc);
-                if (cell != null && cell.getState() != CellState.FLOODED) {
-                    castedRes.getData().add(cell);
-                }
+            for (Location loc : Utils.getCornerCells(position)) {
+                final Cell cell = board.getCellIfNotFlooded(loc);
+                if (cell != null) castedRes.getData().add(cell);
             }
         }
     }

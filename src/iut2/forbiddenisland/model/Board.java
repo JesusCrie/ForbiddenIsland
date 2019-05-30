@@ -37,8 +37,7 @@ public class Board {
         switch (r.getType()) {
             // *** Cells related requests ***
             case CELLS_ALL:
-                return (Response<T>) new Response<Map<Location, Cell>>(r, true)
-                        .setData(cells);
+                return (Response<T>) new Response<Map<Location, Cell>>(r, true).setData(getCells());
             case CELLS_REACHABLE:
                 return (Response<T>) new Response<List<Cell>>(r, true)
                         .setData(getReachableCells(r.getData(Request.DATA_CELL)));
@@ -54,7 +53,7 @@ public class Board {
                 return (Response<T>) new Response<Integer>(r, true)
                         .setData(getDrawAmount());
             case CARD_DRAW:
-                return (Response<T>) new Response<Boolean>(r,  drawCard(r.getData(Request.DATA_PLAYER), r.getData(Request.DATA_AMOUNT)));
+                return (Response<T>) new Response<Boolean>(r, drawCard(r.getData(Request.DATA_PLAYER), r.getData(Request.DATA_AMOUNT)));
             case CARD_USE:
                 return (Response<T>) new Response<Boolean>(r, useCard(r.getData(Request.DATA_PLAYER), r.getData(Request.DATA_CARD), r));
             case CARD_TRASH:
@@ -106,14 +105,13 @@ public class Board {
         return Response.EMPTY;
     }
 
-    /**
-     */
+    // *** Responses logic ***
+
     public int getPlayerMoveAmount() {
         return 3;
     }
 
     /**
-     *
      * @param c
      */
     public List<Cell> getReachableCells(final Cell c) {
@@ -124,9 +122,6 @@ public class Board {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * @param c
-     */
     public List<Cell> getCellsDryable(final Cell c) {
         final Location loc = c.getLocation();
 
@@ -138,39 +133,29 @@ public class Board {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * @param p
-     */
     public List<Adventurer> getPlayersSendable(final Adventurer p) {
         return cells.get(p.getPosition().getLocation()).getAdventurers().stream()
                 .filter(anAdventurer -> anAdventurer != p)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * @param p
-     */
     public List<Treasure> getTreasuresClaimable(final Adventurer p) {
-       List<Treasure> treasures = new ArrayList<>();
-       if(p.getPosition() instanceof TreasureCell){
-           TreasureCell c = (TreasureCell) p.getPosition();
-           for (Card card : p.getCards()){
-               if(card instanceof TreasurePartCard){
-                   if (((TreasurePartCard) card).getTreasure() == c.getTreasure()){
-                       treasures.add(c.getTreasure());
-                   }
-               }
-           }
-       }
-       return treasures;
+        List<Treasure> treasures = new ArrayList<>();
+        if (p.getPosition() instanceof TreasureCell) {
+            TreasureCell c = (TreasureCell) p.getPosition();
+            for (Card card : p.getCards()) {
+                if (card instanceof TreasurePartCard) {
+                    if (((TreasurePartCard) card).getTreasure() == c.getTreasure()) {
+                        treasures.add(c.getTreasure());
+                    }
+                }
+            }
+        }
+        return treasures;
     }
 
-    /**
-     * @param p
-     * @param c
-     */
     public boolean movePlayer(final Adventurer p, final Cell c, final Request r) {
-        if(r.canBypass()){
+        if (r.canBypass()) {
             p.move(c);
             return true;
         }
@@ -183,12 +168,8 @@ public class Board {
         return false;
     }
 
-    /**
-     * @param p
-     * @param c
-     */
     public boolean dryCell(final Adventurer p, final Cell c, final Request r) {
-        if(r.canBypass() && c.getState() == CellState.WET){
+        if (r.canBypass() && c.getState() == CellState.WET) {
             c.setState(CellState.DRY);
             return true;
         }
@@ -201,13 +182,8 @@ public class Board {
         return false;
     }
 
-    /**
-     * @param from
-     * @param to
-     * @param c
-     */
     public boolean sendCard(final Adventurer from, final Adventurer to, final Card c, final Request r) {
-        if(r.canBypass() && from.getCards().contains(c)){
+        if (r.canBypass() && from.getCards().contains(c)) {
             from.removeCard(c);
             to.addCard(c);
             return true;
@@ -224,12 +200,8 @@ public class Board {
         return false;
     }
 
-    /**
-     * @param p
-     * @param c
-     */
     public boolean claimTreasure(final Adventurer p, final TreasureCell c, final Request r) {
-        if (r.canBypass() && c.getTreasure().isClaimable()){
+        if (r.canBypass() && c.getTreasure().isClaimable()) {
             p.addTreasure(c.getTreasure());
             c.getTreasure().setClaimable(false);
             return true;
@@ -245,17 +217,7 @@ public class Board {
         return false;
     }
 
-    public boolean flood() {
-        final int cardAmount = getWaterLevel().computeAmountFloodCards();
-
-        for (int i = 0; i < cardAmount; i++) {
-            final FloodCard card = (FloodCard) getFloodDeck().drawCard();
-            card.getTargetedCell().waterUp();
-            getFloodDeck().discardCard(card);
-        }
-
-        return true;
-    }
+    // *** Game state related getters ***
 
     public WaterLevel getWaterLevel() {
         return waterLevel;
@@ -265,62 +227,83 @@ public class Board {
         return floodDeck;
     }
 
+    public Map<Location, Cell> getCells() {
+        return cells;
+    }
+
     public Cell getCell(final Location l) {
         return cells.get(l);
     }
 
     public Cell getCellIfDry(final Location l) {
-        return cells.get(l).getState() == CellState.DRY ? cells.get(l) : null;
+        final Cell c = getCell(l);
+        if (c != null && c.getState() == CellState.DRY)
+            return c;
+        return null;
     }
 
     public Cell getCellIfWet(final Location l) {
-        return cells.get(l).getState() == CellState.WET ? cells.get(l) : null;
+        final Cell c = getCell(l);
+        if (c != null && c.getState() == CellState.WET)
+            return c;
+        return null;
     }
 
     public Cell getCellIfFlooded(final Location l) {
-        return cells.get(l).getState() == CellState.FLOODED ? cells.get(l) : null;
+        final Cell c = getCell(l);
+        if (c != null && c.getState() == CellState.FLOODED)
+            return c;
+        return null;
     }
 
-    public int getDrawAmount(){
+    public Cell getCellIfNotFlooded(final Location l) {
+        final Cell c = getCell(l);
+        if (c != null && c.getState() != CellState.FLOODED)
+            return c;
+        return null;
+    }
+
+    public int getDrawAmount() {
         return 2;
     }
 
-    public boolean drawCard(final Adventurer p, final int drawAmount){
+    public boolean drawCard(final Adventurer p, final int drawAmount) {
         for (int i = 1; i <= drawAmount; i++) {
             p.addCard(treasureDeck.drawCard());
         }
         return true;
     }
 
-    public boolean useCard(final Adventurer p, final SpecialCard card, final Request r){
-        if(r.canBypass()){
+    public boolean useCard(final Adventurer p, final SpecialCard card, final Request r) {
+        if (r.canBypass()) {
             treasureDeck.discardCard(card);
             p.removeCard(card);
             return true;
         }
 
 
-        if(p.getCards().contains(card)){
+        if (p.getCards().contains(card)) {
             treasureDeck.discardCard(card);
             p.removeCard(card);
             return true;
         } else return false;
     }
 
-    public boolean trashCard(final Adventurer p, final Card c){
-        if (p.getCards().contains(c)){
+    public boolean trashCard(final Adventurer p, final Card c) {
+        if (p.getCards().contains(c)) {
             p.removeCard(c);
             treasureDeck.discardCard((TreasureCard) c);
             return true;
-        } return false;
+        }
+        return false;
     }
 
-    public FloodCard islandDrawCard(){
+    public FloodCard islandDrawCard() {
         return floodDeck.drawCard();
     }
 
-    public boolean incrementWaterLevel(int i){
-        for(int j = 0; j < i; i++){
+    public boolean incrementWaterLevel(int i) {
+        for (int j = 0; j < i; i++) {
             getWaterLevel().incrementWater();
         }
         return true;

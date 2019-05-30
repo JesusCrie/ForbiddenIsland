@@ -5,6 +5,7 @@ import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.model.*;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.Card;
+import iut2.forbiddenisland.model.card.SpecialCard;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
@@ -133,7 +134,7 @@ public class Controller {
      *
      * @param o - The observable to observe.
      */
-    public void observeClickCard(final Observable<Card> o) {
+    public void observeClickCard(final Observable<SpecialCard> o) {
         o.subscribe(card -> {
             if (gameMode.get() == GameMode.SEND) {
                 selectedCard = card;
