@@ -27,7 +27,7 @@ public class PilotPower implements Power {
     @Override
     public void alterResponse(final Response res) {
         if (res.getOriginRequest().getType() == RequestType.CELLS_REACHABLE && canUsePower) {
-            List<Cell> cells = /*board.getCell*/ null;
+            List<Cell> cells = board.getCellsNotFlooded();
             res.setData(cells);
             canUsePower = false;
         }

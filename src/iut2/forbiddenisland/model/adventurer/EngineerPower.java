@@ -10,23 +10,21 @@ public class EngineerPower implements Power {
     // if useAction = adventurer use one action
     // if not useAction = adventurer don't use action
     private boolean useAction = false;
-    private boolean lock = false;
 
     @Override
     public void alterRequest(final Request req) {
         if (req.getType() == RequestType.GAME_NEW_ROUND) {
             useAction = false;
-            lock = false;
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void alterResponse(final Response res) {
-        if (res.getOriginRequest().getType() == RequestType.PLAYER_DRY) {
-            if (useAction && !lock) {
+        if (res.getOriginRequest().getType() == RequestType.PLAYER_DRY && res.isOk()) {
+            if (useAction ) {
                 res.setData(0);
-                lock = true;
+                useAction = false;
             } else {
                 useAction = true;
             }
