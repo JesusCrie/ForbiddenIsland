@@ -1,4 +1,4 @@
-package iut2.forbiddenisland.model.cell;
+package iut2.forbiddenisland.view;
 
 public class CellNames {
     public static final String HELIPORT = "Héliport";

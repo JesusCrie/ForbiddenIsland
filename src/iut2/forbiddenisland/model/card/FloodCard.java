@@ -2,6 +2,9 @@ package iut2.forbiddenisland.model.card;
 
 import iut2.forbiddenisland.model.cell.Cell;
 
+/**
+ * Represent a card from the flood deck. Only playable by the island.
+ */
 public class FloodCard extends Card {
 
     private final Cell cell;

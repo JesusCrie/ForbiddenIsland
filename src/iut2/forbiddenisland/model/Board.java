@@ -19,15 +19,20 @@ import java.util.stream.Stream;
 public class Board {
 
     private final Map<Location, Cell> cells;
+    private final List<Adventurer> adventurers;
     private final WaterLevel waterLevel;
     private final FloodDeck floodDeck;
     private final TreasureDeck treasureDeck;
 
-    public Board(final Map<Location, Cell> cells, final WaterLevel waterLevel) {
+    public Board(final Map<Location, Cell> cells,
+                 final List<Adventurer> adventurers,
+                 final List<Treasure> treasures,
+                 final WaterLevel waterLevel) {
         this.cells = cells;
+        this.adventurers = adventurers;
         this.waterLevel = waterLevel;
-        this.floodDeck = new FloodDeck();
-        this.treasureDeck = new TreasureDeck();
+        this.floodDeck = new FloodDeck(cells.values());
+        this.treasureDeck = new TreasureDeck(treasures);
     }
 
     /**
@@ -274,12 +279,13 @@ public class Board {
 
     // *** Game state related getters ***
 
-    public WaterLevel getWaterLevel() {
-        return waterLevel;
+
+    public List<Adventurer> getAdventurers() {
+        return adventurers;
     }
 
-    public FloodDeck getFloodDeck() {
-        return floodDeck;
+    public WaterLevel getWaterLevel() {
+        return waterLevel;
     }
 
     public Map<Location, Cell> getCells() {

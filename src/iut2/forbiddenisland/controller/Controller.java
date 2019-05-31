@@ -154,7 +154,10 @@ public class Controller {
      * @param o - The observable to observe.
      */
     public void observeClickEndRound(final Observable<Void> o) {
-
+        o.subscribe(v -> {
+            engine.endPlayerRound();
+            // TODO maybe more end round things
+        });
     }
 
 }

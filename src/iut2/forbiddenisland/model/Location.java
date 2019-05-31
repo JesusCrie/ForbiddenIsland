@@ -35,15 +35,17 @@ public class Location {
         return y;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(x, y);
-    }
+    // Equality methods
 
     @Override
     public boolean equals(final Object obj) {
         if (!(obj instanceof Location))
             return false;
         return ((Location) obj).x == x && ((Location) obj).y == y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 }

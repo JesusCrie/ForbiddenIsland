@@ -4,6 +4,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 
+/**
+ * Represent any deck of cards.
+ *
+ * @param <T> - The type of cards to hold.
+ */
 public abstract class Deck<T extends Card> {
 
     protected final LinkedList<T> deck = new LinkedList<>();
