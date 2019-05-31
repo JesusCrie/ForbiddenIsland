@@ -144,13 +144,14 @@ public class BoardGenerator {
                 new Cell(CellNames.PURPLE_FOREST, locationProvider.get()),
                 new Cell(CellNames.LOST_LAGOON, locationProvider.get()),
                 new Cell(CellNames.FOGGY_SWAMP, locationProvider.get()),
+                new Cell(CellNames.OBSERVATORY, locationProvider.get()),
                 new Cell(CellNames.GHOST_ROCK, locationProvider.get()),
                 new Cell(CellNames.TWILIGHT_VAL, locationProvider.get()),
                 new Cell(CellNames.WATCHTOWER, locationProvider.get())
         );
     }
 
-    public static void createRandomBoard(final List<Adventurer> adventurers, final int initialWaterLevel) {
+    public static Board createRandomBoard(final List<Adventurer> adventurers, final int initialWaterLevel) {
         // Create the unique location provider of this build
         final Supplier<Location> locationProvider = createLocationProvider();
 
@@ -166,7 +167,7 @@ public class BoardGenerator {
         // Collect the stream by mapping the key to the location of the cell and the value to the cell itself
         ).collect(Collectors.toMap(Cell::getLocation, cell -> cell));
 
-        final Board board = new Board(
+        return new Board(
                 cells,
                 adventurers,
                 treasures,
