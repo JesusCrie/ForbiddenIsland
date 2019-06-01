@@ -17,7 +17,22 @@ public class DiverPower implements Power {
     @Override
     public void alterRequest(final Request req, final Board board) {
         if (req.getType() == RequestType.PLAYER_MOVE) {
-            // TODO
+            final Cell target = null;
+            final List<Cell> reachableCells = new ArrayList<>();
+            final List<Cell> floodedCells = new ArrayList<>();
+            for (Location loc : Utils.getCrossCells(req.getCurrentPlayer().getPosition().getLocation())){
+                final Cell cell = req.getData(Request.DATA_CELL);
+                if (cell != null){
+                    if(cell == target){
+                        return;
+                    }
+                    reachableCells.add(cell);
+                }
+            }
+            if (checkDiverMoveCell(board, reachableCells, floodedCells, req.getCurrentPlayer().getPosition().getLocation(), target)){
+                req.bypassChecks();
+                return;
+            }
         }
     }
 
@@ -45,5 +60,25 @@ public class DiverPower implements Power {
                 getDriverReachableCells(board, reachableCells, floodedCells, cell.getLocation());
             }
         }
+    }
+
+    private boolean checkDiverMoveCell(final Board board, final List<Cell> reachableCells, final List<Cell> floodedCells, final Location pos, final Cell target) {
+        for (Location loc : Utils.getCrossCells(pos)) {
+            final Cell cell = board.getCell(loc);
+            if (cell != null && cell.getState() != CellState.FLOODED
+                    && reachableCells.contains(cell)) {
+                if (cell.equals(target)) {
+                    return true;
+                }
+                reachableCells.add(cell);
+
+            } else if (cell != null && !floodedCells.contains(cell)) {
+                floodedCells.add(cell);
+                if (checkDiverMoveCell(board, reachableCells, floodedCells, cell.getLocation(), target)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
