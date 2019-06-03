@@ -23,6 +23,7 @@ public class ExplorerMovePower implements Power {
             for (Location loc : Utils.getCornerCells(position)) {
                 if (req.<Cell>getData(Request.DATA_CELL).getLocation().equals(loc)) {
                     req.bypassChecks();
+                    return;
                 }
             }
         }
