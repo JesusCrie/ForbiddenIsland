@@ -14,6 +14,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Allow the current player to reach any cell as long as there is a path
+ * of flooded cells between him and the desired cell.
+ */
 public class DiverPower implements Power {
 
     @Override
