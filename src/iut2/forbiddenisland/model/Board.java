@@ -20,6 +20,7 @@ public class Board {
 
     private final Map<Location, Cell> cells;
     private final List<Adventurer> adventurers;
+    private final List<Treasure> treasures;
     private final WaterLevel waterLevel;
     private final FloodDeck floodDeck;
     private final TreasureDeck treasureDeck;
@@ -30,6 +31,7 @@ public class Board {
                  final WaterLevel waterLevel) {
         this.cells = cells;
         this.adventurers = adventurers;
+        this.treasures = treasures;
         this.waterLevel = waterLevel;
         this.floodDeck = new FloodDeck(cells.values());
         this.treasureDeck = new TreasureDeck(treasures);
@@ -282,6 +284,10 @@ public class Board {
 
     public List<Adventurer> getAdventurers() {
         return adventurers;
+    }
+
+    public List<Treasure> getTreasures() {
+        return treasures;
     }
 
     public WaterLevel getWaterLevel() {

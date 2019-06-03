@@ -10,6 +10,7 @@ public class CliPrompter {
     private static final Scanner IN = new Scanner(System.in);
     private static final PrintStream OUT = System.out;
 
+    @SafeVarargs
     public static void createMenu(final String prompt, final Pair<String, Runnable>... actions) {
         OUT.println(prompt);
 
@@ -19,7 +20,7 @@ public class CliPrompter {
 
         int res;
         do {
-            res = askPositiveInt(prompt, actions.length);
+            res = askPositiveInt("> ", actions.length);
         } while (res == -1);
 
         actions[res].getRight().run();
@@ -46,7 +47,7 @@ public class CliPrompter {
     }
 
     public static String askString(final String prompt) {
-        OUT.print(prompt + ": ");
+        OUT.print(prompt + " ");
         return IN.nextLine();
     }
 }

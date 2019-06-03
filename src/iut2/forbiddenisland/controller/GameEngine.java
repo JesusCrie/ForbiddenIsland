@@ -135,6 +135,16 @@ public class GameEngine {
         return adventurers;
     }
 
+    /**
+     * Expose the water level of the board.
+     * Updated when the state of the water need a visual update.
+     *
+     * @return An observable of the water level of the board.
+     */
+    public Observable<WaterLevel> getWaterLevel() {
+        return waterLevel;
+    }
+
     // *** More getters that will trigger a request to the board ***
 
     /**

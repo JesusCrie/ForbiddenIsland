@@ -2,7 +2,13 @@ package iut2.forbiddenisland.view.cli;
 
 import iut2.forbiddenisland.model.Board;
 import iut2.forbiddenisland.model.Location;
+import iut2.forbiddenisland.model.Treasure;
+import iut2.forbiddenisland.model.adventurer.Adventurer;
+import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.CellState;
+import iut2.forbiddenisland.model.cell.TreasureCell;
+
+import java.util.stream.Collectors;
 
 public class ConsoleRenderer {
 
@@ -11,14 +17,14 @@ public class ConsoleRenderer {
         final StringBuilder output = new StringBuilder();
 
         // Header line
-        line = newLine()
+        line = newLineBoard()
                 .append(" 0 1 2 3 4 5\n");
         output.append(line);
 
         // First line
 
         // Padd 2 cells (4 spaces)
-        line = newLine(0)
+        line = newLineBoard(0)
                 .append("    ")
                 .append(stateToAnsi(board.getCell(Location.from(2, 0)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(3, 0)).getState()))
@@ -28,7 +34,7 @@ public class ConsoleRenderer {
         output.append(line);
 
         // Second line
-        line = newLine(1)
+        line = newLineBoard(1)
                 .append("  ")
                 .append(stateToAnsi(board.getCell(Location.from(1, 1)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(2, 1)).getState()))
@@ -38,7 +44,7 @@ public class ConsoleRenderer {
         output.append(line);
 
         // Third line
-        line = newLine(2)
+        line = newLineBoard(2)
                 .append(stateToAnsi(board.getCell(Location.from(0, 2)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(1, 2)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(2, 2)).getState()))
@@ -49,7 +55,7 @@ public class ConsoleRenderer {
         output.append(line);
 
         // Fourth line
-        line = newLine(3)
+        line = newLineBoard(3)
                 .append(stateToAnsi(board.getCell(Location.from(0, 3)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(1, 3)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(2, 3)).getState()))
@@ -60,7 +66,7 @@ public class ConsoleRenderer {
         output.append(line);
 
         // Fifth line
-        line = newLine(4)
+        line = newLineBoard(4)
                 .append("  ").append(stateToAnsi(board.getCell(Location.from(1, 4)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(2, 4)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(3, 4)).getState()))
@@ -69,25 +75,68 @@ public class ConsoleRenderer {
         output.append(line);
 
         // Sixth line
-        line = newLine(5)
+        line = newLineBoard(5)
                 .append("    ").append(stateToAnsi(board.getCell(Location.from(2, 5)).getState()))
                 .append(stateToAnsi(board.getCell(Location.from(3, 5)).getState()))
                 .append("    \n");
         output.append(line);
 
+        // Adventurers
+
+        output.append("\n");
+
+        for (int i = 0; i < board.getAdventurers().size(); i++) {
+            final Adventurer adventurer = board.getAdventurers().get(i);
+
+            line = newLine().append(adventurer.getName())
+                    .append(": X = ").append(adventurer.getPosition().getLocation().getX())
+                    .append(", Y = ").append(adventurer.getPosition().getLocation().getY())
+                    .append("\n");
+
+            output.append(line);
+        }
+
+        // Treasures
+
+        output.append("\n");
+
+        for (int i = 0; i < board.getTreasures().size(); i++) {
+            final Treasure treasure = board.getTreasures().get(i);
+
+            line = newLine().append(treasure.getName()).append("\n");
+
+            if (treasure.isClaimable()) {
+                line.append(board.getCells().values().stream()
+                        .filter(cell -> cell instanceof TreasureCell)
+                        .map(cell -> (TreasureCell) cell)
+                        .filter(cell -> cell.getTreasure() == treasure)
+                        .map(Cell::getLocation)
+                        .map(location -> "\tAt X = " + location.getX() + ", Y = " + location.getY())
+                        .collect(Collectors.joining("\n")));
+            } else {
+                line.append("\tAlready taken");
+            }
+
+            output.append(line).append("\n");
+        }
+
         return output.toString();
     }
 
-    private static StringBuilder newLine() {
-        return newLine(null);
+    private static StringBuilder newLineBoard() {
+        return newLineBoard(null);
     }
 
-    private static StringBuilder newLine(final Integer lineHeader) {
+    private static StringBuilder newLineBoard(final Integer lineHeader) {
         if (lineHeader == null) {
             return new StringBuilder("  ");
         } else {
             return new StringBuilder(String.valueOf(lineHeader)).append(" ");
         }
+    }
+
+    private static StringBuilder newLine() {
+        return new StringBuilder();
     }
 
     private static String stateToAnsi(final CellState state) {
