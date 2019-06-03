@@ -10,13 +10,13 @@ import java.util.Arrays;
 public class TestDemoBoard {
 
     public static void main(String[] args) {
-        /*final Board board = DemoBoard.createAndGet(Arrays.asList(
+        final Board board = DemoBoard.createAndGet(Arrays.asList(
                 new Pilot(), new Navigator(), new Explorer(), new Messenger()
-        ));*/
+        ));
 
-        final Board board = BoardGenerator.createRandomBoard(Arrays.asList(
+        /*final Board board = BoardGenerator.createRandomBoard(Arrays.asList(
                 new Pilot(), new Navigator(), new Explorer(), new Messenger()
-        ), 1);
+        ), 1);*/
 
         System.out.println(ConsoleRenderer.buildBoard(board));
     }

@@ -16,7 +16,7 @@ public class ModelProxy {
     public ModelProxy(final Board board) {
         this.board = board;
 
-        // Configure middlewares
+        // Configure middleware
         middlewares = Arrays.asList(
                 new PowerMiddleware(board)
         );

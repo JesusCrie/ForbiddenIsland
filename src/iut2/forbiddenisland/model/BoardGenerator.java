@@ -151,6 +151,13 @@ public class BoardGenerator {
         );
     }
 
+    /**
+     * Create a random board, giving a list of adventurers and an initial water level.
+     *
+     * @param adventurers       - The adventurers to put on the board.
+     * @param initialWaterLevel - The initial water level of the board.
+     * @return A random board with the adventurers on their start cell.
+     */
     public static Board createRandomBoard(final List<Adventurer> adventurers, final int initialWaterLevel) {
         // Create the unique location provider of this build
         final Supplier<Location> locationProvider = createLocationProvider();
@@ -164,7 +171,7 @@ public class BoardGenerator {
                         createTreasureCells(treasures, locationProvider).stream()
                 ),
                 createCommonCells(locationProvider).stream()
-        // Collect the stream by mapping the key to the location of the cell and the value to the cell itself
+                // Collect the stream by mapping the key to the location of the cell and the value to the cell itself
         ).collect(Collectors.toMap(Cell::getLocation, cell -> cell));
 
         return new Board(
