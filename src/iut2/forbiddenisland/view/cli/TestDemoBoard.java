@@ -20,6 +20,6 @@ public class TestDemoBoard {
                 new Pilot(), new Navigator(), new Explorer(), new Messenger()
         ), 1);
 
-        System.out.println(ConsoleRenderer.buildBoard(board));
+        System.out.println(ConsoleRenderer.drawBoard(board));
     }
 }

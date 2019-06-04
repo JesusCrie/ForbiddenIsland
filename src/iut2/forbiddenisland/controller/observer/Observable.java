@@ -8,6 +8,10 @@ public class Observable<T> {
     private final List<Observer<T>> listeners = new ArrayList<>();
     protected T value;
 
+    public Observable() {
+        this(null);
+    }
+
     public Observable(final T initialValue) {
         set(initialValue);
     }

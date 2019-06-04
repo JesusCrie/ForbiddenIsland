@@ -10,6 +10,7 @@ import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
 import java.util.List;
+import java.util.Map;
 
 public class Controller {
 
@@ -27,7 +28,7 @@ public class Controller {
         return gameMode;
     }
 
-    public Observable<List<Cell>> getCells() {
+    public Observable<Map<Location, Cell>> getCells() {
         return engine.getCells();
     }
 
@@ -37,6 +38,14 @@ public class Controller {
 
     public Observable<List<Adventurer>> getAdventurers() {
         return engine.getAdventurers();
+    }
+
+    public Observable<Adventurer> getCurrentAdventurer() {
+        return engine.getCurrentPlayer();
+    }
+
+    public Observable<List<Treasure>> getTreasures() {
+        return engine.getTreasures();
     }
 
     /**

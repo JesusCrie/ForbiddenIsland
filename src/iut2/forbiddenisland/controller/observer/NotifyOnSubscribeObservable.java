@@ -7,7 +7,11 @@ package iut2.forbiddenisland.controller.observer;
  *
  * @param <T> - The type of wrapped object.
  */
-public class NotifyOnSubscribeObservable<T> extends Observable<T> {
+public class NotifyOnSubscribeObservable<T> extends NotifyOnCreateObservable<T> {
+
+    public NotifyOnSubscribeObservable() {
+        super(null);
+    }
 
     public NotifyOnSubscribeObservable(final T initialValue) {
         super(initialValue);

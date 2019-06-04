@@ -118,6 +118,12 @@ public enum RequestType {
     // *** Island related requests ***
 
     /**
+     * Used to query the treasures of the board.
+     * = List&lt;Treasure&gt;
+     */
+    TREASURES_ALL,
+
+    /**
      * Used to make the island draw a flood card.
      * = FloodCard
      */

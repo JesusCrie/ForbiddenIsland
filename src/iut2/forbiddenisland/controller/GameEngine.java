@@ -7,6 +7,8 @@ import iut2.forbiddenisland.controller.request.Request;
 import iut2.forbiddenisland.controller.request.RequestType;
 import iut2.forbiddenisland.controller.request.Response;
 import iut2.forbiddenisland.model.Board;
+import iut2.forbiddenisland.model.Location;
+import iut2.forbiddenisland.model.Treasure;
 import iut2.forbiddenisland.model.WaterLevel;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.Card;
@@ -17,15 +19,17 @@ import iut2.forbiddenisland.model.cell.TreasureCell;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class GameEngine {
 
     private final PlayerManagement players;
     private final ModelProxy modelProxy;
 
-    private final Observable<List<Cell>> cells;
+    private final Observable<Map<Location, Cell>> cells;
     private final Observable<List<Adventurer>> adventurers;
     private final Observable<WaterLevel> waterLevel;
+    private final Observable<List<Treasure>> treasures;
     private final Observable<Integer> remainingActions;
 
     public GameEngine(final Board board, final Adventurer... players) {
@@ -36,6 +40,7 @@ public class GameEngine {
         cells = createCellsObs();
         adventurers = createAdventurersObs();
         waterLevel = createWaterLevelObs();
+        treasures = createTreasureObs();
 
         remainingActions = new NotifyOnSubscribeObservable<>(0);
     }
@@ -48,12 +53,12 @@ public class GameEngine {
      *
      * @return An observable that auto updates it self when it changes.
      */
-    private Observable<List<Cell>> createCellsObs() {
-        return new NotifyOnCreateObservable<List<Cell>>() {
+    private Observable<Map<Location, Cell>> createCellsObs() {
+        return new NotifyOnSubscribeObservable<>() {
             @Override
             public void notifyChanges() {
                 // Query all cells
-                final Response<List<Cell>> allCells = modelProxy.request(
+                final Response<Map<Location, Cell>> allCells = modelProxy.request(
                         new Request(RequestType.CELLS_ALL, getCurrentPlayer().get())
                 );
 
@@ -79,7 +84,7 @@ public class GameEngine {
      * @return An observable for the current water level.
      */
     private Observable<WaterLevel> createWaterLevelObs() {
-        return new NotifyOnCreateObservable<WaterLevel>() {
+        return new NotifyOnSubscribeObservable<>() {
             @Override
             public void notifyChanges() {
                 // Query water level
@@ -88,6 +93,27 @@ public class GameEngine {
                 );
 
                 value = waterLevel.getData();
+
+                super.notifyChanges();
+            }
+        };
+    }
+
+    /**
+     * Create an observable that will keep an updated version of the treasures.
+     *
+     * @return An observable of the treasures.
+     */
+    private Observable<List<Treasure>> createTreasureObs() {
+        return new NotifyOnSubscribeObservable<>() {
+            @Override
+            public void notifyChanges() {
+                // Query treasures
+                final Response<List<Treasure>> treasures = modelProxy.request(
+                        new Request(RequestType.TREASURES_ALL, getCurrentPlayer().get())
+                );
+
+                value = treasures.getData();
 
                 super.notifyChanges();
             }
@@ -121,7 +147,7 @@ public class GameEngine {
      *
      * @return An observable of every cells currently on the board.
      */
-    public Observable<List<Cell>> getCells() {
+    public Observable<Map<Location, Cell>> getCells() {
         return cells;
     }
 
@@ -143,6 +169,16 @@ public class GameEngine {
      */
     public Observable<WaterLevel> getWaterLevel() {
         return waterLevel;
+    }
+
+    /**
+     * Expose the treasures of the board.
+     * Updated when the state of the treasures need a visual update.
+     *
+     * @return An observable of each treasures of the board.
+     */
+    public Observable<List<Treasure>> getTreasures() {
+        return treasures;
     }
 
     // *** More getters that will trigger a request to the board ***

@@ -86,6 +86,9 @@ public class Board {
                         .setData(getPlayersSendable(r.getCurrentPlayer()));
 
             // *** Island related requests ***
+            case TREASURES_ALL:
+                return (Response<T>) new Response<List<Treasure>>(r, true)
+                        .setData(getTreasures());
             case ISLAND_DRAW:
                 return (Response<T>) new Response<FloodCard>(r, true)
                         .setData(islandDrawCard());

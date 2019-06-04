@@ -8,11 +8,14 @@ import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.CellState;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ConsoleRenderer {
 
-    public static String buildBoard(final Board board) {
+    public static String drawBoard(final Map<Location, Cell> cells, final List<Treasure> treasures,
+                                   final List<Adventurer> players) {
         StringBuilder line;
         final StringBuilder output = new StringBuilder();
 
@@ -26,8 +29,8 @@ public class ConsoleRenderer {
         // Padd 2 cells (4 spaces)
         line = newLineBoard(0)
                 .append("    ")
-                .append(stateToAnsi(board.getCell(Location.from(2, 0)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(3, 0)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(2, 0)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(3, 0)).getState()))
                 .append("    \n");
 
         // Append 2 times because each cell is 2 character wide
@@ -36,48 +39,48 @@ public class ConsoleRenderer {
         // Second line
         line = newLineBoard(1)
                 .append("  ")
-                .append(stateToAnsi(board.getCell(Location.from(1, 1)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(2, 1)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(3, 1)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(4, 1)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(1, 1)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(2, 1)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(3, 1)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(4, 1)).getState()))
                 .append("  \n");
         output.append(line);
 
         // Third line
         line = newLineBoard(2)
-                .append(stateToAnsi(board.getCell(Location.from(0, 2)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(1, 2)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(2, 2)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(3, 2)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(4, 2)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(5, 2)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(0, 2)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(1, 2)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(2, 2)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(3, 2)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(4, 2)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(5, 2)).getState()))
                 .append("\n");
         output.append(line);
 
         // Fourth line
         line = newLineBoard(3)
-                .append(stateToAnsi(board.getCell(Location.from(0, 3)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(1, 3)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(2, 3)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(3, 3)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(4, 3)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(5, 3)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(0, 3)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(1, 3)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(2, 3)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(3, 3)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(4, 3)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(5, 3)).getState()))
                 .append("\n");
         output.append(line);
 
         // Fifth line
         line = newLineBoard(4)
-                .append("  ").append(stateToAnsi(board.getCell(Location.from(1, 4)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(2, 4)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(3, 4)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(4, 4)).getState()))
+                .append("  ").append(stateToAnsi(cells.get(Location.from(1, 4)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(2, 4)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(3, 4)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(4, 4)).getState()))
                 .append("  \n");
         output.append(line);
 
         // Sixth line
         line = newLineBoard(5)
-                .append("    ").append(stateToAnsi(board.getCell(Location.from(2, 5)).getState()))
-                .append(stateToAnsi(board.getCell(Location.from(3, 5)).getState()))
+                .append("    ").append(stateToAnsi(cells.get(Location.from(2, 5)).getState()))
+                .append(stateToAnsi(cells.get(Location.from(3, 5)).getState()))
                 .append("    \n");
         output.append(line);
 
@@ -85,8 +88,8 @@ public class ConsoleRenderer {
 
         output.append("\n");
 
-        for (int i = 0; i < board.getAdventurers().size(); i++) {
-            final Adventurer adventurer = board.getAdventurers().get(i);
+        for (int i = 0; i < players.size(); i++) {
+            final Adventurer adventurer = players.get(i);
 
             line = newLine().append(adventurer.getName())
                     .append(": X = ").append(adventurer.getPosition().getLocation().getX())
@@ -100,21 +103,21 @@ public class ConsoleRenderer {
 
         output.append("\n");
 
-        for (int i = 0; i < board.getTreasures().size(); i++) {
-            final Treasure treasure = board.getTreasures().get(i);
+        for (int i = 0; i < treasures.size(); i++) {
+            final Treasure treasure = treasures.get(i);
 
             line = newLine().append(treasure.getName()).append("\n");
 
             if (treasure.isClaimable()) {
-                line.append(board.getCells().values().stream()
+                line.append(cells.values().stream()
                         .filter(cell -> cell instanceof TreasureCell)
                         .map(cell -> (TreasureCell) cell)
                         .filter(cell -> cell.getTreasure() == treasure)
                         .map(Cell::getLocation)
-                        .map(location -> "\tAt X = " + location.getX() + ", Y = " + location.getY())
+                        .map(location -> "\tPosition: X = " + location.getX() + ", Y = " + location.getY())
                         .collect(Collectors.joining("\n")));
             } else {
-                line.append("\tAlready taken");
+                line.append("\tDéjà pris");
             }
 
             output.append(line).append("\n");
