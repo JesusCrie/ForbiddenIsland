@@ -18,6 +18,9 @@ public class PowerMiddleware implements Middleware {
 
     @Override
     public Request handleRequest(final Request request) {
+        if (request.getCurrentPlayer() == null)
+            return request;
+
         request.getCurrentPlayer().getPowers().forEach(
                 power -> power.alterRequest(request, board)
         );
@@ -27,6 +30,9 @@ public class PowerMiddleware implements Middleware {
 
     @Override
     public <T> Response<T> handleResponse(final Response<T> response) {
+        if (response.getOriginRequest().getCurrentPlayer() == null)
+            return response;
+
         response.getOriginRequest().getCurrentPlayer().getPowers().forEach(
                 power -> power.alterResponse(response, board)
         );

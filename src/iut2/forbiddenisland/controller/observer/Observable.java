@@ -13,7 +13,7 @@ public class Observable<T> {
     }
 
     public Observable(final T initialValue) {
-        set(initialValue);
+        value = initialValue;
     }
 
     /**

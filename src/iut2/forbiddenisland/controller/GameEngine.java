@@ -11,12 +11,10 @@ import iut2.forbiddenisland.model.Location;
 import iut2.forbiddenisland.model.Treasure;
 import iut2.forbiddenisland.model.WaterLevel;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
-import iut2.forbiddenisland.model.card.Card;
-import iut2.forbiddenisland.model.card.SpecialCard;
+import iut2.forbiddenisland.model.card.*;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +28,11 @@ public class GameEngine {
     private final Observable<List<Adventurer>> adventurers;
     private final Observable<WaterLevel> waterLevel;
     private final Observable<List<Treasure>> treasures;
+    private final Observable<Boolean> endGame;
     private final Observable<Integer> remainingActions;
 
-    public GameEngine(final Board board, final Adventurer... players) {
-        this.players = new PlayerManagement(Arrays.asList(players));
+    public GameEngine(final Board board, final List<Adventurer> players) {
+        this.players = new PlayerManagement(players);
 
         modelProxy = new ModelProxy(board);
 
@@ -41,8 +40,11 @@ public class GameEngine {
         adventurers = createAdventurersObs();
         waterLevel = createWaterLevelObs();
         treasures = createTreasureObs();
+        endGame = createEndGameObs();
 
         remainingActions = new NotifyOnSubscribeObservable<>(0);
+
+        newPlayerRound();
     }
 
     // *** Factory methods for complex observables ***
@@ -54,7 +56,7 @@ public class GameEngine {
      * @return An observable that auto updates it self when it changes.
      */
     private Observable<Map<Location, Cell>> createCellsObs() {
-        return new NotifyOnSubscribeObservable<>() {
+        return new NotifyOnSubscribeObservable<Map<Location, Cell>>() {
             @Override
             public void notifyChanges() {
                 // Query all cells
@@ -75,7 +77,7 @@ public class GameEngine {
      * @return An observable that will be notified when an adventurer changes.
      */
     private Observable<List<Adventurer>> createAdventurersObs() {
-        return new Observable<>(players.players);
+        return new NotifyOnSubscribeObservable<>(players.players);
     }
 
     /**
@@ -84,7 +86,7 @@ public class GameEngine {
      * @return An observable for the current water level.
      */
     private Observable<WaterLevel> createWaterLevelObs() {
-        return new NotifyOnSubscribeObservable<>() {
+        return new NotifyOnSubscribeObservable<WaterLevel>() {
             @Override
             public void notifyChanges() {
                 // Query water level
@@ -105,7 +107,7 @@ public class GameEngine {
      * @return An observable of the treasures.
      */
     private Observable<List<Treasure>> createTreasureObs() {
-        return new NotifyOnSubscribeObservable<>() {
+        return new NotifyOnSubscribeObservable<List<Treasure>>() {
             @Override
             public void notifyChanges() {
                 // Query treasures
@@ -114,6 +116,27 @@ public class GameEngine {
                 );
 
                 value = treasures.getData();
+
+                super.notifyChanges();
+            }
+        };
+    }
+
+    /**
+     * Create an observable that will keep the current win status of the game.
+     * True for a win, False for a defeat, and null if the game is still running.
+     *
+     * @return An observable of the game state.
+     */
+    private Observable<Boolean> createEndGameObs() {
+        return new NotifyOnCreateObservable<Boolean>() {
+            @Override
+            public void notifyChanges() {
+                final Response<Boolean> res = modelProxy.request(
+                        new Request(RequestType.GAME_CHECK_WIN, getCurrentPlayer().get())
+                );
+
+                value = res.getData();
 
                 super.notifyChanges();
             }
@@ -181,6 +204,15 @@ public class GameEngine {
         return treasures;
     }
 
+    /**
+     * Expose the status of the game
+     *
+     * @return An observable of the winning status of the game.
+     */
+    public Observable<Boolean> getEndGame() {
+        return endGame;
+    }
+
     // *** More getters that will trigger a request to the board ***
 
     /**
@@ -210,6 +242,19 @@ public class GameEngine {
         );
 
         return dryableCells.getData();
+    }
+
+    /**
+     * Get all adventurers whose you can send a card to.
+     *
+     * @return The list of players you can reach.
+     */
+    public List<Adventurer> getPlayersSendable() {
+        final Response<List<Adventurer>> sendablePlayers = modelProxy.request(
+                new Request(RequestType.PLAYERS_SENDABLE, getCurrentPlayer().get())
+        );
+
+        return sendablePlayers.getData();
     }
 
     // *** Player round related methods ***
@@ -246,8 +291,11 @@ public class GameEngine {
                         .putData(Request.DATA_CELL, cell)
         );
 
-        decrementActions(res.getData());
-        cells.notifyChanges();
+        if (res.isOk()) {
+            decrementActions(res.getData());
+            cells.notifyChanges();
+        }
+
         return res.isOk();
     }
 
@@ -259,11 +307,15 @@ public class GameEngine {
     public boolean dryCell(final Cell cell) {
         final Response<Integer> res = modelProxy.request(
                 new Request(RequestType.PLAYER_DRY, getCurrentPlayer().get())
+                        .putData(Request.DATA_PLAYER, getCurrentPlayer().get())
                         .putData(Request.DATA_CELL, cell)
         );
 
-        decrementActions(res.getData());
-        cells.notifyChanges();
+        if (res.isOk()) {
+            decrementActions(res.getData());
+            cells.notifyChanges();
+        }
+
         return res.isOk();
     }
 
@@ -278,9 +330,12 @@ public class GameEngine {
                         .putData(Request.DATA_CELL, cell)
         );
 
-        decrementActions(res.getData());
-        adventurers.notifyChanges();
-        cells.notifyChanges();
+        if (res.isOk()) {
+            decrementActions(res.getData());
+            adventurers.notifyChanges();
+            cells.notifyChanges();
+        }
+
         return res.isOk();
     }
 
@@ -298,8 +353,11 @@ public class GameEngine {
                         .putData(Request.DATA_CARD, card)
         );
 
-        decrementActions(res.getData());
-        adventurers.notifyChanges();
+        if (res.isOk()) {
+            decrementActions(res.getData());
+            adventurers.notifyChanges();
+        }
+
         return res.isOk();
     }
 
@@ -315,8 +373,11 @@ public class GameEngine {
                         .putData(Request.DATA_CARD, card)
         );
 
-        adventurers.notifyChanges();
-        cells.notifyChanges();
+        if (res.isOk()) {
+            adventurers.notifyChanges();
+            cells.notifyChanges();
+        }
+
         return res.isOk();
     }
 
@@ -330,8 +391,20 @@ public class GameEngine {
         ).getData();
 
         for (int i = 0; i < drawAmount; i++) {
-            modelProxy.request(new Request(RequestType.CARD_DRAW, getCurrentPlayer().get()));
+            final Response<TreasureCard> res = modelProxy.request(
+                    new Request(RequestType.CARD_DRAW, getCurrentPlayer().get())
+                            .putData(Request.DATA_PLAYER, getCurrentPlayer().get())
+                            .putData(Request.DATA_AMOUNT, 1) // Only one because the rising water card need to be applied immediately
+            );
+
+            if (res.getData() instanceof RisingWatersCard) {
+                modelProxy.request(new Request(RequestType.ISLAND_WATER_UP, getCurrentPlayer().get()));
+                waterLevel.notifyChanges();
+                startIslandTurn();
+            }
         }
+
+        newPlayerRound();
 
         cells.notifyChanges();
         adventurers.notifyChanges();
@@ -350,10 +423,12 @@ public class GameEngine {
         ).getData().computeAmountFloodCards();
 
         for (int i = 0; i < drawAmount; i++) {
-            modelProxy.request(new Request(RequestType.ISLAND_DRAW, null));
+            // Draw a card
+            final Response<FloodCard> floodCard = modelProxy.request(new Request(RequestType.ISLAND_DRAW, null));
+
+            // Use the card
+            modelProxy.request(new Request(RequestType.ISLAND_APPLY, null).putData(Request.DATA_CARD, floodCard.getData()));
         }
-
-
     }
 
     /**

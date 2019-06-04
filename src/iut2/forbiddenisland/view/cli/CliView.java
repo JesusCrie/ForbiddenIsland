@@ -6,7 +6,6 @@ import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.model.Location;
 import iut2.forbiddenisland.model.Treasure;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
-import iut2.forbiddenisland.model.card.Card;
 import iut2.forbiddenisland.model.card.TreasureCard;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.CellState;
@@ -26,13 +25,12 @@ public class CliView {
     private final Observable<Void> obsModeSend = new Observable<>();
     private final Observable<Void> obsModeClaim = new Observable<>();
 
-    private final Observable<List<Cell>> obsReachableCells;
-
     private Map<Location, Cell> cells;
     private List<Adventurer> players;
     private Adventurer currentPlayer;
     private List<Treasure> treasures;
     private int remainingActions;
+    private boolean gameOn = true;
 
     public CliView(final Controller controller) {
         controller.observeClickCell(obsClickCell);
@@ -45,18 +43,33 @@ public class CliView {
         controller.observeModeSend(obsModeSend);
         controller.observeModeTreasureClaim(obsModeClaim);
 
+        controller.getFeedbackObservable().subscribe(val -> System.out.println("\n" + val + "\n"));
+
         controller.getCells().subscribe(val -> cells = val);
         controller.getAdventurers().subscribe(val -> players = val);
         controller.getCurrentAdventurer().subscribe(val -> currentPlayer = val);
         controller.getTreasures().subscribe(val -> treasures = val);
         controller.getRemainingActions().subscribe(val -> remainingActions = val);
+        controller.getEndGameObservable().subscribe(val -> {
+            if (val == null)
+                return;
+
+            gameOn = false;
+
+            if (val)
+                System.out.println("****** Les joueurs ont gagnés ! ******");
+            else
+                System.out.println("****** L'Ile a gagner... ******");
+        });
     }
 
     public void start() {
-
+        while (gameOn) {
+            roundAction();
+        }
     }
 
-    private void round() {
+    private void roundAction() {
         final String board = ConsoleRenderer.drawBoard(cells, treasures, players);
         System.out.println(board);
         System.out.println("\n== Tour de: " + currentPlayer.getName() + " ==\n");
@@ -65,12 +78,18 @@ public class CliView {
                 Pair.of("Bouger", this::moveMode),
                 Pair.of("Assecher", this::dryMode),
                 Pair.of("Envoyer une carte", this::sendMode),
-                Pair.of("Récuperer un trésor", this::claimMode)
+                Pair.of("Récuperer un trésor", this::claimMode),
+                Pair.of("Fin du tour", this::roundEnd)
         );
+    }
+
+    private void roundEnd() {
+        obsEndRound.notifyChanges();
     }
 
     private void moveMode() {
         obsModeMove.notifyChanges();
+        obsClickPlayer.set(currentPlayer);
         System.out.println("== Ou voulez vous aller ? ==");
 
         final Location position = currentPlayer.getPosition().getLocation();
@@ -87,6 +106,9 @@ public class CliView {
         } while (to == null);
 
         obsClickCell.set(to);
+
+        // Back to round menu
+        roundAction();
     }
 
     private void dryMode() {
@@ -107,6 +129,9 @@ public class CliView {
         } while (to == null || to.getState() == CellState.WET);
 
         obsClickCell.set(to);
+
+        // Back to round menu
+        roundAction();
     }
 
     @SuppressWarnings("unchecked")
@@ -127,14 +152,17 @@ public class CliView {
 
         CliPrompter.createMenu("Selectionnez un destinataire", actionPlayers);
 
-        System.out.println("La carte a été envoyée");
-    }
-
-    private void cardSendStepThree(final Card card, final Adventurer target) {
-
+        // Back to round menu
+        roundAction();
     }
 
     private void claimMode() {
+        obsModeClaim.notifyChanges();
 
+        System.out.println("== Vous essayer de recuperer le trésor sur votre tuile ==");
+        obsClickCell.set(currentPlayer.getPosition());
+
+        // Back to round menu
+        roundAction();
     }
 }

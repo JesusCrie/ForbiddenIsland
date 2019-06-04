@@ -138,12 +138,12 @@ public enum RequestType {
 
     /**
      * Used to query the current water level of the island.
-     * = int
+     * = WaterLevel
      */
     ISLAND_WATER_LEVEL,
 
     /**
-     * Used to increase the water level of the island.
+     * Used to increase the water level of the island and reset the flood deck.
      * - DATA_AMOUNT: int
      * = boolean
      */
@@ -161,5 +161,11 @@ public enum RequestType {
      * Used to get the amount of movements allowed per player in one round.
      * = int
      */
-    GAME_MOVE_AMOUNT
+    GAME_MOVE_AMOUNT,
+
+    /**
+     * Used to check whether the game is over or not.
+     * = boolean
+     */
+    GAME_CHECK_WIN
 }

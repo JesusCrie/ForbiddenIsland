@@ -88,9 +88,7 @@ public class ConsoleRenderer {
 
         output.append("\n");
 
-        for (int i = 0; i < players.size(); i++) {
-            final Adventurer adventurer = players.get(i);
-
+        for (final Adventurer adventurer : players) {
             line = newLine().append(adventurer.getName())
                     .append(": X = ").append(adventurer.getPosition().getLocation().getX())
                     .append(", Y = ").append(adventurer.getPosition().getLocation().getY())

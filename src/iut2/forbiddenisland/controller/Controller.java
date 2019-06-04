@@ -12,6 +12,7 @@ import iut2.forbiddenisland.model.card.TreasureCard;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -19,12 +20,27 @@ public class Controller {
 
     private final GameEngine engine;
     private final Observable<GameMode> gameMode;
+    private final Observable<String> feedbackObs;
+    private final Observable<List<Adventurer>> sendableAdventurers;
+
     private Adventurer selectedAdventurer;
     private Card selectedCard;
 
-    public Controller(final Board board, final Adventurer... adventurers) {
+    public Controller(final Board board, final List<Adventurer> adventurers) {
         engine = new GameEngine(board, adventurers);
         gameMode = new NotifyOnSubscribeObservable<>(GameMode.IDLE);
+        feedbackObs = new Observable<>();
+        sendableAdventurers = new Observable<List<Adventurer>>() {
+            @Override
+            public void notifyChanges() {
+                value = engine.getPlayersSendable();
+                super.notifyChanges();
+            }
+        };
+    }
+
+    public Observable<String> getFeedbackObservable() {
+        return feedbackObs;
     }
 
     public Observable<GameMode> getGameMode() {
@@ -33,6 +49,36 @@ public class Controller {
 
     public Observable<Map<Location, Cell>> getCells() {
         return engine.getCells();
+    }
+
+    public Observable<List<Cell>> getHighlightedCells() {
+        return new NotifyOnSubscribeObservable<List<Cell>>() {
+            @Override
+            public void notifyChanges() {
+                switch (gameMode.get()) {
+                    case MOVE:
+                        value = engine.getReachableCells();
+                        break;
+                    case DRY:
+                        value = engine.getDryableCells();
+                        break;
+                    case SEND:
+                        value = Collections.emptyList();
+                        break;
+                    case TREASURE:
+                        final Cell current = getCurrentAdventurer().get().getPosition();
+                        if (current instanceof TreasureCell)
+                            value = Collections.singletonList(current);
+                        else
+                            value = Collections.emptyList();
+                    case IDLE:
+                    default:
+                        value = Collections.emptyList();
+                }
+
+                super.notifyChanges();
+            }
+        };
     }
 
     public Observable<Integer> getRemainingActions() {
@@ -47,8 +93,16 @@ public class Controller {
         return engine.getCurrentPlayer();
     }
 
+    public Observable<List<Adventurer>> getSendableAdventurers() {
+        return sendableAdventurers;
+    }
+
     public Observable<List<Treasure>> getTreasures() {
         return engine.getTreasures();
+    }
+
+    public Observable<Boolean> getEndGameObservable() {
+        return engine.getEndGame();
     }
 
     /**
@@ -101,14 +155,20 @@ public class Controller {
         o.subscribe(cell -> {
             switch (gameMode.get()) {
                 case MOVE:
-                    engine.movePlayer(selectedAdventurer, cell);
+                    if (!engine.movePlayer(selectedAdventurer, cell))
+                        feedbackObs.set("Vous n'avez pas le droit de vous deplacer ici !");
                     break;
                 case DRY:
-                    engine.dryCell(cell);
+                    if (!engine.dryCell(cell))
+                        feedbackObs.set("Vous n'avez pas le droit d'assecher cette tuile !");
                     break;
                 case TREASURE:
-                    if (cell instanceof TreasureCell)
-                        engine.claimTreasure((TreasureCell) cell);
+                    if (cell instanceof TreasureCell) {
+                        if (!engine.claimTreasure((TreasureCell) cell))
+                            feedbackObs.set("Vous ne pouvez pas recupérer ce trésor !");
+                    } else {
+                        feedbackObs.set("Ce n'est pas une tuile trésor !");
+                    }
                     break;
                 default:
                     break;
@@ -128,8 +188,10 @@ public class Controller {
                 case SEND:
                     selectedAdventurer = adventurer;
 
-                    if (selectedCard != null)
-                        engine.sendCard(selectedAdventurer, selectedCard);
+                    if (selectedCard != null) {
+                        if (!engine.sendCard(selectedAdventurer, selectedCard))
+                            feedbackObs.set("Vous ne pouvez pas envoyer cette carte à cet aventurier !");
+                    }
                     break;
                 case MOVE:
                     selectedAdventurer = adventurer;
@@ -151,10 +213,13 @@ public class Controller {
             if (gameMode.get() == GameMode.SEND) {
                 selectedCard = card;
 
-                if (selectedAdventurer != null)
-                    engine.sendCard(selectedAdventurer, selectedCard);
+                if (selectedAdventurer != null) {
+                    if (!engine.sendCard(selectedAdventurer, selectedCard))
+                        feedbackObs.set("Vous ne pouvez pas envoyer cette carte à cet aventurier !");
+                }
             } else if (card instanceof SpecialCard) {
-                engine.useCard((SpecialCard) card);
+                if (!engine.useCard((SpecialCard) card))
+                    feedbackObs.set("Vous ne pouvez pas utiliser cette carte !");
             }
         });
     }
@@ -168,6 +233,9 @@ public class Controller {
     public void observeClickEndRound(final Observable<Void> o) {
         o.subscribe(v -> {
             engine.endPlayerRound();
+            gameMode.set(GameMode.IDLE);
+
+            engine.startIslandTurn();
             // TODO maybe more end round things
         });
     }

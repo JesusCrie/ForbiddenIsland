@@ -7,6 +7,7 @@ import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.*;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.CellState;
+import iut2.forbiddenisland.model.cell.HeliportCell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
 import java.util.ArrayList;
@@ -95,8 +96,8 @@ public class Board {
             case ISLAND_APPLY:
                 return (Response<T>) new Response<Void>(r, islandUseCard(r.getData(Request.DATA_CARD)));
             case ISLAND_WATER_LEVEL:
-                return (Response<T>) new Response<Integer>(r, true)
-                        .setData(getWaterLevel().computeAmountFloodCards());
+                return (Response<T>) new Response<WaterLevel>(r, true)
+                        .setData(getWaterLevel());
             case ISLAND_WATER_UP:
                 return (Response<T>) new Response<Void>(r, incrementWaterLevel(r.getData(Request.DATA_AMOUNT)));
 
@@ -106,12 +107,15 @@ public class Board {
             case GAME_MOVE_AMOUNT:
                 return (Response<T>) new Response<Integer>(r, true)
                         .setData(getPlayerMoveAmount());
+            case GAME_CHECK_WIN:
+                return (Response<T>) new Response<Boolean>(r, true)
+                        .setData(checkWin(r));
 
             default:
                 throw new IllegalStateException("Unknown request !");
         }
 
-        return Response.EMPTY;
+        return new Response<>(r, true);
     }
 
     // *** Responses logic ***
@@ -279,7 +283,30 @@ public class Board {
         for (int i = 0; i < amount; ++i)
             getWaterLevel().incrementWater();
 
+        floodDeck.reset();
+
         return true;
+    }
+
+    public Boolean checkWin(final Request request) {
+        if (request.canBypass())
+            return true;
+
+        if (waterLevel.getLevel() == 10)
+            return false;
+
+        final Cell heliport = cells.values().stream()
+                .filter(cell -> cell instanceof HeliportCell)
+                .findFirst()
+                .filter(cell -> cell.getState() != CellState.FLOODED)
+                .orElse(null);
+
+        if (heliport == null)
+            return false;
+
+        // TODO check if someone is isolated
+
+        return null;
     }
 
     // *** Game state related getters ***

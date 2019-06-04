@@ -8,6 +8,10 @@ public class WaterLevel {
         this.waterLevel = initialLevel;
     }
 
+    public int getLevel() {
+        return waterLevel;
+    }
+
     public void incrementWater() {
         ++waterLevel;
     }
