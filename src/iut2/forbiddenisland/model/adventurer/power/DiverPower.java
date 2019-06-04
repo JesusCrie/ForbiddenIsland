@@ -70,11 +70,15 @@ public class DiverPower implements Power {
             if (current == null)
                 continue;
 
-            // If is flooded, continue the exploration on this cell
-            if (current.getState() == CellState.FLOODED) {
+            // If is flooded or wet, continue the exploration on this cell
+            if (current.getState() != CellState.DRY) {
                 // If already explored, don't continue further
                 if (exploredCells.contains(current))
                     continue;
+
+                // If is wet, its also reachable
+                if (current.getState() == CellState.WET)
+                    reachableCells.add(current);
 
                 exploredCells.add(current);
                 exploreReachableCells(current, board, exploredCells, reachableCells);
@@ -116,8 +120,8 @@ public class DiverPower implements Power {
                 return true;
             }
 
-            // If it's flooded, we can continue to search
-            if (current.getState() == CellState.FLOODED) {
+            // If it's flooded or wet, we can continue to search
+            if (current.getState() != CellState.DRY) {
                 exploredCells.add(current);
 
                 // If recursive call is true, stop there and propagate the result up

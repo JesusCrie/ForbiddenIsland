@@ -6,7 +6,8 @@ import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.model.Location;
 import iut2.forbiddenisland.model.Treasure;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
-import iut2.forbiddenisland.model.card.SpecialCard;
+import iut2.forbiddenisland.model.card.Card;
+import iut2.forbiddenisland.model.card.TreasureCard;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.CellState;
 
@@ -17,13 +18,15 @@ public class CliView {
 
     private final Observable<Cell> obsClickCell = new Observable<>();
     private final Observable<Adventurer> obsClickPlayer = new Observable<>();
-    private final Observable<SpecialCard> obsClickCard = new Observable<>();
+    private final Observable<TreasureCard> obsClickCard = new Observable<>();
     private final Observable<Void> obsEndRound = new Observable<>();
 
     private final Observable<Void> obsModeMove = new Observable<>();
     private final Observable<Void> obsModeDry = new Observable<>();
     private final Observable<Void> obsModeSend = new Observable<>();
     private final Observable<Void> obsModeClaim = new Observable<>();
+
+    private final Observable<List<Cell>> obsReachableCells;
 
     private Map<Location, Cell> cells;
     private List<Adventurer> players;
@@ -99,17 +102,36 @@ public class CliView {
             final int toX = CliPrompter.askPositiveInt("X ?", 5);
             final int toY = CliPrompter.askPositiveInt("Y ?", 5);
 
-            to = cells.get(Location.from(toX, toY))
+            to = cells.get(Location.from(toX, toY));
 
         } while (to == null || to.getState() == CellState.WET);
 
         obsClickCell.set(to);
     }
 
+    @SuppressWarnings("unchecked")
     private void sendMode() {
         obsModeSend.notifyChanges();
         System.out.println("== Quelle carte voulez vous envoyer ? ==");
-        // TODO
+
+        final Pair<String, Runnable>[] actionCards = currentPlayer.getCards().stream()
+                .map(card -> Pair.of(card.getName(), (Runnable) () -> obsClickCard.set(card)))
+                .toArray(Pair[]::new);
+
+        CliPrompter.createMenu("Selectionnez une carte", actionCards);
+
+        final Pair<String, Runnable>[] actionPlayers = players.stream()
+                .filter(pl -> pl != currentPlayer)
+                .map(pl -> Pair.of(pl.getName(), (Runnable) () -> obsClickPlayer.set(pl)))
+                .toArray(Pair[]::new);
+
+        CliPrompter.createMenu("Selectionnez un destinataire", actionPlayers);
+
+        System.out.println("La carte a été envoyée");
+    }
+
+    private void cardSendStepThree(final Card card, final Adventurer target) {
+
     }
 
     private void claimMode() {

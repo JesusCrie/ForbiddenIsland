@@ -2,10 +2,13 @@ package iut2.forbiddenisland.controller;
 
 import iut2.forbiddenisland.controller.observer.NotifyOnSubscribeObservable;
 import iut2.forbiddenisland.controller.observer.Observable;
-import iut2.forbiddenisland.model.*;
+import iut2.forbiddenisland.model.Board;
+import iut2.forbiddenisland.model.Location;
+import iut2.forbiddenisland.model.Treasure;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.Card;
 import iut2.forbiddenisland.model.card.SpecialCard;
+import iut2.forbiddenisland.model.card.TreasureCard;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
@@ -143,15 +146,15 @@ public class Controller {
      *
      * @param o - The observable to observe.
      */
-    public void observeClickCard(final Observable<SpecialCard> o) {
+    public void observeClickCard(final Observable<TreasureCard> o) {
         o.subscribe(card -> {
             if (gameMode.get() == GameMode.SEND) {
                 selectedCard = card;
 
                 if (selectedAdventurer != null)
                     engine.sendCard(selectedAdventurer, selectedCard);
-            } else {
-                engine.useCard(card);
+            } else if (card instanceof SpecialCard) {
+                engine.useCard((SpecialCard) card);
             }
         });
     }
