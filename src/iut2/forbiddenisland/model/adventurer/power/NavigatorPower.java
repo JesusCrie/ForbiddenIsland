@@ -1,4 +1,4 @@
-package iut2.forbiddenisland.model.adventurer;
+package iut2.forbiddenisland.model.adventurer.power;
 
 import iut2.forbiddenisland.Utils;
 import iut2.forbiddenisland.controller.request.Request;
@@ -6,6 +6,7 @@ import iut2.forbiddenisland.controller.request.RequestType;
 import iut2.forbiddenisland.controller.request.Response;
 import iut2.forbiddenisland.model.Board;
 import iut2.forbiddenisland.model.Location;
+import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.cell.Cell;
 
 import java.util.Arrays;

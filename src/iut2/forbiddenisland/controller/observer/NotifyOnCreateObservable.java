@@ -9,7 +9,11 @@ package iut2.forbiddenisland.controller.observer;
 public class NotifyOnCreateObservable<T> extends Observable<T> {
 
     public NotifyOnCreateObservable() {
-        super(null);
+        this(null);
+    }
+
+    public NotifyOnCreateObservable(final T initialValue) {
+        super(initialValue);
         notifyChanges();
     }
 }

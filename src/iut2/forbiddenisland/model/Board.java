@@ -7,6 +7,7 @@ import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.*;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.CellState;
+import iut2.forbiddenisland.model.cell.HeliportCell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
 import java.util.ArrayList;
@@ -19,15 +20,22 @@ import java.util.stream.Stream;
 public class Board {
 
     private final Map<Location, Cell> cells;
+    private final List<Adventurer> adventurers;
+    private final List<Treasure> treasures;
     private final WaterLevel waterLevel;
     private final FloodDeck floodDeck;
     private final TreasureDeck treasureDeck;
 
-    public Board(final Map<Location, Cell> cells, final WaterLevel waterLevel) {
+    public Board(final Map<Location, Cell> cells,
+                 final List<Adventurer> adventurers,
+                 final List<Treasure> treasures,
+                 final WaterLevel waterLevel) {
         this.cells = cells;
+        this.adventurers = adventurers;
+        this.treasures = treasures;
         this.waterLevel = waterLevel;
-        this.floodDeck = new FloodDeck();
-        this.treasureDeck = new TreasureDeck();
+        this.floodDeck = new FloodDeck(cells.values());
+        this.treasureDeck = new TreasureDeck(treasures);
     }
 
     /**
@@ -79,14 +87,17 @@ public class Board {
                         .setData(getPlayersSendable(r.getCurrentPlayer()));
 
             // *** Island related requests ***
+            case TREASURES_ALL:
+                return (Response<T>) new Response<List<Treasure>>(r, true)
+                        .setData(getTreasures());
             case ISLAND_DRAW:
                 return (Response<T>) new Response<FloodCard>(r, true)
                         .setData(islandDrawCard());
             case ISLAND_APPLY:
                 return (Response<T>) new Response<Void>(r, islandUseCard(r.getData(Request.DATA_CARD)));
             case ISLAND_WATER_LEVEL:
-                return (Response<T>) new Response<Integer>(r, true)
-                        .setData(getWaterLevel().computeAmountFloodCards());
+                return (Response<T>) new Response<WaterLevel>(r, true)
+                        .setData(getWaterLevel());
             case ISLAND_WATER_UP:
                 return (Response<T>) new Response<Void>(r, incrementWaterLevel(r.getData(Request.DATA_AMOUNT)));
 
@@ -96,12 +107,15 @@ public class Board {
             case GAME_MOVE_AMOUNT:
                 return (Response<T>) new Response<Integer>(r, true)
                         .setData(getPlayerMoveAmount());
+            case GAME_CHECK_WIN:
+                return (Response<T>) new Response<Boolean>(r, true)
+                        .setData(checkWin(r));
 
             default:
                 throw new IllegalStateException("Unknown request !");
         }
 
-        return Response.EMPTY;
+        return new Response<>(r, true);
     }
 
     // *** Responses logic ***
@@ -269,17 +283,45 @@ public class Board {
         for (int i = 0; i < amount; ++i)
             getWaterLevel().incrementWater();
 
+        floodDeck.reset();
+
         return true;
+    }
+
+    public Boolean checkWin(final Request request) {
+        if (request.canBypass())
+            return true;
+
+        if (waterLevel.getLevel() == 10)
+            return false;
+
+        final Cell heliport = cells.values().stream()
+                .filter(cell -> cell instanceof HeliportCell)
+                .findFirst()
+                .filter(cell -> cell.getState() != CellState.FLOODED)
+                .orElse(null);
+
+        if (heliport == null)
+            return false;
+
+        // TODO check if someone is isolated
+
+        return null;
     }
 
     // *** Game state related getters ***
 
-    public WaterLevel getWaterLevel() {
-        return waterLevel;
+
+    public List<Adventurer> getAdventurers() {
+        return adventurers;
     }
 
-    public FloodDeck getFloodDeck() {
-        return floodDeck;
+    public List<Treasure> getTreasures() {
+        return treasures;
+    }
+
+    public WaterLevel getWaterLevel() {
+        return waterLevel;
     }
 
     public Map<Location, Cell> getCells() {

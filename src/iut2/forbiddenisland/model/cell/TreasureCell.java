@@ -3,6 +3,9 @@ package iut2.forbiddenisland.model.cell;
 import iut2.forbiddenisland.model.Location;
 import iut2.forbiddenisland.model.Treasure;
 
+/**
+ * Represent a cell where we can claim a treasure.
+ */
 public class TreasureCell extends Cell {
 
 	private final Treasure treasure;

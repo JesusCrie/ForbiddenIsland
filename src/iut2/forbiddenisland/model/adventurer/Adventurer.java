@@ -1,6 +1,7 @@
 package iut2.forbiddenisland.model.adventurer;
 
 import iut2.forbiddenisland.model.Treasure;
+import iut2.forbiddenisland.model.adventurer.power.Power;
 import iut2.forbiddenisland.model.card.TreasureCard;
 import iut2.forbiddenisland.model.cell.Cell;
 
@@ -8,18 +9,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Represent an adventurer of any kind.
+ */
 public abstract class Adventurer {
 
     private final String name;
     private final List<Power> powers;
     private Cell position;
     private final List<Treasure> treasures = new ArrayList<>();
-    private List<TreasureCard> cards;
+    private final List<TreasureCard> cards = new ArrayList<>();
 
-    public Adventurer(final String name, final Cell position, final Power... powers) {
+    public Adventurer(final String name, final Power... powers) {
         this.name = name;
         this.powers = Arrays.asList(powers);
-        this.position = position;
     }
 
     public String getName() {
@@ -31,7 +34,8 @@ public abstract class Adventurer {
     }
 
     public void move(final Cell to) {
-        position.removeAdventurer(this);
+        if (position != null)
+            position.removeAdventurer(this);
         position = to;
         to.addAdventurer(this);
 
@@ -45,7 +49,7 @@ public abstract class Adventurer {
         return treasures;
     }
 
-    public boolean addTreasure(Treasure t) {
+    public boolean addTreasure(final Treasure t) {
         return getTreasures().add(t);
     }
 
@@ -53,11 +57,11 @@ public abstract class Adventurer {
         return cards;
     }
 
-    public boolean addCard(TreasureCard c) {
-        return getCards().add(c);
+    public boolean addCard(final TreasureCard c) {
+        return cards.add(c);
     }
 
-    public boolean removeCard(TreasureCard c) {
-        return getCards().remove(c);
+    public boolean removeCard(final TreasureCard c) {
+        return cards.remove(c);
     }
 }
