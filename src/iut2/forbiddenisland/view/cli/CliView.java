@@ -126,7 +126,7 @@ public class CliView {
 
             to = cells.get(Location.from(toX, toY));
 
-        } while (to == null || to.getState() == CellState.WET);
+        } while (to == null || to.getState() != CellState.WET);
 
         obsClickCell.set(to);
 
