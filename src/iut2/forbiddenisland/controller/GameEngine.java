@@ -291,8 +291,11 @@ public class GameEngine {
                         .putData(Request.DATA_CELL, cell)
         );
 
+        final Location previous = player.getPosition().getLocation();
+
         if (res.isOk()) {
             decrementActions(res.getData());
+
             cells.notifyChanges();
         }
 

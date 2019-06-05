@@ -70,6 +70,11 @@ public class CliView {
     }
 
     private void roundAction() {
+        if (remainingActions <= 0) {
+            roundEnd();
+            return;
+        }
+
         final String board = ConsoleRenderer.drawBoard(cells, treasures, players);
         System.out.println(board);
         System.out.println("\n== Tour de: " + currentPlayer.getName() + " ==\n");
@@ -98,8 +103,8 @@ public class CliView {
 
         do {
             System.out.println("Entrez les coordonnées d'une case existante");
-            final int toX = CliPrompter.askPositiveInt("X ?", 5);
-            final int toY = CliPrompter.askPositiveInt("Y ?", 5);
+            final int toX = CliPrompter.askPositiveInt("X ?", 6);
+            final int toY = CliPrompter.askPositiveInt("Y ?", 6);
 
             to = cells.get(Location.from(toX, toY));
 
@@ -121,8 +126,8 @@ public class CliView {
 
         do {
             System.out.println("Entrez les coordonnées d'une case inondée");
-            final int toX = CliPrompter.askPositiveInt("X ?", 5);
-            final int toY = CliPrompter.askPositiveInt("Y ?", 5);
+            final int toX = CliPrompter.askPositiveInt("X ?", 6);
+            final int toY = CliPrompter.askPositiveInt("Y ?", 6);
 
             to = cells.get(Location.from(toX, toY));
 

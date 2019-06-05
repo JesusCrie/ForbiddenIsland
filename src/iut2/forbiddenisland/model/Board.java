@@ -175,7 +175,9 @@ public class Board {
         final Adventurer adv = r.getData(Request.DATA_PLAYER);
         final Cell cell = r.getData(Request.DATA_CELL);
 
-        if (r.canBypass() || Utils.isAdjacent(adv.getPosition().getLocation(), cell.getLocation())) {
+        if (r.canBypass()
+                || (Utils.isAdjacent(adv.getPosition().getLocation(), cell.getLocation())
+                && cell.getState() != CellState.FLOODED)) {
             adv.move(cell);
             return true;
         }

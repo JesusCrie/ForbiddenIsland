@@ -108,7 +108,11 @@ public class DiverPower implements Power {
 
             // If out of bounds, ignore right away
             if (current == null)
-                return false;
+                continue;
+
+            // Already explored
+            if (!exploredCells.add(current))
+                continue;
 
             // If it's the targeted cell
             if (current == target) {
@@ -122,7 +126,6 @@ public class DiverPower implements Power {
 
             // If it's flooded or wet, we can continue to search
             if (current.getState() != CellState.DRY) {
-                exploredCells.add(current);
 
                 // If recursive call is true, stop there and propagate the result up
                 if (checkDiverMoveCell(current, target, board, exploredCells)) {
