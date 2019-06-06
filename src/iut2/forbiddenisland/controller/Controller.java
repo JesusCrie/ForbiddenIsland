@@ -232,10 +232,12 @@ public class Controller {
      */
     public void observeClickEndRound(final Observable<Void> o) {
         o.subscribe(v -> {
-            engine.endPlayerRound();
             gameMode.set(GameMode.IDLE);
+            engine.endPlayerRound();
 
             engine.startIslandTurn();
+
+            engine.newPlayerRound();
             // TODO maybe more end round things
         });
     }
