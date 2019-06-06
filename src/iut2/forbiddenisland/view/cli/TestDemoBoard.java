@@ -13,7 +13,7 @@ public class TestDemoBoard {
 
     public static void main(String[] args) {
         final List<Adventurer> adventurers = Arrays.asList(
-                new Pilot(), new Navigator(), new Explorer(), new Messenger()
+                new Pilot(), new Navigator(), new Explorer(), new Messenger(), new Diver(), new Engineer()
         );
 
         final Board board = DemoBoard.createAndGet(adventurers);

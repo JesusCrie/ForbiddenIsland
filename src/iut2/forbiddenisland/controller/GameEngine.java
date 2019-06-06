@@ -293,6 +293,7 @@ public class GameEngine {
 
         if (res.isOk()) {
             decrementActions(res.getData());
+
             cells.notifyChanges();
         }
 
@@ -403,8 +404,6 @@ public class GameEngine {
                 startIslandTurn();
             }
         }
-
-        newPlayerRound();
 
         cells.notifyChanges();
         adventurers.notifyChanges();
