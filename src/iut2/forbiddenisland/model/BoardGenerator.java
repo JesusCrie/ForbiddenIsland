@@ -5,7 +5,7 @@ import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.HeliportCell;
 import iut2.forbiddenisland.model.cell.StartCell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
-import iut2.forbiddenisland.view.CellNames;
+import iut2.forbiddenisland.view.CellName;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -80,17 +80,17 @@ public class BoardGenerator {
         final Treasure waveChalice = treasures.get(3);
 
         return Arrays.asList(
-                new TreasureCell(CellNames.MOON_TEMPLE, locationProvider.get(), sacredStone),
-                new TreasureCell(CellNames.SUN_TEMPLE, locationProvider.get(), sacredStone),
+                new TreasureCell(CellName.MOON_TEMPLE, locationProvider.get(), sacredStone),
+                new TreasureCell(CellName.SUN_TEMPLE, locationProvider.get(), sacredStone),
 
-                new TreasureCell(CellNames.WISPERING_GARDEN, locationProvider.get(), zephyrStatue),
-                new TreasureCell(CellNames.SCREAMINGS_GARDEN, locationProvider.get(), zephyrStatue),
+                new TreasureCell(CellName.WISPERING_GARDEN, locationProvider.get(), zephyrStatue),
+                new TreasureCell(CellName.SCREAMINGS_GARDEN, locationProvider.get(), zephyrStatue),
 
-                new TreasureCell(CellNames.FIRE_CAVERN, locationProvider.get(), ardentCrystal),
-                new TreasureCell(CellNames.SHADOW_CAVERN, locationProvider.get(), ardentCrystal),
+                new TreasureCell(CellName.FIRE_CAVERN, locationProvider.get(), ardentCrystal),
+                new TreasureCell(CellName.SHADOW_CAVERN, locationProvider.get(), ardentCrystal),
 
-                new TreasureCell(CellNames.CORAL_PALACE, locationProvider.get(), waveChalice),
-                new TreasureCell(CellNames.TIDAL_PALACE, locationProvider.get(), waveChalice)
+                new TreasureCell(CellName.CORAL_PALACE, locationProvider.get(), waveChalice),
+                new TreasureCell(CellName.TIDAL_PALACE, locationProvider.get(), waveChalice)
         );
     }
 
@@ -103,12 +103,12 @@ public class BoardGenerator {
      */
     private static List<StartCell> createStartCells(final List<Adventurer> adventurers, final Supplier<Location> locationProvider) {
         final List<StartCell> cells = Arrays.asList(
-                new HeliportCell(CellNames.HELIPORT, locationProvider.get()),
-                new StartCell(CellNames.BRONZE_DOOR, locationProvider.get()),
-                new StartCell(CellNames.COPPER_DOOR, locationProvider.get()),
-                new StartCell(CellNames.IRON_DOOR, locationProvider.get()),
-                new StartCell(CellNames.SILVER_DOOR, locationProvider.get()),
-                new StartCell(CellNames.GOLDEN_DOOR, locationProvider.get())
+                new HeliportCell(CellName.HELIPORT, locationProvider.get()),
+                new StartCell(CellName.BRONZE_DOOR, locationProvider.get()),
+                new StartCell(CellName.COPPER_DOOR, locationProvider.get()),
+                new StartCell(CellName.IRON_DOOR, locationProvider.get()),
+                new StartCell(CellName.SILVER_DOOR, locationProvider.get()),
+                new StartCell(CellName.GOLDEN_DOOR, locationProvider.get())
         );
 
         // Move each adventurer to its starting cell
@@ -138,16 +138,16 @@ public class BoardGenerator {
      */
     private static List<Cell> createCommonCells(final Supplier<Location> locationProvider) {
         return Arrays.asList(
-                new Cell(CellNames.ABYSS_BRIDGE, locationProvider.get()),
-                new Cell(CellNames.CLIFFS_OBLIVION, locationProvider.get()),
-                new Cell(CellNames.ILLUSION_DUNE, locationProvider.get()),
-                new Cell(CellNames.PURPLE_FOREST, locationProvider.get()),
-                new Cell(CellNames.LOST_LAGOON, locationProvider.get()),
-                new Cell(CellNames.FOGGY_SWAMP, locationProvider.get()),
-                new Cell(CellNames.OBSERVATORY, locationProvider.get()),
-                new Cell(CellNames.GHOST_ROCK, locationProvider.get()),
-                new Cell(CellNames.TWILIGHT_VAL, locationProvider.get()),
-                new Cell(CellNames.WATCHTOWER, locationProvider.get())
+                new Cell(CellName.ABYSS_BRIDGE, locationProvider.get()),
+                new Cell(CellName.CLIFFS_OBLIVION, locationProvider.get()),
+                new Cell(CellName.ILLUSION_DUNE, locationProvider.get()),
+                new Cell(CellName.PURPLE_FOREST, locationProvider.get()),
+                new Cell(CellName.LOST_LAGOON, locationProvider.get()),
+                new Cell(CellName.FOGGY_SWAMP, locationProvider.get()),
+                new Cell(CellName.OBSERVATORY, locationProvider.get()),
+                new Cell(CellName.GHOST_ROCK, locationProvider.get()),
+                new Cell(CellName.TWILIGHT_VAL, locationProvider.get()),
+                new Cell(CellName.WATCHTOWER, locationProvider.get())
         );
     }
 
