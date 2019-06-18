@@ -1,5 +1,7 @@
 package iut2.forbiddenisland.model.card;
 
+import iut2.forbiddenisland.view.TreasureCardGraphicalMetadata;
+
 /**
  * Represent the sand bag special card.
  * The effect of this card need to be applied in the controller.
@@ -7,6 +9,6 @@ package iut2.forbiddenisland.model.card;
 public class SandBagCard extends SpecialCard {
 
     public SandBagCard(){
-        super("Sacs de Sable");
+        super(TreasureCardGraphicalMetadata.SPECIAL_SAND_BAG);
     }
 }

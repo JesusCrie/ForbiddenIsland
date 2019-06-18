@@ -5,7 +5,8 @@ import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.HeliportCell;
 import iut2.forbiddenisland.model.cell.StartCell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
-import iut2.forbiddenisland.view.CellName;
+import iut2.forbiddenisland.view.CellGraphicalMetadata;
+import iut2.forbiddenisland.view.TreasureCardGraphicalMetadata;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -58,10 +59,10 @@ public class BoardGenerator {
      */
     private static List<Treasure> createTreasures() {
         return Arrays.asList(
-                new Treasure("La pierre sacrée"),
-                new Treasure("La Statue du Zéphyr"),
-                new Treasure("Le Cristal Ardent"),
-                new Treasure("Le Calice de l'Onde")
+                new Treasure(TreasureCardGraphicalMetadata.TREASURE_SACRED_STONE.getName()),
+                new Treasure(TreasureCardGraphicalMetadata.TREASURE_ZEPHYR_STATUE.getName()),
+                new Treasure(TreasureCardGraphicalMetadata.TREASURE_ARDENT_CRYSTAL.getName()),
+                new Treasure(TreasureCardGraphicalMetadata.TREASURE_WAVE_CHALICE.getName())
         );
     }
 
@@ -80,17 +81,17 @@ public class BoardGenerator {
         final Treasure waveChalice = treasures.get(3);
 
         return Arrays.asList(
-                new TreasureCell(CellName.MOON_TEMPLE, locationProvider.get(), sacredStone),
-                new TreasureCell(CellName.SUN_TEMPLE, locationProvider.get(), sacredStone),
+                new TreasureCell(CellGraphicalMetadata.MOON_TEMPLE, locationProvider.get(), sacredStone),
+                new TreasureCell(CellGraphicalMetadata.SUN_TEMPLE, locationProvider.get(), sacredStone),
 
-                new TreasureCell(CellName.WISPERING_GARDEN, locationProvider.get(), zephyrStatue),
-                new TreasureCell(CellName.SCREAMINGS_GARDEN, locationProvider.get(), zephyrStatue),
+                new TreasureCell(CellGraphicalMetadata.WHISPERS_GARDEN, locationProvider.get(), zephyrStatue),
+                new TreasureCell(CellGraphicalMetadata.SCREAMINGS_GARDEN, locationProvider.get(), zephyrStatue),
 
-                new TreasureCell(CellName.FIRE_CAVERN, locationProvider.get(), ardentCrystal),
-                new TreasureCell(CellName.SHADOW_CAVERN, locationProvider.get(), ardentCrystal),
+                new TreasureCell(CellGraphicalMetadata.FIRE_CAVERN, locationProvider.get(), ardentCrystal),
+                new TreasureCell(CellGraphicalMetadata.SHADOW_CAVERN, locationProvider.get(), ardentCrystal),
 
-                new TreasureCell(CellName.CORAL_PALACE, locationProvider.get(), waveChalice),
-                new TreasureCell(CellName.TIDAL_PALACE, locationProvider.get(), waveChalice)
+                new TreasureCell(CellGraphicalMetadata.CORAL_PALACE, locationProvider.get(), waveChalice),
+                new TreasureCell(CellGraphicalMetadata.TIDAL_PALACE, locationProvider.get(), waveChalice)
         );
     }
 
@@ -103,12 +104,12 @@ public class BoardGenerator {
      */
     private static List<StartCell> createStartCells(final List<Adventurer> adventurers, final Supplier<Location> locationProvider) {
         final List<StartCell> cells = Arrays.asList(
-                new HeliportCell(CellName.HELIPORT, locationProvider.get()),
-                new StartCell(CellName.BRONZE_DOOR, locationProvider.get()),
-                new StartCell(CellName.COPPER_DOOR, locationProvider.get()),
-                new StartCell(CellName.IRON_DOOR, locationProvider.get()),
-                new StartCell(CellName.SILVER_DOOR, locationProvider.get()),
-                new StartCell(CellName.GOLDEN_DOOR, locationProvider.get())
+                new HeliportCell(CellGraphicalMetadata.HELIPORT, locationProvider.get()),
+                new StartCell(CellGraphicalMetadata.BRONZE_DOOR, locationProvider.get()),
+                new StartCell(CellGraphicalMetadata.COPPER_DOOR, locationProvider.get()),
+                new StartCell(CellGraphicalMetadata.IRON_DOOR, locationProvider.get()),
+                new StartCell(CellGraphicalMetadata.SILVER_DOOR, locationProvider.get()),
+                new StartCell(CellGraphicalMetadata.GOLDEN_DOOR, locationProvider.get())
         );
 
         // Move each adventurer to its starting cell
@@ -138,16 +139,16 @@ public class BoardGenerator {
      */
     private static List<Cell> createCommonCells(final Supplier<Location> locationProvider) {
         return Arrays.asList(
-                new Cell(CellName.ABYSS_BRIDGE, locationProvider.get()),
-                new Cell(CellName.CLIFFS_OBLIVION, locationProvider.get()),
-                new Cell(CellName.ILLUSION_DUNE, locationProvider.get()),
-                new Cell(CellName.PURPLE_FOREST, locationProvider.get()),
-                new Cell(CellName.LOST_LAGOON, locationProvider.get()),
-                new Cell(CellName.FOGGY_SWAMP, locationProvider.get()),
-                new Cell(CellName.OBSERVATORY, locationProvider.get()),
-                new Cell(CellName.GHOST_ROCK, locationProvider.get()),
-                new Cell(CellName.TWILIGHT_VAL, locationProvider.get()),
-                new Cell(CellName.WATCHTOWER, locationProvider.get())
+                new Cell(CellGraphicalMetadata.ABYSS_BRIDGE, locationProvider.get()),
+                new Cell(CellGraphicalMetadata.CLIFFS_OBLIVION, locationProvider.get()),
+                new Cell(CellGraphicalMetadata.ILLUSION_DUNE, locationProvider.get()),
+                new Cell(CellGraphicalMetadata.PURPLE_FOREST, locationProvider.get()),
+                new Cell(CellGraphicalMetadata.LOST_LAGOON, locationProvider.get()),
+                new Cell(CellGraphicalMetadata.FOGGY_SWAMP, locationProvider.get()),
+                new Cell(CellGraphicalMetadata.OBSERVATORY, locationProvider.get()),
+                new Cell(CellGraphicalMetadata.GHOST_ROCK, locationProvider.get()),
+                new Cell(CellGraphicalMetadata.TWILIGHT_VAL, locationProvider.get()),
+                new Cell(CellGraphicalMetadata.WATCHTOWER, locationProvider.get())
         );
     }
 

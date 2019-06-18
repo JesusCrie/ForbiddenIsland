@@ -2,7 +2,6 @@ package iut2.forbiddenisland.view.cli;
 
 import iut2.forbiddenisland.controller.Controller;
 import iut2.forbiddenisland.model.Board;
-import iut2.forbiddenisland.model.BoardGenerator;
 import iut2.forbiddenisland.model.adventurer.*;
 import iut2.forbiddenisland.view.DemoBoard;
 
@@ -13,7 +12,12 @@ public class TestDemoBoard {
 
     public static void main(String[] args) {
         final List<Adventurer> adventurers = Arrays.asList(
-                new Pilot(), new Navigator(), new Explorer(), new Messenger(), new Diver(), new Engineer()
+                new Pilot("Jean Mich"),
+                new Navigator("Jacquie"),
+                new Explorer("Jeane"),
+                new Messenger("Pierrot"),
+                new Diver("Philippe !"),
+                new Engineer("Gertrude")
         );
 
         final Board board = DemoBoard.createAndGet(adventurers);

@@ -2,25 +2,30 @@ package iut2.forbiddenisland.model.cell;
 
 import iut2.forbiddenisland.model.Location;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
+import iut2.forbiddenisland.view.CellGraphicalMetadata;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Cell {
 
-    private final String name;
+    private final CellGraphicalMetadata metadata;
     private CellState state = CellState.DRY;
     private final Location location;
 
     private final List<Adventurer> adventurers = new ArrayList<>();
 
-    public Cell(final String name, final Location location) {
-        this.name = name;
+    public Cell(final CellGraphicalMetadata metadata, final Location location) {
+        this.metadata = metadata;
         this.location = location;
     }
 
     public String getName() {
-        return this.name;
+        return metadata.getName();
+    }
+
+    public CellGraphicalMetadata getMetadata() {
+        return metadata;
     }
 
     public Location getLocation() {

@@ -4,6 +4,7 @@ import iut2.forbiddenisland.model.Treasure;
 import iut2.forbiddenisland.model.adventurer.power.Power;
 import iut2.forbiddenisland.model.card.TreasureCard;
 import iut2.forbiddenisland.model.cell.Cell;
+import iut2.forbiddenisland.view.AdventurerGraphicalMetadata;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,18 +16,24 @@ import java.util.List;
 public abstract class Adventurer {
 
     private final String name;
+    private final AdventurerGraphicalMetadata metadata;
     private final List<Power> powers;
     private Cell position;
     private final List<Treasure> treasures = new ArrayList<>();
     private final List<TreasureCard> cards = new ArrayList<>();
 
-    public Adventurer(final String name, final Power... powers) {
+    public Adventurer(final String name, final AdventurerGraphicalMetadata metadata, final Power... powers) {
         this.name = name;
+        this.metadata = metadata;
         this.powers = Arrays.asList(powers);
     }
 
     public String getName() {
-        return this.name;
+        return name + " " + metadata.getName();
+    }
+
+    public AdventurerGraphicalMetadata getMetadata() {
+        return metadata;
     }
 
     public Cell getPosition() {

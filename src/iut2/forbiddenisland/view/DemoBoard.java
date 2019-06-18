@@ -24,35 +24,35 @@ public class DemoBoard {
 
         final Map<Location, Cell> map = new HashMap<>();
 
-        add(map, new Cell(CellName.ABYSS_BRIDGE, Location.from(2, 0)));
-        add(map, new StartCell(CellName.BRONZE_DOOR, Location.from(3, 0)));
+        add(map, new Cell(CellGraphicalMetadata.ABYSS_BRIDGE, Location.from(2, 0)));
+        add(map, new StartCell(CellGraphicalMetadata.BRONZE_DOOR, Location.from(3, 0)));
 
-        add(map, new TreasureCell(CellName.SHADOW_CAVERN, Location.from(1, 1), treasures.get(2)));
-        add(map, new StartCell(CellName.IRON_DOOR, Location.from(2, 1)));
-        add(map, new StartCell(CellName.GOLDEN_DOOR, Location.from(3, 1)));
-        add(map, new Cell(CellName.CLIFFS_OBLIVION, Location.from(4, 1)));
+        add(map, new TreasureCell(CellGraphicalMetadata.SHADOW_CAVERN, Location.from(1, 1), treasures.get(2)));
+        add(map, new StartCell(CellGraphicalMetadata.IRON_DOOR, Location.from(2, 1)));
+        add(map, new StartCell(CellGraphicalMetadata.GOLDEN_DOOR, Location.from(3, 1)));
+        add(map, new Cell(CellGraphicalMetadata.CLIFFS_OBLIVION, Location.from(4, 1)));
 
-        add(map, new TreasureCell(CellName.CORAL_PALACE, Location.from(0, 2), treasures.get(3)));
-        add(map, new StartCell(CellName.SILVER_DOOR, Location.from(1, 2)));
-        add(map, new Cell(CellName.ILLUSION_DUNE, Location.from(2, 2)));
-        add(map, new HeliportCell(CellName.HELIPORT, Location.from(3, 2)));
-        add(map, new Cell(CellName.COPPER_DOOR, Location.from(4, 2)));
-        add(map, new TreasureCell(CellName.SCREAMINGS_GARDEN, Location.from(5, 2), treasures.get(1)));
+        add(map, new TreasureCell(CellGraphicalMetadata.CORAL_PALACE, Location.from(0, 2), treasures.get(3)));
+        add(map, new StartCell(CellGraphicalMetadata.SILVER_DOOR, Location.from(1, 2)));
+        add(map, new Cell(CellGraphicalMetadata.ILLUSION_DUNE, Location.from(2, 2)));
+        add(map, new HeliportCell(CellGraphicalMetadata.HELIPORT, Location.from(3, 2)));
+        add(map, new Cell(CellGraphicalMetadata.COPPER_DOOR, Location.from(4, 2)));
+        add(map, new TreasureCell(CellGraphicalMetadata.SCREAMINGS_GARDEN, Location.from(5, 2), treasures.get(1)));
 
-        add(map, new Cell(CellName.PURPLE_FOREST, Location.from(0, 3)));
-        add(map, new Cell(CellName.LOST_LAGOON, Location.from(1, 3)));
-        add(map, new Cell(CellName.FOGGY_SWAMP, Location.from(2, 3)));
-        add(map, new Cell(CellName.OBSERVATORY, Location.from(3, 3)));
-        add(map, new Cell(CellName.GHOST_ROCK, Location.from(4, 3)));
-        add(map, new TreasureCell(CellName.FIRE_CAVERN, Location.from(5, 3), treasures.get(2)));
+        add(map, new Cell(CellGraphicalMetadata.PURPLE_FOREST, Location.from(0, 3)));
+        add(map, new Cell(CellGraphicalMetadata.LOST_LAGOON, Location.from(1, 3)));
+        add(map, new Cell(CellGraphicalMetadata.FOGGY_SWAMP, Location.from(2, 3)));
+        add(map, new Cell(CellGraphicalMetadata.OBSERVATORY, Location.from(3, 3)));
+        add(map, new Cell(CellGraphicalMetadata.GHOST_ROCK, Location.from(4, 3)));
+        add(map, new TreasureCell(CellGraphicalMetadata.FIRE_CAVERN, Location.from(5, 3), treasures.get(2)));
 
-        add(map, new TreasureCell(CellName.SUN_TEMPLE, Location.from(1, 4), treasures.get(0)));
-        add(map, new TreasureCell(CellName.MOON_TEMPLE, Location.from(2, 4), treasures.get(0)));
-        add(map, new TreasureCell(CellName.TIDAL_PALACE, Location.from(3, 4), treasures.get(3)));
-        add(map, new Cell(CellName.TWILIGHT_VAL, Location.from(4, 4)));
+        add(map, new TreasureCell(CellGraphicalMetadata.SUN_TEMPLE, Location.from(1, 4), treasures.get(0)));
+        add(map, new TreasureCell(CellGraphicalMetadata.MOON_TEMPLE, Location.from(2, 4), treasures.get(0)));
+        add(map, new TreasureCell(CellGraphicalMetadata.TIDAL_PALACE, Location.from(3, 4), treasures.get(3)));
+        add(map, new Cell(CellGraphicalMetadata.TWILIGHT_VAL, Location.from(4, 4)));
 
-        add(map, new Cell(CellName.WATCHTOWER, Location.from(2, 5)));
-        add(map, new TreasureCell(CellName.WISPERING_GARDEN, Location.from(3, 5), treasures.get(1)));
+        add(map, new Cell(CellGraphicalMetadata.WATCHTOWER, Location.from(2, 5)));
+        add(map, new TreasureCell(CellGraphicalMetadata.WHISPERS_GARDEN, Location.from(3, 5), treasures.get(1)));
 
         map.get(Location.from(3, 0)).setState(CellState.WET);
         map.get(Location.from(2, 2)).setState(CellState.FLOODED);

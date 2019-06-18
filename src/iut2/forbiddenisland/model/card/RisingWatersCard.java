@@ -1,5 +1,7 @@
 package iut2.forbiddenisland.model.card;
 
+import iut2.forbiddenisland.view.TreasureCardGraphicalMetadata;
+
 /**
  * Represent the rising waters special card.
  * The effect of this card need to be applied in the controller.
@@ -7,6 +9,6 @@ package iut2.forbiddenisland.model.card;
 public class RisingWatersCard extends SpecialCard {
 
     public RisingWatersCard() {
-        super("Montée des Eaux");
+        super(TreasureCardGraphicalMetadata.SPECIAL_RISING_WATERS);
     }
 }
