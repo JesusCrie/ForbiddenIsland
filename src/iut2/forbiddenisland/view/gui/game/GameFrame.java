@@ -1,5 +1,6 @@
 package iut2.forbiddenisland.view.gui.game;
 
+import iut2.forbiddenisland.controller.Controller;
 import iut2.forbiddenisland.view.gui.utils.ConstraintFactory;
 
 import javax.swing.*;
@@ -7,7 +8,7 @@ import java.awt.GridBagLayout;
 
 public class GameFrame extends JFrame {
 
-    public GameFrame() {
+    public GameFrame(final Controller controller) {
         setSize(1000, 1000);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -21,7 +22,7 @@ public class GameFrame extends JFrame {
          *  PPP A
          */
 
-        add(new BoardPanel(this),
+        add(new BoardPanel(null),
                 ConstraintFactory.fillBoth(0, 0, 3, 3));
         add(new WaterLevelPanel(this),
                 ConstraintFactory.fillBoth(3, 0, 1, 3));

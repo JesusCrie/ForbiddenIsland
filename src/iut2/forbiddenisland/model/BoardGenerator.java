@@ -7,6 +7,7 @@ import iut2.forbiddenisland.model.cell.StartCell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 import iut2.forbiddenisland.view.CellGraphicalMetadata;
 import iut2.forbiddenisland.view.TreasureCardGraphicalMetadata;
+import iut2.forbiddenisland.view.TreasureGraphicalMetadata;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -59,10 +60,10 @@ public class BoardGenerator {
      */
     private static List<Treasure> createTreasures() {
         return Arrays.asList(
-                new Treasure(TreasureCardGraphicalMetadata.TREASURE_SACRED_STONE.getName()),
-                new Treasure(TreasureCardGraphicalMetadata.TREASURE_ZEPHYR_STATUE.getName()),
-                new Treasure(TreasureCardGraphicalMetadata.TREASURE_ARDENT_CRYSTAL.getName()),
-                new Treasure(TreasureCardGraphicalMetadata.TREASURE_WAVE_CHALICE.getName())
+                new Treasure(TreasureGraphicalMetadata.SACRED_STONE),
+                new Treasure(TreasureGraphicalMetadata.ZEPHYR_STATUE),
+                new Treasure(TreasureGraphicalMetadata.ARDENT_CRYSTAL),
+                new Treasure(TreasureGraphicalMetadata.WAVE_CHALICE)
         );
     }
 

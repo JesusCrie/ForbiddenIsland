@@ -16,10 +16,10 @@ public class DemoBoard {
 
     public static Board createAndGet(final List<Adventurer> adventurers) {
         final List<Treasure> treasures = Arrays.asList(
-                new Treasure("La pierre sacrée"),
-                new Treasure("La Statue du Zéphyr"),
-                new Treasure("Le Cristal Ardent"),
-                new Treasure("Le Calice de l'Onde")
+                new Treasure(TreasureGraphicalMetadata.SACRED_STONE),
+                new Treasure(TreasureGraphicalMetadata.ZEPHYR_STATUE),
+                new Treasure(TreasureGraphicalMetadata.ARDENT_CRYSTAL),
+                new Treasure(TreasureGraphicalMetadata.WAVE_CHALICE)
         );
 
         final Map<Location, Cell> map = new HashMap<>();
