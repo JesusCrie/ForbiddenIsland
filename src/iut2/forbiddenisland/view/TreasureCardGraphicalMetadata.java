@@ -14,7 +14,8 @@ public enum TreasureCardGraphicalMetadata {
     TREASURE_WAVE_CHALICE("Le Calice de l'Onde", "/cartes/Calice.png"),
     SPECIAL_RISING_WATERS("Montée des Eaux", "/cartes/MonteeDesEaux.png"),
     SPECIAL_HELICOPTER("Hélicoptère", "/cartes/Helicoptere.png"),
-    SPECIAL_SAND_BAG("Sacs de Sable", "/cartes/SacsDeSable.png");
+    SPECIAL_SAND_BAG("Sacs de Sable", "/cartes/SacsDeSable.png"),
+    EMPTY_CARD("Carte vide", "/cartes/FondRouge.png");
 
     private final String name;
     private final String imageFile;
@@ -51,6 +52,8 @@ public enum TreasureCardGraphicalMetadata {
             return TREASURE_ARDENT_CRYSTAL;
         } else if (treasure.getName().equals(TREASURE_WAVE_CHALICE.getName())) {
             return TREASURE_WAVE_CHALICE;
+        } else if (treasure.getName().equals((EMPTY_CARD.getName()))){
+            return EMPTY_CARD;
         }
 
         return null;
