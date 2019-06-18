@@ -11,19 +11,20 @@ import java.util.concurrent.CompletableFuture;
 public class DiscardFrame extends JFrame {
 
     public DiscardFrame(final List<TreasureCard> treasureCards, final CompletableFuture<TreasureCard> future) {
-        setSize(100 * treasureCards.size() + 100, 300);
+        setSize(100 * treasureCards.size() + 185 , 250);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setAlwaysOnTop(true);
+        setResizable(false);
 
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
-        final JLabel label = new JLabel("Quelle carte voulez vous retiré ?", JLabel.CENTER);
+        final JLabel label = new JLabel("Choisissez une carte à jeter", JLabel.CENTER);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = treasureCards.size();
-        c.insets = new Insets(0, 0, 20, 0);
+        c.insets = new Insets(0, 0, 15, 0);
         add(label, c);
 
         for (int i = 0; i < treasureCards.size() - 1; i++) {
@@ -33,8 +34,8 @@ public class DiscardFrame extends JFrame {
             c.gridx = i;
             c.gridy = 1;
             c.insets = new Insets(0, 5, 0, 5);
-            c.ipady = 100;
-            c.ipadx = 50;
+            c.ipady = 150;
+            c.ipadx = 75;
             add(button, c);
             button.addActionListener(e -> {
                 dispose();
@@ -47,9 +48,9 @@ public class DiscardFrame extends JFrame {
         final JButton button = new CardButton(card);
         c.gridx = treasureCards.size() - 1;
         c.gridy = 1;
-        c.insets = new Insets(0, 25, 0, 0);
-        c.ipady = 100;
-        c.ipadx = 50;
+        c.insets = new Insets(0, 35, 0, 0);
+        c.ipady = 150;
+        c.ipadx = 75;
         add(button, c);
         button.addActionListener(e -> {
             dispose();
