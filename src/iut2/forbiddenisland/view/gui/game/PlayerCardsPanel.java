@@ -31,6 +31,7 @@ public class PlayerCardsPanel extends JPanel {
         adventurers = controller.getAdventurers().get();
         mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setPreferredSize(new Dimension(500, 800));
 
         int k = 0;
         for (Adventurer adv : adventurers){
