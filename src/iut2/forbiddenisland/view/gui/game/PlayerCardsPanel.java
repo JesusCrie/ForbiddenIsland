@@ -23,10 +23,10 @@ public class PlayerCardsPanel extends JPanel {
 
     private final JButton[][] cards;
 
-    private final AdventurerCard type1;
-    private final AdventurerCard type2;
-    private final AdventurerCard type3;
-    private final AdventurerCard type4;
+    private AdventurerCard type1;
+    private AdventurerCard type2;
+    private AdventurerCard type3;
+    private AdventurerCard type4;
 
     private final JLabel name1;
     private final JLabel name2;
@@ -64,10 +64,19 @@ public class PlayerCardsPanel extends JPanel {
         name3 = new JLabel();
         name4 = new JLabel();
 
-        type1 = new AdventurerCard(adventurers.get(0));
-        type2 = new AdventurerCard(adventurers.get(1));
-        type3 = new AdventurerCard(adventurers.get(2));
-        type4 = new AdventurerCard(adventurers.get(3));
+        if(adventurers.size() >= 1){
+            type1 = new AdventurerCard(adventurers.get(0));
+        }
+        if (adventurers.size() >= 2) {
+            type2 = new AdventurerCard(adventurers.get(1));
+        }
+        if (adventurers.size() >= 3) {
+            type3 = new AdventurerCard(adventurers.get(2));
+        }
+
+        if (adventurers.size() >= 4) {
+            type4 = new AdventurerCard(adventurers.get(3));
+        }
         //</editor-fold>
 
         //<editor-fold desc="*** PLAYER 1 ***">
