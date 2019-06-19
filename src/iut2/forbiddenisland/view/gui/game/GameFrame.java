@@ -34,11 +34,12 @@ public class GameFrame extends JFrame {
             final Box waterActionContainer = Box.createVerticalBox();
             waterActionContainer.setPreferredSize(new Dimension(300, 1000));
 
-            final WaterLevelPanel waterLevelPanel = new WaterLevelPanel(waterActionContainer);
+            final WaterLevelPanel waterLevelPanel = new WaterLevelPanel(controller);
             waterActionContainer.setPreferredSize(new Dimension(300, 600));
             waterActionContainer.add(waterLevelPanel);
 
             final ActionPanel actionPanel = new ActionPanel(controller);
+            actionPanel.setMaximumSize(new Dimension(300, 300));
             actionPanel.setPreferredSize(new Dimension(300, 300));
             waterActionContainer.add(actionPanel);
 

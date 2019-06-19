@@ -1,27 +1,27 @@
 package iut2.forbiddenisland.view.gui.game;
 
+import iut2.forbiddenisland.controller.Controller;
+import iut2.forbiddenisland.view.IconGraphicalMetadata;
 import iut2.forbiddenisland.view.gui.utils.AutoResizePreserveRatioImagePanel;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import java.awt.Graphics;
 
-public class WaterLevelPanel extends JLayeredPane {
+public class WaterLevelPanel extends AutoResizePreserveRatioImagePanel {
 
+    private int waterLevel = 5;
 
-    public WaterLevelPanel(final Component parent) {
-        AutoResizePreserveRatioImagePanel fond;
-        try {
-             fond = new AutoResizePreserveRatioImagePanel(
-                    ImageIO.read(getClass().getResourceAsStream("/Niveau.png"))
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-            fond = null;
-        }
-        fond.setSize(300,200);
-        add(fond, 1);
+    public WaterLevelPanel(final Controller controller) {
+        super(IconGraphicalMetadata.ICON_WATER_LEVEL.getImage());
+    }
+
+    @Override
+    protected void paintComponent(final Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(IconGraphicalMetadata.ICON_WATER_LEVEL_CURSOR.getImage(),
+                20, getYCursor(waterLevel), (int) (getWidth() * 0.25), (int) (getHeight() * 0.07), null);
+    }
+
+    public int getYCursor(final int waterLevel) {
+        return (int) (getHeight() * 0.785 - (waterLevel * getHeight() * 0.082));
     }
 }

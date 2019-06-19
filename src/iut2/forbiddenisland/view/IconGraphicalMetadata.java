@@ -10,7 +10,9 @@ public enum IconGraphicalMetadata {
     ICON_GIVE("/icones/iconGive.png"),
     ICON_MOVE("/icones/iconMove.png"),
     ICON_SHIFT("/icones/iconShift.png"),
-    ICON_GET("/icones/iconGet.png");
+    ICON_GET("/icones/iconGet.png"),
+    ICON_WATER_LEVEL("/Niveau.png"),
+    ICON_WATER_LEVEL_CURSOR("/stick.png");
 
     private final String image;
     private Image cacheImage;
