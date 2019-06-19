@@ -5,6 +5,7 @@ import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.model.Board;
 import iut2.forbiddenisland.model.Location;
 import iut2.forbiddenisland.model.Treasure;
+import iut2.forbiddenisland.model.WaterLevel;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.Card;
 import iut2.forbiddenisland.model.card.SpecialCard;
@@ -85,6 +86,10 @@ public class Controller {
         return engine.getRemainingActions();
     }
 
+    public Observable<WaterLevel> getWaterLevel(){
+        return engine.getWaterLevel();
+    }
+
     public Observable<List<Adventurer>> getAdventurers() {
         return engine.getAdventurers();
     }
@@ -104,7 +109,6 @@ public class Controller {
     public Observable<Boolean> getEndGameObservable() {
         return engine.getEndGame();
     }
-
     /**
      * The controller will subscribe to the provided observable
      * and enable the move mode of the engine when triggered.

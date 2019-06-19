@@ -8,10 +8,14 @@ import java.awt.Graphics;
 
 public class WaterLevelPanel extends AutoResizePreserveRatioImagePanel {
 
-    private int waterLevel = 5;
+    private int waterLevel;
 
     public WaterLevelPanel(final Controller controller) {
         super(IconGraphicalMetadata.ICON_WATER_LEVEL.getImage());
+        controller.getWaterLevel().subscribe(val -> {
+            waterLevel = val.getLevel();
+            repaint();
+        });
     }
 
     @Override
