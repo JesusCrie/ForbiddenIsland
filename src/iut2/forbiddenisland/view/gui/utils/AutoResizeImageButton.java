@@ -6,7 +6,7 @@ import java.awt.Image;
 
 public class AutoResizeImageButton extends JButton {
 
-    private final Image background;
+    protected Image background;
 
     public AutoResizeImageButton(final Image background) {
         this.background = background;

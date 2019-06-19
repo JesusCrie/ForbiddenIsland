@@ -2,6 +2,7 @@ package iut2.forbiddenisland.view.gui.utils;
 
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.cell.Cell;
+import iut2.forbiddenisland.model.cell.CellState;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -12,8 +13,21 @@ public class GridCellButton extends AutoResizeImageButton {
     private final Cell cell;
 
     public GridCellButton(final Cell cell) {
-        super(cell.getMetadata().getGridImage());
+        super(cell.getMetadata().getGridDryImage());
         this.cell = cell;
+    }
+
+    public void update() {
+        if (cell.getState() == CellState.FLOODED) {
+            setVisible(false);
+        } else {
+            setVisible(true);
+
+            if (cell.getState() == CellState.DRY)
+                background = cell.getMetadata().getGridDryImage();
+            else
+                background = cell.getMetadata().getGridWetImage();
+        }
     }
 
     @Override

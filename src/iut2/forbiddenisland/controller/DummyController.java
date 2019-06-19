@@ -16,6 +16,7 @@ public class DummyController extends Controller {
             new Messenger("Batman")
     );
 
+    //private static Board DUMMY_BOARD = BoardGenerator.createRandomBoard(DUMMY_ADVENTURERS, 0);
     private static Board DUMMY_BOARD = DemoBoard.createAndGet(DUMMY_ADVENTURERS);
 
     public DummyController() {

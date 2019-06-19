@@ -2,44 +2,56 @@ package iut2.forbiddenisland.view.gui.game;
 
 import iut2.forbiddenisland.controller.Controller;
 import iut2.forbiddenisland.model.card.TreasureCard;
-import iut2.forbiddenisland.view.gui.utils.ConstraintFactory;
 
 import javax.swing.*;
-import java.awt.GridBagLayout;
+import java.awt.Dimension;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class GameFrame extends JFrame {
 
+    private final Box container;
+
     public GameFrame(final Controller controller) {
-        setSize(1000, 1000);
+        setSize(1900, 1000);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        setLayout(new GridBagLayout());
+        container = Box.createHorizontalBox();
 
-        /*
-         *  BBB W
-         *  BBB W
-         *  BBB W
-         *
-         *  PPP A
-         */
+        // Create board panel
+        final BoardPanel boardPanel = new BoardPanel(controller);
+        boardPanel.setPreferredSize(new Dimension(1000, 1000));
+        container.add(boardPanel);
 
-        add(new BoardPanel(null),
-                ConstraintFactory.fillBoth(0, 0, 3, 3));
-        add(new PlayerCardsPanel(controller),
-                ConstraintFactory.fillBoth(3, 0, 2, 3));
-        add(new WaterLevelPanel(this),
-                ConstraintFactory.fillBoth(5, 0, 1, 2));
-        add(new ActionPanel(controller),
-                ConstraintFactory.fillBoth(5, 2, 1, 1));
+        // Create player card panel
+        final PlayerCardsPanel playerCardsPanel = new PlayerCardsPanel(controller);
+        playerCardsPanel.setPreferredSize(new Dimension(500, 1000));
+        container.add(playerCardsPanel);
+
+        // Create water & action panels
+        {
+            final Box waterActionContainer = Box.createVerticalBox();
+            waterActionContainer.setPreferredSize(new Dimension(300, 1000));
+
+            final WaterLevelPanel waterLevelPanel = new WaterLevelPanel(waterActionContainer);
+            waterActionContainer.setPreferredSize(new Dimension(300, 600));
+            waterActionContainer.add(waterLevelPanel);
+
+            final ActionPanel actionPanel = new ActionPanel(controller);
+            actionPanel.setPreferredSize(new Dimension(300, 300));
+            waterActionContainer.add(actionPanel);
+
+            container.add(waterActionContainer);
+        }
+
+        add(container);
     }
 
-    public TreasureCard askCardToDiscard(final List<TreasureCard> list) {
+    public static TreasureCard askCardToDiscard(final List<TreasureCard> cards) {
         final CompletableFuture<TreasureCard> future = new CompletableFuture<>();
 
-        final DiscardCardFrame frame = new DiscardCardFrame(list, future);
+        final DiscardCardFrame frame = new DiscardCardFrame(cards, future);
         frame.setVisible(true);
 
         try {

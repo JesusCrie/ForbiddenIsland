@@ -9,7 +9,7 @@ import iut2.forbiddenisland.view.gui.utils.GridCellButton;
 import iut2.forbiddenisland.view.gui.utils.TreasureImage;
 
 import javax.swing.*;
-import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,20 +17,18 @@ import java.util.Map;
 
 public class BoardPanel extends JPanel {
 
-    private static final JPanel EMPTY = new JPanel();
-
     private final Observable<Cell> cellClickNotifier = new Observable<>();
 
-    private final List<JPanel> treasurePanels = new ArrayList<>(4);
-    private final Map<Location, JPanel> cellsPanels = new HashMap<>();
+    private final List<TreasureImage> treasurePanels = new ArrayList<>(4);
+    private final Map<Location, GridCellButton> cellsPanels = new HashMap<>();
 
     public BoardPanel(final Controller controller) {
-        setLayout(new GridBagLayout());
+        setLayout(new GridLayout(8, 8));
 
-        // TODO when real controller
-        //controller.observeClickCell(cellClickNotifier);
+        controller.observeClickCell(cellClickNotifier);
 
-
+        setup(controller.getCells().get(), controller.getTreasures().get());
+        update();
     }
 
     private void setup(final Map<Location, Cell> cells, final List<Treasure> treasures) {
@@ -42,98 +40,114 @@ public class BoardPanel extends JPanel {
         // *** Line 0 ***
 
         for (int i = 0; i < 8; ++i)
-            add(EMPTY);
+            add(createEmpty());
 
         // *** Line 1 ***
 
-        add(EMPTY);
+        add(createEmpty());
 
         // First treasure
-        if (!treasures.get(0).isClaimable())
-            add(new TreasureImage(treasures.get(0)));
+        add(createTreasureDisplay(treasures.get(0)));
 
-        add(EMPTY);
+        add(createEmpty());
 
         add(createCellButton(cells.get(Location.from(2, 0))));
         add(createCellButton(cells.get(Location.from(3, 0))));
 
-        add(EMPTY);
+        add(createEmpty());
 
         // Second treasure
-        if (!treasures.get(1).isClaimable())
-            add(new TreasureImage(treasures.get(1)));
+        add(createTreasureDisplay(treasures.get(1)));
 
-        add(EMPTY);
+        add(createEmpty());
 
         // *** Line 2 ***
 
-        add(EMPTY);
-        add(EMPTY);
+        add(createEmpty());
+        add(createEmpty());
 
         for (int i = 1; i <= 4; ++i)
             add(createCellButton(cells.get(Location.from(i, 1))));
 
-        add(EMPTY);
-        add(EMPTY);
+        add(createEmpty());
+        add(createEmpty());
 
         // *** Line 3 ***
 
-        add(EMPTY);
+        add(createEmpty());
 
         for (int i = 0; i <= 5; ++i)
             add(createCellButton(cells.get(Location.from(i, 2))));
 
-        add(EMPTY);
+        add(createEmpty());
 
         // *** Line 4 ***
 
-        add(EMPTY);
+        add(createEmpty());
 
         for (int i = 0; i <= 5; ++i)
             add(createCellButton(cells.get(Location.from(i, 3))));
 
-        add(EMPTY);
+        add(createEmpty());
 
         // *** Line 5 ***
 
-        add(EMPTY);
-        add(EMPTY);
+        add(createEmpty());
+        add(createEmpty());
 
         for (int i = 1; i <= 4; ++i)
             add(createCellButton(cells.get(Location.from(i, 4))));
 
-        add(EMPTY);
-        add(EMPTY);
+        add(createEmpty());
+        add(createEmpty());
 
         // *** Line 6 ***
 
-        add(EMPTY);
+        add(createEmpty());
 
-        if (!treasures.get(2).isClaimable())
-            add(new TreasureImage(treasures.get(2)));
+        // Third treasure
+        add(createTreasureDisplay(treasures.get(2)));
 
-        add(EMPTY);
+        add(createEmpty());
 
         add(createCellButton(cells.get(Location.from(2, 5))));
         add(createCellButton(cells.get(Location.from(3, 5))));
 
-        add(EMPTY);
+        add(createEmpty());
 
-        if (!treasures.get(3).isClaimable())
-            add(new TreasureImage(treasures.get(3)));
+        // Fourth treasure
+        add(createTreasureDisplay(treasures.get(3)));
 
-        add(EMPTY);
+        add(createEmpty());
 
         // *** Line 7 ***
 
         for (int i = 0; i < 8; ++i)
-            add(EMPTY);
+            add(createEmpty());
+    }
+
+    private void update() {
+        treasurePanels.forEach(TreasureImage::update);
+        cellsPanels.values().forEach(GridCellButton::update);
+        repaint();
+    }
+
+    private JPanel createEmpty() {
+        return new JPanel();
     }
 
     private GridCellButton createCellButton(final Cell cell) {
         final GridCellButton btn = new GridCellButton(cell);
         btn.addActionListener(e -> cellClickNotifier.set(cell));
 
+        cellsPanels.put(cell.getLocation(), btn);
         return btn;
+    }
+
+    private TreasureImage createTreasureDisplay(final Treasure treasure) {
+        final TreasureImage display = new TreasureImage(treasure);
+        treasurePanels.add(display);
+
+        return display;
     }
 }
