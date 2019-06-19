@@ -15,17 +15,18 @@ import java.awt.*;
 import java.util.List;
 
 public class PlayerCardsPanel extends JPanel {
-    private final JPanel player1Panel;
-    private final JPanel player2Panel;
-    private final JPanel player3Panel;
-    private final JPanel player4Panel;
+    private final JComponent mainPanel;
+    private final JComponent player1Panel;
+    private final JComponent player2Panel;
+    private final JComponent player3Panel;
+    private final JComponent player4Panel;
 
     private final JButton[][] cards;
 
-    private final AdventurerCard type1;
-    private final AdventurerCard type2;
-    private final AdventurerCard type3;
-    private final AdventurerCard type4;
+    private AdventurerCard type1;
+    private AdventurerCard type2;
+    private AdventurerCard type3;
+    private AdventurerCard type4;
 
     private final JLabel name1;
     private final JLabel name2;
@@ -39,22 +40,22 @@ public class PlayerCardsPanel extends JPanel {
         //<editor-fold desc="*** INTANCIATION ***">
         adventurers = controller.getAdventurers().get();
 
+        mainPanel = Box.createVerticalBox();
 
+        player1Panel = Box.createVerticalBox();
+        player2Panel = Box.createVerticalBox();
+        player3Panel = Box.createVerticalBox();
+        player4Panel = Box.createVerticalBox();
 
-        player1Panel = new JPanel(new GridBagLayout());
-        player2Panel = new JPanel(new GridBagLayout());
-        player3Panel = new JPanel(new GridBagLayout());
-        player4Panel = new JPanel(new GridBagLayout());
+        JComponent topPanel1 = Box.createHorizontalBox();
+        JComponent topPanel2 = Box.createHorizontalBox();
+        JComponent topPanel3 = Box.createHorizontalBox();
+        JComponent topPanel4 = Box.createHorizontalBox();
 
-        JPanel topPanel1 = new JPanel(new GridBagLayout());
-        JPanel topPanel2 = new JPanel(new GridBagLayout());
-        JPanel topPanel3 = new JPanel(new GridBagLayout());
-        JPanel topPanel4 = new JPanel(new GridBagLayout());
-
-        JPanel botPanel1 = new JPanel(new GridBagLayout());
-        JPanel botPanel2 = new JPanel(new GridBagLayout());
-        JPanel botPanel3 = new JPanel(new GridBagLayout());
-        JPanel botPanel4 = new JPanel(new GridBagLayout());
+        JComponent botPanel1 = Box.createHorizontalBox();
+        JComponent botPanel2 = Box.createHorizontalBox();
+        JComponent botPanel3 = Box.createHorizontalBox();
+        JComponent botPanel4 = Box.createHorizontalBox();
 
         cards = new JButton[4][5];
 
@@ -63,18 +64,27 @@ public class PlayerCardsPanel extends JPanel {
         name3 = new JLabel();
         name4 = new JLabel();
 
-        type1 = new AdventurerCard(adventurers.get(0));
-        type2 = new AdventurerCard(adventurers.get(1));
-        type3 = new AdventurerCard(adventurers.get(2));
-        type4 = new AdventurerCard(adventurers.get(3));
+        if(adventurers.size() >= 1){
+            type1 = new AdventurerCard(adventurers.get(0));
+        }
+        if (adventurers.size() >= 2) {
+            type2 = new AdventurerCard(adventurers.get(1));
+        }
+        if (adventurers.size() >= 3) {
+            type3 = new AdventurerCard(adventurers.get(2));
+        }
+
+        if (adventurers.size() >= 4) {
+            type4 = new AdventurerCard(adventurers.get(3));
+        }
         //</editor-fold>
 
         //<editor-fold desc="*** PLAYER 1 ***">
         if (adventurers.size() >= 1){
-            topPanel1.add(type1, ConstraintFactory.fillBoth(0,0,1,1));
+            topPanel1.add(type1);
             name1.setText(adventurers.get(0).getName());
-            topPanel1.add(name1, ConstraintFactory.fillHorizontal(2,0,4,1));
-            player1Panel.add(topPanel1, ConstraintFactory.fillBoth(0,0,5,1));
+            topPanel1.add(name1);
+            player1Panel.add(topPanel1);
 
 
             java.util.List<TreasureCard> playerCards = adventurers.get(0).getCards();
@@ -165,10 +175,11 @@ public class PlayerCardsPanel extends JPanel {
         }
         //</editor-fold>
 
-        this.setLayout(new GridBagLayout());
-        this.add(player1Panel, ConstraintFactory.fillBoth(0,0,3,2));
-        this.add(player2Panel, ConstraintFactory.fillBoth(0,2,3,2));
-        this.add(player3Panel, ConstraintFactory.fillBoth(0,4,3,2));
-        this.add(player4Panel, ConstraintFactory.fillBoth(0,6,3,2));
+        mainPanel.add(player1Panel);
+        mainPanel.add(player2Panel);
+        mainPanel.add(player3Panel);
+        mainPanel.add(player4Panel);
+
+        this.add(mainPanel);
     }
 }

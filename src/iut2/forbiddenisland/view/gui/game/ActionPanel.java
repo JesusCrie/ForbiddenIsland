@@ -3,10 +3,14 @@ package iut2.forbiddenisland.view.gui.game;
 import iut2.forbiddenisland.controller.Controller;
 import iut2.forbiddenisland.view.IconGraphicalMetadata;
 import iut2.forbiddenisland.view.gui.utils.AutoResizeImageButton;
+import iut2.forbiddenisland.view.gui.utils.AutoResizePreserveRatioImagePanel;
 import iut2.forbiddenisland.view.gui.utils.ConstraintFactory;
 
 import javax.swing.*;
 import java.awt.GridBagLayout;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class ActionPanel extends JPanel {
     private final JPanel countPanel;
@@ -34,17 +38,23 @@ public class ActionPanel extends JPanel {
         countAction = new JLabel();
         countAction.setHorizontalAlignment((int) CENTER_ALIGNMENT);
 
-        labDry = new JLabel("Assecher");
-        labClear = new JLabel("Récuperer tresor");
-        labEnd = new JLabel("Finir Tours");
-        labMove = new JLabel("Se deplacer");
-        labSend = new JLabel("echanger carte");
+        labDry = new JLabel("Assécher");
+        labClear = new JLabel("Récupérer trésor");
+        labEnd = new JLabel("Finir tours");
+        labMove = new JLabel("Se déplacer");
+        labSend = new JLabel("Echanger carte");
 
-        btnDry = new AutoResizeImageButton(IconGraphicalMetadata.ICON_DRY.getImage());
-        btnSend = new AutoResizeImageButton(IconGraphicalMetadata.ICON_GIVE.getImage());
-        btnMove = new AutoResizeImageButton(IconGraphicalMetadata.ICON_MOVE.getImage());
-        btnEnd = new AutoResizeImageButton(IconGraphicalMetadata.ICON_SHIFT.getImage());
-        btnClear = new AutoResizeImageButton(IconGraphicalMetadata.ICON_GET.getImage());
+        btnDry = new JButton();
+        btnSend = new JButton();
+        btnMove = new JButton();
+        btnEnd = new JButton();
+        btnClear = new JButton();
+
+        btnDry.setLayout(new GridBagLayout());
+        btnSend.setLayout(new GridBagLayout());
+        btnMove.setLayout(new GridBagLayout());
+        btnEnd.setLayout(new GridBagLayout());
+        btnClear.setLayout(new GridBagLayout());
         //</editor-fold>
 
         //<editor-fold desc="*** COUNT PANEL ***">
@@ -52,21 +62,31 @@ public class ActionPanel extends JPanel {
         countPanel.add(countAction);
         //</editor-fold>
 
-        actPanel.add(labDry, ConstraintFactory.fillHorizontal(0, 0, 1, 1));
-        actPanel.add(labClear, ConstraintFactory.fillHorizontal(0, 1, 1, 1));
-        actPanel.add(labMove, ConstraintFactory.fillHorizontal(0, 2, 1, 1));
-        actPanel.add(labSend, ConstraintFactory.fillHorizontal(0, 3, 1, 1));
-        actPanel.add(labEnd, ConstraintFactory.fillHorizontal(0, 4, 1, 1));
+        //<editor-fold desc="*** ACTION PANEL ***">
+        btnDry.add(new AutoResizePreserveRatioImagePanel(IconGraphicalMetadata.ICON_DRY.getImage()), ConstraintFactory.fillBoth(0,0,1,1));
+        btnDry.add(labDry, ConstraintFactory.fillBoth(1,0,1,1));
+        actPanel.add(btnDry, ConstraintFactory.fillHorizontal(0,0,2,1));
 
-        actPanel.add(btnDry, ConstraintFactory.fillBoth(2, 0, 1, 1));
-        actPanel.add(btnClear, ConstraintFactory.fillBoth(2, 1, 1, 1));
-        actPanel.add(btnMove, ConstraintFactory.fillBoth(2, 2, 1, 1));
-        actPanel.add(btnSend, ConstraintFactory.fillBoth(2, 3, 1, 1));
-        actPanel.add(btnEnd, ConstraintFactory.fillBoth(2, 4, 1, 1));
+        btnMove.add(new AutoResizePreserveRatioImagePanel((IconGraphicalMetadata.ICON_MOVE.getImage())), ConstraintFactory.fillBoth(0,0,1,1));
+        btnMove.add(labMove, ConstraintFactory.fillBoth(1,0,1,1));
+        actPanel.add(btnMove, ConstraintFactory.fillHorizontal(0,1,2,1));
+
+        btnClear.add(new AutoResizePreserveRatioImagePanel((IconGraphicalMetadata.ICON_GET.getImage())), ConstraintFactory.fillBoth(0,0,1,1));
+        btnClear.add(labClear, ConstraintFactory.fillBoth(1,0,1,1));
+        actPanel.add(btnClear, ConstraintFactory.fillHorizontal(0,2,2,1));
+
+        btnSend.add(new AutoResizePreserveRatioImagePanel((IconGraphicalMetadata.ICON_GIVE.getImage())), ConstraintFactory.fillBoth(0,0,1,1));
+        btnSend.add(labSend, ConstraintFactory.fillBoth(1,0,1,1));
+        actPanel.add(btnSend, ConstraintFactory.fillHorizontal(0,3,2,1));
+
+        btnEnd.add(new AutoResizePreserveRatioImagePanel((IconGraphicalMetadata.ICON_SHIFT.getImage())), ConstraintFactory.fillBoth(0,0,1,1));
+        btnEnd.add(labEnd, ConstraintFactory.fillBoth(1,0,1,1));
+        actPanel.add(btnEnd, ConstraintFactory.fillHorizontal(0,1,2,1));
+        //</editor-fold>
 
         this.setLayout(new GridBagLayout());
         this.add(countPanel, ConstraintFactory.create(1, 0));
-        this.add(actPanel, ConstraintFactory.fillBoth(0, 1, 3, 5));
+        this.add(actPanel, ConstraintFactory.fillBoth(0, 1, 4, 5));
 
     }
 }
