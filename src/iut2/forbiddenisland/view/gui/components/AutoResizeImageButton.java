@@ -1,4 +1,4 @@
-package iut2.forbiddenisland.view.gui.utils;
+package iut2.forbiddenisland.view.gui.components;
 
 import javax.swing.*;
 import java.awt.Graphics;

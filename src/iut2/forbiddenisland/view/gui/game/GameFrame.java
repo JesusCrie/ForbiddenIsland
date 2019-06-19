@@ -4,6 +4,7 @@ import iut2.forbiddenisland.controller.Controller;
 import iut2.forbiddenisland.model.card.TreasureCard;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.Dimension;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -17,7 +18,10 @@ public class GameFrame extends JFrame {
         setSize(1900, 1000);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
+        // Yes, every size is hardcoded and its not responsive
+
         container = Box.createHorizontalBox();
+        container.setBorder(new EmptyBorder(5, 5, 5, 5));
 
         // Create board panel
         final BoardPanel boardPanel = new BoardPanel(controller);
@@ -38,9 +42,10 @@ public class GameFrame extends JFrame {
             waterActionContainer.setPreferredSize(new Dimension(300, 600));
             waterActionContainer.add(waterLevelPanel);
 
-            final ActionPanel actionPanel = new ActionPanel(controller);
+            final ActionPanel actionPanel = new ActionPanel(controller, 300, 300);
             actionPanel.setMaximumSize(new Dimension(300, 300));
             actionPanel.setPreferredSize(new Dimension(300, 300));
+            actionPanel.setup();
             waterActionContainer.add(actionPanel);
 
             container.add(waterActionContainer);

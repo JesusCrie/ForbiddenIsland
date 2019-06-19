@@ -5,8 +5,8 @@ import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.model.Location;
 import iut2.forbiddenisland.model.Treasure;
 import iut2.forbiddenisland.model.cell.Cell;
-import iut2.forbiddenisland.view.gui.utils.GridCellButton;
-import iut2.forbiddenisland.view.gui.utils.TreasureImage;
+import iut2.forbiddenisland.view.gui.components.GridCellButton;
+import iut2.forbiddenisland.view.gui.components.TreasureImage;
 
 import javax.swing.*;
 import java.awt.GridLayout;

@@ -7,10 +7,10 @@ import java.io.IOException;
 public enum IconGraphicalMetadata {
 
     ICON_DRY("/icones/iconDry.png"),
-    ICON_GIVE("/icones/iconGive.png"),
+    ICON_SEND("/icones/iconGive.png"),
     ICON_MOVE("/icones/iconMove.png"),
-    ICON_SHIFT("/icones/iconShift.png"),
-    ICON_GET("/icones/iconGet.png"),
+    ICON_DONE("/icones/iconDone.png"),
+    ICON_CLAIM("/icones/iconGet.png"),
     ICON_WATER_LEVEL("/Niveau.png"),
     ICON_WATER_LEVEL_CURSOR("/stick.png");
 

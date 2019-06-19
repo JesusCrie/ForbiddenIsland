@@ -58,7 +58,7 @@ public class BoardGenerator {
      *
      * @return A list of the treasures.
      */
-    private static List<Treasure> createTreasures() {
+    public static List<Treasure> createTreasures() {
         return Arrays.asList(
                 new Treasure(TreasureGraphicalMetadata.SACRED_STONE),
                 new Treasure(TreasureGraphicalMetadata.ZEPHYR_STATUE),

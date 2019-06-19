@@ -18,6 +18,7 @@ public class ForbiddenIsland {
             startFrame.setVisible(true);
 
             final GameFrame frame = new GameFrame(controller);
+            frame.pack();
             frame.setVisible(true);
         });
     }

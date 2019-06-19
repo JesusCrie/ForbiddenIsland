@@ -1,7 +1,7 @@
 package iut2.forbiddenisland.view.gui.game;
 
 import iut2.forbiddenisland.model.card.TreasureCard;
-import iut2.forbiddenisland.view.gui.utils.CardButton;
+import iut2.forbiddenisland.view.gui.components.CardButton;
 import iut2.forbiddenisland.view.gui.utils.ConstraintFactory;
 
 import javax.swing.*;

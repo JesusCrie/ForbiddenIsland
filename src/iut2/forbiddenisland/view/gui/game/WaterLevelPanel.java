@@ -2,7 +2,7 @@ package iut2.forbiddenisland.view.gui.game;
 
 import iut2.forbiddenisland.controller.Controller;
 import iut2.forbiddenisland.view.IconGraphicalMetadata;
-import iut2.forbiddenisland.view.gui.utils.AutoResizePreserveRatioImagePanel;
+import iut2.forbiddenisland.view.gui.components.AutoResizePreserveRatioImagePanel;
 
 import java.awt.Graphics;
 

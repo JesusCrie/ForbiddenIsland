@@ -14,8 +14,6 @@ public class ConstraintFactory {
 
     public static GridBagConstraints create(final int gridX, final int gridY, final int width, final int height) {
         final GridBagConstraints constraints = create(gridX, gridY);
-        constraints.gridwidth = width;
-        constraints.gridheight = height;
         constraints.weightx = width;
         constraints.weighty = height;
 

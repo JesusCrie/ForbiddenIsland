@@ -1,17 +1,15 @@
 package iut2.forbiddenisland.view.gui.game;
 
 import iut2.forbiddenisland.controller.Controller;
-import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.TreasureCard;
 import iut2.forbiddenisland.view.TreasureCardGraphicalMetadata;
-import iut2.forbiddenisland.view.gui.utils.AdventurerCard;
-import iut2.forbiddenisland.view.gui.utils.AutoResizeImageButton;
-import iut2.forbiddenisland.view.gui.utils.CardButton;
+import iut2.forbiddenisland.view.gui.components.AdventurerCardButton;
+import iut2.forbiddenisland.view.gui.components.AutoResizeImageButton;
+import iut2.forbiddenisland.view.gui.components.CardButton;
 import iut2.forbiddenisland.view.gui.utils.ConstraintFactory;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 
 public class PlayerCardsPanel extends JPanel {
@@ -23,10 +21,10 @@ public class PlayerCardsPanel extends JPanel {
 
     private final JButton[][] cards;
 
-    private AdventurerCard type1;
-    private AdventurerCard type2;
-    private AdventurerCard type3;
-    private AdventurerCard type4;
+    private AdventurerCardButton type1;
+    private AdventurerCardButton type2;
+    private AdventurerCardButton type3;
+    private AdventurerCardButton type4;
 
     private final JLabel name1;
     private final JLabel name2;
@@ -65,17 +63,17 @@ public class PlayerCardsPanel extends JPanel {
         name4 = new JLabel();
 
         if(adventurers.size() >= 1){
-            type1 = new AdventurerCard(adventurers.get(0));
+            type1 = new AdventurerCardButton(adventurers.get(0));
         }
         if (adventurers.size() >= 2) {
-            type2 = new AdventurerCard(adventurers.get(1));
+            type2 = new AdventurerCardButton(adventurers.get(1));
         }
         if (adventurers.size() >= 3) {
-            type3 = new AdventurerCard(adventurers.get(2));
+            type3 = new AdventurerCardButton(adventurers.get(2));
         }
 
         if (adventurers.size() >= 4) {
-            type4 = new AdventurerCard(adventurers.get(3));
+            type4 = new AdventurerCardButton(adventurers.get(3));
         }
         //</editor-fold>
 

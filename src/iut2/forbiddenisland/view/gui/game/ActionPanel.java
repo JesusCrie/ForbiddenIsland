@@ -2,91 +2,74 @@ package iut2.forbiddenisland.view.gui.game;
 
 import iut2.forbiddenisland.controller.Controller;
 import iut2.forbiddenisland.view.IconGraphicalMetadata;
-import iut2.forbiddenisland.view.gui.utils.AutoResizeImageButton;
-import iut2.forbiddenisland.view.gui.utils.AutoResizePreserveRatioImagePanel;
-import iut2.forbiddenisland.view.gui.utils.ConstraintFactory;
 
 import javax.swing.*;
-import java.awt.GridBagLayout;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Image;
 
 public class ActionPanel extends JPanel {
-    private final JPanel countPanel;
-    private final JPanel actPanel;
 
-    private final JLabel countAction;
+    private final int width;
+    private final int height;
 
+    private final JLabel remainingActionsText;
+    private final JButton btnMove;
     private final JButton btnDry;
     private final JButton btnSend;
-    private final JButton btnMove;
-    private final JButton btnClear;
-    private final JButton btnEnd;
+    private final JButton btnClaim;
+    private final JButton btnEndRound;
 
-    private final JLabel labDry;
-    private final JLabel labEnd;
-    private final JLabel labClear;
-    private final JLabel labMove;
-    private final JLabel labSend;
+    public ActionPanel(final Controller controller, final int width, final int height) {
+        this.width = width;
+        this.height = height;
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-    public ActionPanel(final Controller controller) {
-        //<editor-fold desc="*** INITIALISATION ***">
-        countPanel = new JPanel(new GridBagLayout());
-        actPanel = new JPanel(new GridBagLayout());
-
-        countAction = new JLabel();
-        countAction.setHorizontalAlignment((int) CENTER_ALIGNMENT);
-
-        labDry = new JLabel("Assécher");
-        labClear = new JLabel("Récupérer trésor");
-        labEnd = new JLabel("Finir tours");
-        labMove = new JLabel("Se déplacer");
-        labSend = new JLabel("Echanger carte");
-
+        remainingActionsText = new JLabel("", SwingConstants.CENTER);
+        btnMove = new JButton();
         btnDry = new JButton();
         btnSend = new JButton();
-        btnMove = new JButton();
-        btnEnd = new JButton();
-        btnClear = new JButton();
+        btnClaim = new JButton();
+        btnEndRound = new JButton();
+    }
 
-        btnDry.setLayout(new GridBagLayout());
-        btnSend.setLayout(new GridBagLayout());
-        btnMove.setLayout(new GridBagLayout());
-        btnEnd.setLayout(new GridBagLayout());
-        btnClear.setLayout(new GridBagLayout());
-        //</editor-fold>
+    public void setup() {
 
-        //<editor-fold desc="*** COUNT PANEL ***">
-        countAction.setText("Nombres d'action restante : " + controller.getRemainingActions().get());
-        countPanel.add(countAction);
-        //</editor-fold>
+        final int heightPerButton = height / 6;
 
-        //<editor-fold desc="*** ACTION PANEL ***">
-        btnDry.add(new AutoResizePreserveRatioImagePanel(IconGraphicalMetadata.ICON_DRY.getImage()), ConstraintFactory.fillBoth(0,0,1,1));
-        btnDry.add(labDry, ConstraintFactory.fillBoth(1,0,1,1));
-        actPanel.add(btnDry, ConstraintFactory.fillHorizontal(0,0,2,1));
+        remainingActionsText.setText("32 actions restantes");
 
-        btnMove.add(new AutoResizePreserveRatioImagePanel((IconGraphicalMetadata.ICON_MOVE.getImage())), ConstraintFactory.fillBoth(0,0,1,1));
-        btnMove.add(labMove, ConstraintFactory.fillBoth(1,0,1,1));
-        actPanel.add(btnMove, ConstraintFactory.fillHorizontal(0,1,2,1));
+        final Dimension dim = new Dimension(width, heightPerButton);
+        remainingActionsText.setMinimumSize(dim);
+        remainingActionsText.setPreferredSize(dim);
+        remainingActionsText.setMaximumSize(dim);
 
-        btnClear.add(new AutoResizePreserveRatioImagePanel((IconGraphicalMetadata.ICON_GET.getImage())), ConstraintFactory.fillBoth(0,0,1,1));
-        btnClear.add(labClear, ConstraintFactory.fillBoth(1,0,1,1));
-        actPanel.add(btnClear, ConstraintFactory.fillHorizontal(0,2,2,1));
+        add(remainingActionsText);
 
-        btnSend.add(new AutoResizePreserveRatioImagePanel((IconGraphicalMetadata.ICON_GIVE.getImage())), ConstraintFactory.fillBoth(0,0,1,1));
-        btnSend.add(labSend, ConstraintFactory.fillBoth(1,0,1,1));
-        actPanel.add(btnSend, ConstraintFactory.fillHorizontal(0,3,2,1));
+        setupButton(btnMove, "Se Déplacer", IconGraphicalMetadata.ICON_MOVE.getImage(), heightPerButton);
+        add(btnMove);
 
-        btnEnd.add(new AutoResizePreserveRatioImagePanel((IconGraphicalMetadata.ICON_SHIFT.getImage())), ConstraintFactory.fillBoth(0,0,1,1));
-        btnEnd.add(labEnd, ConstraintFactory.fillBoth(1,0,1,1));
-        actPanel.add(btnEnd, ConstraintFactory.fillHorizontal(0,1,2,1));
-        //</editor-fold>
+        setupButton(btnDry, "Assecher", IconGraphicalMetadata.ICON_DRY.getImage(), heightPerButton);
+        add(btnDry);
 
-        this.setLayout(new GridBagLayout());
-        this.add(countPanel, ConstraintFactory.create(1, 0));
-        this.add(actPanel, ConstraintFactory.fillBoth(0, 1, 4, 5));
+        setupButton(btnSend, "Envoyer Carte", IconGraphicalMetadata.ICON_SEND.getImage(), heightPerButton);
+        add(btnSend);
 
+        setupButton(btnClaim, "Récupérer Trésor", IconGraphicalMetadata.ICON_CLAIM.getImage(), heightPerButton);
+        add(btnClaim);
+
+        setupButton(btnEndRound, "Fin du tour", IconGraphicalMetadata.ICON_DONE.getImage(), heightPerButton);
+        btnEndRound.setBackground(Color.ORANGE);
+        add(btnEndRound);
+    }
+
+    private void setupButton(final JButton btn, final String label, Image icon, final int size) {
+        icon = icon.getScaledInstance((int) (size * 0.8), (int) (size * 0.8), Image.SCALE_SMOOTH);
+
+        btn.setHorizontalAlignment(JButton.LEFT);
+        btn.setMaximumSize(new Dimension(width, size));
+        btn.setIconTextGap(10);
+        btn.setIcon(new ImageIcon(icon));
+        btn.setText(label);
     }
 }

@@ -34,7 +34,7 @@ public class StartingFrame extends JFrame {
     private JLabel[] numAventurier = new JLabel[4];
 
     public StartingFrame() {
-
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         setSize(800, 800);
         setLayout(new BorderLayout());
@@ -171,9 +171,6 @@ public class StartingFrame extends JFrame {
                 }
             }
         });
-
-        setVisible(true);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public String[] getAdventurerNames() {
