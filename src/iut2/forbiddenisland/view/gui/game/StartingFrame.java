@@ -18,7 +18,7 @@ import javax.swing.*;
  */
 public class StartingFrame extends JFrame {
 
-    public String[] adventurerName = new String[4];
+    private String[] adventurerNames = new String[4];
     private int nbAdventurer;
     private JPanel panelCenter = new JPanel();
     private JLabel[] aventurier = new JLabel[4];
@@ -27,7 +27,7 @@ public class StartingFrame extends JFrame {
     private GridBagConstraints c = new GridBagConstraints();
     private JComboBox difficulty;
     private String[] setDifficulty;
-    public int levelDifficulty;
+    private int levelDifficulty;
     private JLabel erreur;
     private JPanel[] unAventurier = new JPanel[4];
     private JComboBox nbAventurier;
@@ -52,8 +52,9 @@ public class StartingFrame extends JFrame {
 
         String[] setDifficulty = new String[]{"Novice", "Normal", "Elite", "Légendaire"};
         difficulty = new JComboBox(setDifficulty);
-        JPanel difficultyPanel = new JPanel(new GridLayout(1, 2, 10, 10));
-        JLabel selecDifficulty = new JLabel("Sélection de la difficulté : ");
+        JPanel difficultyPanel = new JPanel(new GridLayout(1, 4, 10, 10));
+        difficultyPanel.add(new JLabel(""));
+        JLabel selecDifficulty = new JLabel("Difficulté : ");
         f = new Font("Arial", Font.BOLD, 20);
         selecDifficulty.setFont(f);
         difficultyPanel.add(selecDifficulty);
@@ -63,26 +64,33 @@ public class StartingFrame extends JFrame {
         selecDifficultyPanel.add(new JLabel(""));
         difficulty.setFont(f);
         difficultyPanel.add(selecDifficultyPanel);
+        difficultyPanel.add(new JLabel(""));
 
         mainPanel.add(difficultyPanel);
 
         JPanel panelCenter = new JPanel(new GridLayout(5, 1, 10, 10));
         mainPanel.add(panelCenter, BorderLayout.CENTER);
-        erreur = new JLabel("");
+        JPanel panelErreur = new JPanel(new BorderLayout());
+        erreur = new JLabel("",JLabel.CENTER );
         erreur.setForeground(Color.red);
         erreur.setFont(f);
-        mainPanel.add(erreur);
+
+        panelErreur.add(erreur,BorderLayout.CENTER);
+        mainPanel.add(panelErreur);
         Font font = new Font("Arial", Font.BOLD, 20);
-        JPanel selecNbAventurier = new JPanel(new GridLayout(1,2));
-        JLabel selecNbAdv = new JLabel("Sélection du nombre d'aventurier : ");
+        JPanel selecNbAventurier = new JPanel(new GridLayout(1,4));
+        selecNbAventurier.add(new JLabel(""));
+        JLabel selecNbAdv = new JLabel("Nombre de Joueur");
         selecNbAdv.setFont(font);
         selecNbAventurier.add(selecNbAdv);
+
 
         String[] nbAv = new String[]{"2","3","4"};
         nbAventurier = new JComboBox(nbAv);
         nbAventurier.setSelectedIndex(2);
         nbAventurier.setFont(new Font("Arial", 3, 15    ));
         selecNbAventurier.add(nbAventurier);
+        selecNbAventurier.add(new JLabel(""));
         panelCenter.add(selecNbAventurier);
 
         nbAventurier.addItemListener(new ItemListener() {
@@ -104,14 +112,17 @@ public class StartingFrame extends JFrame {
 
         for (int i = 0; i < 4; i++) {
             unAventurier[i] = new JPanel();
-            unAventurier[i].setLayout(new GridLayout(1,2));
-            numAventurier[i] = new JLabel("Aventurier " + (i + 1) + " : ");
+            unAventurier[i].setLayout(new GridLayout(1,4));
+            numAventurier[i] = new JLabel("Joueur " + (i + 1) + " : ");
             numAventurier[i].setFont(font);
+            unAventurier[i].add(new JLabel(""));
             unAventurier[i].add(numAventurier[i]);
             name[i] = new JTextField();
             name[i].setFont(font);
             name[i].setColumns(10);
             unAventurier[i].add(name[i]);
+
+            unAventurier[i].add(new JLabel(""));
 
             panelCenter.add(unAventurier[i]);
 
@@ -140,8 +151,8 @@ public class StartingFrame extends JFrame {
                 boolean startgame = false;
                 for (int i = 0; i < 4; i++) {
                     if (!name[i].getText().trim().equals("")) {
-                        adventurerName[j] = name[i].getText();
-                        System.out.println(adventurerName[j]);
+                        getAdventurerNames()[j] = name[i].getText();
+                        System.out.println(getAdventurerNames()[j]);
                         j++;
                     }
                     if (j == nbAdventurer) {
@@ -165,4 +176,11 @@ public class StartingFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    public String[] getAdventurerNames() {
+        return adventurerNames;
+    }
+
+    public int getLevelDifficulty() {
+        return levelDifficulty;
+    }
 }
