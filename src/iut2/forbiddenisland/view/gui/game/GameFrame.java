@@ -23,7 +23,7 @@ public class GameFrame extends JFrame {
 
         add(new BoardPanel(this),
                 ConstraintFactory.fillBoth(0, 0, 3, 3));
-        add(new WaterLevelPanel(this),
+        add(new WaterLevelPanel(),
                 ConstraintFactory.fillBoth(3, 0, 1, 3));
         add(new PlayerCardsPanel(this),
                 ConstraintFactory.fillBoth(0, 3, 3, 1));
