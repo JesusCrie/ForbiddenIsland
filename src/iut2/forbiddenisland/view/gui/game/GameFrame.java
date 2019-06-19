@@ -28,12 +28,12 @@ public class GameFrame extends JFrame {
 
         add(new BoardPanel(null),
                 ConstraintFactory.fillBoth(0, 0, 3, 3));
-        add(new WaterLevelPanel(this),
-                ConstraintFactory.fillBoth(3, 0, 1, 3));
         add(new PlayerCardsPanel(controller),
-                ConstraintFactory.fillBoth(0, 3, 3, 1));
+                ConstraintFactory.fillBoth(3, 0, 2, 3));
+        add(new WaterLevelPanel(this),
+                ConstraintFactory.fillBoth(5, 0, 1, 2));
         add(new ActionPanel(controller),
-                ConstraintFactory.fillBoth(3, 3, 1, 1));
+                ConstraintFactory.fillBoth(5, 2, 1, 1));
     }
 
     public TreasureCard askCardToDiscard(final List<TreasureCard> list) {

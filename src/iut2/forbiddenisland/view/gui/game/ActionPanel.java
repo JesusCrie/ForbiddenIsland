@@ -1,12 +1,12 @@
 package iut2.forbiddenisland.view.gui.game;
 
 import iut2.forbiddenisland.controller.Controller;
-import iut2.forbiddenisland.view.TreasureCardGraphicalMetadata;
+import iut2.forbiddenisland.view.IconGraphicalMetadata;
 import iut2.forbiddenisland.view.gui.utils.AutoResizeImageButton;
 import iut2.forbiddenisland.view.gui.utils.ConstraintFactory;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.GridBagLayout;
 
 public class ActionPanel extends JPanel {
     private final JPanel countPanel;
@@ -40,11 +40,11 @@ public class ActionPanel extends JPanel {
         labMove = new JLabel("Se deplacer");
         labSend = new JLabel("echanger carte");
 
-        btnDry = new AutoResizeImageButton(TreasureCardGraphicalMetadata.ICON_DRY.getImage());
-        btnSend = new AutoResizeImageButton(TreasureCardGraphicalMetadata.ICON_GIVE.getImage());
-        btnMove = new AutoResizeImageButton(TreasureCardGraphicalMetadata.ICON_MOVE.getImage());
-        btnEnd = new AutoResizeImageButton(TreasureCardGraphicalMetadata.ICON_SHIFT.getImage());
-        btnClear = new AutoResizeImageButton(TreasureCardGraphicalMetadata.ICON_GET.getImage());
+        btnDry = new AutoResizeImageButton(IconGraphicalMetadata.ICON_DRY.getImage());
+        btnSend = new AutoResizeImageButton(IconGraphicalMetadata.ICON_GIVE.getImage());
+        btnMove = new AutoResizeImageButton(IconGraphicalMetadata.ICON_MOVE.getImage());
+        btnEnd = new AutoResizeImageButton(IconGraphicalMetadata.ICON_SHIFT.getImage());
+        btnClear = new AutoResizeImageButton(IconGraphicalMetadata.ICON_GET.getImage());
         //</editor-fold>
 
         //<editor-fold desc="*** COUNT PANEL ***">
@@ -52,21 +52,21 @@ public class ActionPanel extends JPanel {
         countPanel.add(countAction);
         //</editor-fold>
 
-        actPanel.add(labDry, ConstraintFactory.fillHorizontal(0,0,1,1));
-        actPanel.add(labClear, ConstraintFactory.fillHorizontal(0,1,1,1));
-        actPanel.add(labMove, ConstraintFactory.fillHorizontal(0,2,1,1));
-        actPanel.add(labSend, ConstraintFactory.fillHorizontal(0,3,1,1));
-        actPanel.add(labEnd, ConstraintFactory.fillHorizontal(0,4,1,1));
+        actPanel.add(labDry, ConstraintFactory.fillHorizontal(0, 0, 1, 1));
+        actPanel.add(labClear, ConstraintFactory.fillHorizontal(0, 1, 1, 1));
+        actPanel.add(labMove, ConstraintFactory.fillHorizontal(0, 2, 1, 1));
+        actPanel.add(labSend, ConstraintFactory.fillHorizontal(0, 3, 1, 1));
+        actPanel.add(labEnd, ConstraintFactory.fillHorizontal(0, 4, 1, 1));
 
-        actPanel.add(btnDry, ConstraintFactory.fillBoth(2,0,1,1));
-        actPanel.add(btnClear, ConstraintFactory.fillBoth(2,1,1,1));
-        actPanel.add(btnMove, ConstraintFactory.fillBoth(2,2,1,1));
-        actPanel.add(btnSend, ConstraintFactory.fillBoth(2,3,1,1));
-        actPanel.add(btnEnd, ConstraintFactory.fillBoth(2,4,1,1));
+        actPanel.add(btnDry, ConstraintFactory.fillBoth(2, 0, 1, 1));
+        actPanel.add(btnClear, ConstraintFactory.fillBoth(2, 1, 1, 1));
+        actPanel.add(btnMove, ConstraintFactory.fillBoth(2, 2, 1, 1));
+        actPanel.add(btnSend, ConstraintFactory.fillBoth(2, 3, 1, 1));
+        actPanel.add(btnEnd, ConstraintFactory.fillBoth(2, 4, 1, 1));
 
         this.setLayout(new GridBagLayout());
-        this.add(countPanel, ConstraintFactory.create(1,0));
-        this.add(actPanel, ConstraintFactory.fillBoth(0,1,3,5));
+        this.add(countPanel, ConstraintFactory.create(1, 0));
+        this.add(actPanel, ConstraintFactory.fillBoth(0, 1, 3, 5));
 
     }
 }

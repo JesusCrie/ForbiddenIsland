@@ -15,12 +15,7 @@ public enum TreasureCardGraphicalMetadata {
     SPECIAL_RISING_WATERS("Montée des Eaux", "/cartes/MonteeDesEaux.png"),
     SPECIAL_HELICOPTER("Hélicoptère", "/cartes/Helicoptere.png"),
     SPECIAL_SAND_BAG("Sacs de Sable", "/cartes/SacsDeSable.png"),
-    EMPTY_CARD("Carte vide", "/cartes/FondRouge.png"),
-    ICON_DRY("icone assécher", "/icones/iconDry.png"),
-    ICON_GIVE("icone donner", "/icones/iconGive.png"),
-    ICON_MOVE("icone bouger", "/icones/iconMove.png"),
-    ICON_SHIFT("icone fin", "/icones/iconShift.png"),
-    ICON_GET("icone claim", "/icones/iconGet.png");
+    EMPTY_CARD("Carte vide", "/cartes/FondRouge.png");
 
 
     private final String name;
