@@ -11,8 +11,8 @@ public class ForbiddenIsland {
         SwingUtilities.invokeLater(() -> {
             final StartingFrame Sframe = new StartingFrame();
 
-            final GameFrame Gframe = new GameFrame();
-            Gframe.setVisible(true);
+            //final GameFrame Gframe = new GameFrame();
+            //Gframe.setVisible(true);
         });
     }
 }
