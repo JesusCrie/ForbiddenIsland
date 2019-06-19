@@ -36,10 +36,10 @@ public class GameFrame extends JFrame {
                 ConstraintFactory.fillBoth(3, 3, 1, 1));
     }
 
-    public TreasureCard discardCard(List<TreasureCard> list) {
+    public TreasureCard askCardToDiscard(final List<TreasureCard> list) {
         final CompletableFuture<TreasureCard> future = new CompletableFuture<>();
 
-        final DiscardFrame frame = new DiscardFrame(list, future);
+        final DiscardCardFrame frame = new DiscardCardFrame(list, future);
         frame.setVisible(true);
 
         try {
