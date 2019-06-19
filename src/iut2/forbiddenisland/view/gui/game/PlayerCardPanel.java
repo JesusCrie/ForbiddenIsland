@@ -9,7 +9,7 @@ import iut2.forbiddenisland.view.gui.utils.CardButton;
 import javax.swing.*;
 import java.awt.*;
 
-public class PlayerCard extends JPanel {
+public class PlayerCardPanel extends JPanel {
     private final AdventurerCard type;
     private final JLabel name;
     private final JButton[] cards;
@@ -19,13 +19,16 @@ public class PlayerCard extends JPanel {
 
     private final Font biggerFont;
 
-    PlayerCard(Adventurer adventurer){
-        topPanel = new JPanel(new GridLayout(1,2));
-        botPanel = new JPanel(new GridLayout(1,5));
+    public PlayerCardPanel(final Adventurer adventurer, final int width, final int height) {
+        topPanel = Box.createHorizontalBox();
+        topPanel.setPreferredSize(new Dimension(width, height - 140));
+        botPanel = new JPanel(new GridLayout(1, 5, 0, 5));
+        botPanel.setPreferredSize(new Dimension(width, 140));
 
-        name= new JLabel();
+        name = new JLabel();
         name.setText(adventurer.getName());
         type = new AdventurerCard(adventurer);
+
         cards = new JButton[5];
 
         int k = 0;
@@ -38,22 +41,10 @@ public class PlayerCard extends JPanel {
             cards[j] = new AutoResizeImageButton(TreasureCardGraphicalMetadata.EMPTY_CARD.getImage());
         }
 
-        biggerFont = new Font(name.getFont().getName(), name.getFont().getStyle(), name.getFont().getSize()*2);
+        biggerFont = name.getFont().deriveFont(name.getFont().getSize() * 2f);
         name.setFont(biggerFont);
-        Dimension dim = new Dimension(50,75);
-        //type.setPreferredSize(dim);
-        //type.setMinimumSize(dim);
-        //type.setSize(dim);
-
-
-
-
-
-
-
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
 
         topPanel.add(type);
         topPanel.add(name);
@@ -61,9 +52,9 @@ public class PlayerCard extends JPanel {
         for (int i = 0; i < 5; i++) {
             botPanel.add(cards[i]);
         }
+
         this.add(topPanel);
         this.add(botPanel);
-
 
 
     }
