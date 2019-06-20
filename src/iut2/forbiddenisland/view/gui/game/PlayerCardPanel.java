@@ -1,6 +1,7 @@
 package iut2.forbiddenisland.view.gui.game;
 
 import iut2.forbiddenisland.model.adventurer.Adventurer;
+import iut2.forbiddenisland.model.card.SpecialCard;
 import iut2.forbiddenisland.model.card.TreasureCard;
 import iut2.forbiddenisland.view.TreasureCardGraphicalMetadata;
 import iut2.forbiddenisland.view.gui.components.AdventurerCardButton;
@@ -81,12 +82,17 @@ public class PlayerCardPanel extends JPanel {
         final List<JComponent> buttons = new ArrayList<>(5);
 
         for (TreasureCard card : cards) {
-            final CardButton btn = new CardButton(card);
-            btn.addActionListener(e -> {
-                // TODO notify controller
-            });
+            if (card instanceof SpecialCard) {
+                final CardButton btn = new CardButton(card);
+                btn.addActionListener(e -> {
+                    // TODO notify controller
+                });
 
-            buttons.add(btn);
+                buttons.add(btn);
+
+            } else {
+                buttons.add(new AutoResizePreserveRatioImagePanel(card.getMetadata().getImage()));
+            }
         }
 
         for (int i = cards.size(); i < 5; ++i) {
