@@ -33,14 +33,10 @@ public class Response<T> {
 
     /**
      * Set the data to carry along the response.
-     * Can only be called once, subsequent calls will
-     * have no effects.
      *
      * @param d - The data to carry.
      */
     public Response<T> setData(final T d) {
-        if (data != null)
-            return this;
         this.data = d;
 
         return this;

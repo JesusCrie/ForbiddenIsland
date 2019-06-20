@@ -9,9 +9,9 @@ import java.awt.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class DiscardCardFrame extends JDialog {
+public class DiscardCardPopupFrame extends JDialog {
 
-    public DiscardCardFrame(final List<TreasureCard> treasureCards, final CompletableFuture<TreasureCard> future) {
+    public DiscardCardPopupFrame(final List<TreasureCard> treasureCards, final CompletableFuture<TreasureCard> future) {
 
         setSize(100 * treasureCards.size() + 185, 250);
         setResizable(false);

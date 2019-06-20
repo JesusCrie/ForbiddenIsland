@@ -29,8 +29,14 @@ public class BoardPanel extends JPanel {
         setup(controller.getCells().get(), controller.getTreasures().get());
 
         controller.observeClickCell(cellClickNotifier);
-        controller.getHighlightedCells().subscribe(this::onHighlightedCells);
-        controller.getCells().subscribe(cells -> update());
+
+        controller.getHighlightedCells().subscribe(highlightedCells ->
+                SwingUtilities.invokeLater(() -> onHighlightedCells(highlightedCells))
+        );
+
+        controller.getCells().subscribe(cells -> SwingUtilities.invokeLater(this::update));
+        controller.getTreasures().subscribe(treasures -> SwingUtilities.invokeLater(this::update));
+        controller.getEndGameObservable().subscribe(win -> SwingUtilities.invokeLater(this::update));
     }
 
     private void setup(final Map<Location, Cell> cells, final List<Treasure> treasures) {
@@ -110,7 +116,6 @@ public class BoardPanel extends JPanel {
     private void update() {
         treasurePanels.forEach(TreasureImage::update);
         cellsPanels.values().forEach(GridCellButton::update);
-        repaint();
     }
 
     private JPanel createEmpty() {

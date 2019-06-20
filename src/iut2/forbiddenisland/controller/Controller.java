@@ -2,6 +2,7 @@ package iut2.forbiddenisland.controller;
 
 import iut2.forbiddenisland.controller.observer.NotifyOnSubscribeObservable;
 import iut2.forbiddenisland.controller.observer.Observable;
+import iut2.forbiddenisland.controller.observer.OneTimeObservable;
 import iut2.forbiddenisland.model.Board;
 import iut2.forbiddenisland.model.Location;
 import iut2.forbiddenisland.model.Treasure;
@@ -23,6 +24,7 @@ public class Controller {
     private final Observable<GameMode> gameMode;
     private final Observable<String> feedbackObs;
     private final Observable<List<Adventurer>> sendableAdventurers;
+    private final Observable<List<Cell>> highlightedCells;
 
     private Adventurer selectedAdventurer;
     private Card selectedCard;
@@ -38,21 +40,10 @@ public class Controller {
                 super.notifyChanges();
             }
         };
+        highlightedCells = createHighlightedCellsObs();
     }
 
-    public Observable<String> getFeedbackObservable() {
-        return feedbackObs;
-    }
-
-    public Observable<GameMode> getGameMode() {
-        return gameMode;
-    }
-
-    public Observable<Map<Location, Cell>> getCells() {
-        return engine.getCells();
-    }
-
-    public Observable<List<Cell>> getHighlightedCells() {
+    private Observable<List<Cell>> createHighlightedCellsObs() {
         return new NotifyOnSubscribeObservable<List<Cell>>() {
             @Override
             public void notifyChanges() {
@@ -82,11 +73,27 @@ public class Controller {
         };
     }
 
+    public Observable<String> getFeedbackObservable() {
+        return feedbackObs;
+    }
+
+    public Observable<GameMode> getGameMode() {
+        return gameMode;
+    }
+
+    public Observable<Map<Location, Cell>> getCells() {
+        return engine.getCells();
+    }
+
+    public Observable<List<Cell>> getHighlightedCells() {
+        return highlightedCells;
+    }
+
     public Observable<Integer> getRemainingActions() {
         return engine.getRemainingActions();
     }
 
-    public Observable<WaterLevel> getWaterLevel(){
+    public Observable<WaterLevel> getWaterLevel() {
         return engine.getWaterLevel();
     }
 
@@ -109,6 +116,7 @@ public class Controller {
     public Observable<Boolean> getEndGameObservable() {
         return engine.getEndGame();
     }
+
     /**
      * The controller will subscribe to the provided observable
      * and enable the move mode of the engine when triggered.
@@ -116,7 +124,11 @@ public class Controller {
      * @param o - The observable to observe.
      */
     public void observeModeMove(final Observable<Void> o) {
-        o.subscribe(value -> gameMode.set(GameMode.MOVE));
+        o.subscribe(value -> {
+            gameMode.set(GameMode.MOVE);
+            selectedAdventurer = engine.getCurrentPlayer().get();
+            highlightedCells.notifyChanges();
+        });
     }
 
     /**
@@ -126,7 +138,11 @@ public class Controller {
      * @param o - The observable to observe.
      */
     public void observeModeDry(final Observable<Void> o) {
-        o.subscribe(value -> gameMode.set(GameMode.DRY));
+        o.subscribe(value -> {
+            gameMode.set(GameMode.DRY);
+            selectedAdventurer = engine.getCurrentPlayer().get();
+            highlightedCells.notifyChanges();
+        });
     }
 
     /**
@@ -136,7 +152,14 @@ public class Controller {
      * @param o - The observable to observe.
      */
     public void observeModeTreasureClaim(final Observable<Void> o) {
-        o.subscribe(value -> gameMode.set(GameMode.TREASURE));
+        o.subscribe(value -> {
+            // With the current set of rules, the only way to claim
+            // a treasure is to be exactly on his cell so this gamemode is useless
+            gameMode.set(GameMode.TREASURE);
+
+            // Act like the player clicked the cell he is standing on
+            observeClickCell(new OneTimeObservable<>(engine.getCurrentPlayer().get().getPosition()));
+        });
     }
 
     /**
@@ -146,7 +169,18 @@ public class Controller {
      * @param o - The observable to observe.
      */
     public void observeModeSend(final Observable<Void> o) {
-        o.subscribe(value -> gameMode.set(GameMode.SEND));
+        o.subscribe(value -> {
+            if (engine.getCurrentPlayer().get().getCards().isEmpty()) {
+                feedbackObs.set("Vous n'avez aucune carte à envoyer !");
+            } else {
+                selectedAdventurer = null;
+                selectedCard = null;
+
+                gameMode.set(GameMode.SEND);
+                highlightedCells.notifyChanges();
+
+            }
+        });
     }
 
     /**
@@ -167,6 +201,7 @@ public class Controller {
                         feedbackObs.set("Vous n'avez pas le droit d'assecher cette tuile !");
                     break;
                 case TREASURE:
+                    // If someone was able to claim a treasure from another cell
                     if (cell instanceof TreasureCell) {
                         if (!engine.claimTreasure((TreasureCell) cell))
                             feedbackObs.set("Vous ne pouvez pas recupérer ce trésor !");
@@ -177,6 +212,9 @@ public class Controller {
                 default:
                     break;
             }
+
+            highlightedCells.notifyChanges();
+            engine.getAdventurers().notifyChanges();
         });
     }
 
@@ -203,6 +241,9 @@ public class Controller {
                 default:
                     break;
             }
+
+            engine.getAdventurers().notifyChanges();
+            highlightedCells.notifyChanges();
         });
     }
 

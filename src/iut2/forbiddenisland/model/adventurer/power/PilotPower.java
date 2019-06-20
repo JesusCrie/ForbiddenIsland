@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 public class PilotPower implements Power {
 
-    private boolean canUsePower;
+    private boolean canUsePower = true;
 
     @Override
     public void alterRequest(final Request req, final Board board) {
@@ -44,6 +44,7 @@ public class PilotPower implements Power {
             castedRes.setData(
                     board.getCells().values().stream()
                             .filter(cell -> cell.getState() != CellState.FLOODED)
+                            .filter(cell -> res.getOriginRequest().getCurrentPlayer().getPosition() != cell)
                             .collect(Collectors.toList())
             );
         }

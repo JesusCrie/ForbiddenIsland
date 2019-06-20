@@ -2,28 +2,23 @@ package iut2.forbiddenisland;
 
 import iut2.forbiddenisland.controller.Controller;
 import iut2.forbiddenisland.controller.DummyController;
-import iut2.forbiddenisland.model.BoardGenerator;
-import iut2.forbiddenisland.model.card.TreasureCard;
-import iut2.forbiddenisland.model.card.TreasureDeck;
 import iut2.forbiddenisland.view.gui.game.GameFrame;
-import iut2.forbiddenisland.view.gui.game.StartingFrame;
+import iut2.forbiddenisland.view.gui.game.WelcomeFrame;
 
 import javax.swing.*;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class ForbiddenIsland {
 
     public static void main(String[] args) {
         //startWelcomeFrame();
-        startGameFrame(Collections.emptyList());
+        startGameFrame(null);
     }
 
     public static void startWelcomeFrame() {
         SwingUtilities.invokeLater(() -> {
-            final StartingFrame startingFrame = new StartingFrame();
-            startingFrame.setVisible(true);
+            final WelcomeFrame welcomeFrame = new WelcomeFrame();
+            welcomeFrame.setVisible(true);
         });
     }
 

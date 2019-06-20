@@ -50,6 +50,8 @@ public class DiverPower implements Power {
 
             final Set<Cell> reachableCells = new HashSet<>();
             exploreReachableCells(res.getOriginRequest().getCurrentPlayer().getPosition(), board, new HashSet<>(), reachableCells);
+
+            reachableCells.remove(res.getOriginRequest().getCurrentPlayer().getPosition());
             castedRes.setData(new ArrayList<>(reachableCells));
         }
     }
@@ -70,17 +72,17 @@ public class DiverPower implements Power {
             if (current == null)
                 continue;
 
+            // If already explored, don't continue further
+            if (!exploredCells.add(current))
+                continue;
+
             // If is flooded or wet, continue the exploration on this cell
             if (current.getState() != CellState.DRY) {
-                // If already explored, don't continue further
-                if (exploredCells.contains(current))
-                    continue;
 
                 // If is wet, its also reachable
-                if (current.getState() == CellState.WET)
+                if (current.getState() != CellState.FLOODED)
                     reachableCells.add(current);
 
-                exploredCells.add(current);
                 exploreReachableCells(current, board, exploredCells, reachableCells);
 
                 // If not flooded, then it is reachable

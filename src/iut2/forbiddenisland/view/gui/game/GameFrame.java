@@ -1,5 +1,6 @@
 package iut2.forbiddenisland.view.gui.game;
 
+import iut2.forbiddenisland.ForbiddenIsland;
 import iut2.forbiddenisland.controller.Controller;
 import iut2.forbiddenisland.model.card.TreasureCard;
 
@@ -45,20 +46,43 @@ public class GameFrame extends JFrame {
             final ActionPanel actionPanel = new ActionPanel(controller, 300, 300);
             actionPanel.setMaximumSize(new Dimension(300, 300));
             actionPanel.setPreferredSize(new Dimension(300, 300));
-            actionPanel.setup();
             waterActionContainer.add(actionPanel);
 
             container.add(waterActionContainer);
         }
 
         add(container);
+
+        controller.getFeedbackObservable().subscribe(msg ->
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, msg))
+        );
+
+        controller.getEndGameObservable().subscribe(win ->
+            SwingUtilities.invokeLater(() -> {
+                if (win == null) {
+                    JOptionPane.showMessageDialog(null, "Au joueur suivant !");
+                } else {
+                    if (win) {
+                        JOptionPane.showMessageDialog(null, "Vous avez gagner !", "Victoire", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Vous avez perdu !", "Défaite", JOptionPane.ERROR_MESSAGE);
+                    }
+
+                    // If game is over, discard the frame and restart the game
+                    dispose();
+                    ForbiddenIsland.startWelcomeFrame();
+                }
+            })
+        );
     }
 
     public static TreasureCard askCardToDiscard(final List<TreasureCard> cards) {
         final CompletableFuture<TreasureCard> future = new CompletableFuture<>();
 
-        final DiscardCardFrame frame = new DiscardCardFrame(cards, future);
-        frame.setVisible(true);
+        SwingUtilities.invokeLater(() -> {
+            final DiscardCardPopupFrame frame = new DiscardCardPopupFrame(cards, future);
+            frame.setVisible(true);
+        });
 
         try {
             return future.get();

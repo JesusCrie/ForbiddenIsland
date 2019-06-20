@@ -23,7 +23,7 @@ import static java.awt.event.KeyEvent.VK_ESCAPE;
 /**
  * @author jogak
  */
-public class StartingFrame extends JFrame {
+public class WelcomeFrame extends JFrame {
 
     private String[] adventurerNames = new String[4];
     private int nbAdventurer;
@@ -43,7 +43,7 @@ public class StartingFrame extends JFrame {
     private boolean startgame = false;
     private boolean modeDemo;
 
-    public StartingFrame() {
+    public WelcomeFrame() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();

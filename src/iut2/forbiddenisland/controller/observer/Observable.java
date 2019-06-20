@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Observable<T> {
 
-    private final List<Observer<T>> listeners = new ArrayList<>();
+    protected final List<Observer<T>> listeners = new ArrayList<>();
     protected T value;
 
     public Observable() {

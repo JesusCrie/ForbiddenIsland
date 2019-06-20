@@ -334,6 +334,7 @@ public class GameEngine {
         if (res.isOk()) {
             decrementActions(res.getData());
             adventurers.notifyChanges();
+            treasures.notifyChanges();
             cells.notifyChanges();
         }
 
@@ -428,6 +429,8 @@ public class GameEngine {
             // Use the card
             modelProxy.request(new Request(RequestType.ISLAND_APPLY, null).putData(Request.DATA_CARD, floodCard.getData()));
         }
+
+        cells.notifyChanges();
     }
 
     /**

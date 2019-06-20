@@ -132,7 +132,7 @@ public class Board {
 
     public List<Cell> getReachableCells(final Cell c) {
         return Stream.of(Utils.getCrossCells(c.getLocation()))
-                .map(this::getCell)
+                .map(this::getCellIfNotFlooded)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
@@ -140,9 +140,14 @@ public class Board {
     public List<Cell> getCellsDryable(final Cell c) {
         final Location loc = c.getLocation();
 
-        return Stream.of(Utils.getCrossCells(loc))
+        final List<Cell> data = Stream.of(Utils.getCrossCells(loc))
                 .map(this::getCellIfWet)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+
+        if (c.getState() == CellState.WET)
+            data.add(c);
+        return data;
     }
 
     public List<Adventurer> getPlayersSendable(final Adventurer p) {
@@ -297,6 +302,7 @@ public class Board {
         if (waterLevel.getLevel() == 10)
             return false;
 
+        // Check for heliport
         final Cell heliport = cells.values().stream()
                 .filter(cell -> cell instanceof HeliportCell)
                 .findFirst()
