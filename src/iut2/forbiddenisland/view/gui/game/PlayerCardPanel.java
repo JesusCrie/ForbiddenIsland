@@ -1,5 +1,7 @@
 package iut2.forbiddenisland.view.gui.game;
 
+import iut2.forbiddenisland.controller.Controller;
+import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.SpecialCard;
 import iut2.forbiddenisland.model.card.TreasureCard;
@@ -11,16 +13,20 @@ import iut2.forbiddenisland.view.gui.components.CardButton;
 import javax.swing.*;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerCardPanel extends JPanel {
 
+    private final Observable<TreasureCard> cardClickNotifier = new Observable<>();
+    private final Observable<Adventurer> adventurerClickNotifier = new Observable<>();
     private static final double CARD_IMAGE_RATIO = 501.0 / 699.0;
 
     private JComponent bottomPanel;
 
-    public PlayerCardPanel(final Adventurer adventurer, final int width, final int height) {
+    public PlayerCardPanel(final Controller controller, final Adventurer adventurer, final int width, final int height) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(1, 0, 1, 0));
 
@@ -35,6 +41,9 @@ public class PlayerCardPanel extends JPanel {
 
         add(topPanel);
         add(bottomPanel);
+
+        controller.observeClickCard(cardClickNotifier);
+        controller.observeClickPlayer(adventurerClickNotifier);
     }
 
     public void updateCards(final List<TreasureCard> cards) {
@@ -57,6 +66,7 @@ public class PlayerCardPanel extends JPanel {
         cardPanel.setMaximumSize(new Dimension((int) (height / CARD_IMAGE_RATIO), height));
         final AdventurerCardButton cardImage = new AdventurerCardButton(adv);
         cardPanel.add(cardImage);
+        cardImage.addActionListener(e -> adventurerClickNotifier.set(adv));
 
         final JLabel name = new JLabel(adv.getName());
 
@@ -84,9 +94,7 @@ public class PlayerCardPanel extends JPanel {
         for (TreasureCard card : cards) {
             if (card instanceof SpecialCard) {
                 final CardButton btn = new CardButton(card);
-                btn.addActionListener(e -> {
-                    // TODO notify controller
-                });
+                btn.addActionListener(e -> cardClickNotifier.set(card));
 
                 buttons.add(btn);
 
