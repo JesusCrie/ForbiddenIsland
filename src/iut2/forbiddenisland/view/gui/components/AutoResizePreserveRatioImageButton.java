@@ -1,6 +1,7 @@
 package iut2.forbiddenisland.view.gui.components;
 
 import javax.swing.*;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 
@@ -47,6 +48,8 @@ public class AutoResizePreserveRatioImageButton extends JButton {
             x = getCenteredX(width);
         }
 
+        g.setColor(new Color(0, 0, 0, 0));
+        g.fillRect(0, 0, getWidth(), getHeight());
         g.drawImage(image, x, y, (int) width, (int) height, null);
     }
 
