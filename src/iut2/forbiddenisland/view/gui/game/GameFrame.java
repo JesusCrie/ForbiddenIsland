@@ -29,7 +29,7 @@ public class GameFrame extends JFrame {
         container.add(boardPanel);
 
         // Create player card panel
-        final PlayerCardsPanel playerCardsPanel = new PlayerCardsPanel(controller);
+        final PlayerCardsPanel playerCardsPanel = new PlayerCardsPanel(controller, 500, 1000);
         playerCardsPanel.setPreferredSize(new Dimension(500, 1000));
         container.add(playerCardsPanel);
 

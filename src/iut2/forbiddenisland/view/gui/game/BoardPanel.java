@@ -23,7 +23,8 @@ public class BoardPanel extends JPanel {
     private final Map<Location, GridCellButton> cellsPanels = new HashMap<>();
 
     public BoardPanel(final Controller controller) {
-        setLayout(new GridLayout(8, 8));
+        setLayout(new GridLayout(6, 7));
+        setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
 
         controller.observeClickCell(cellClickNotifier);
 
@@ -39,13 +40,6 @@ public class BoardPanel extends JPanel {
 
         // *** Line 0 ***
 
-        for (int i = 0; i < 8; ++i)
-            add(createEmpty());
-
-        // *** Line 1 ***
-
-        add(createEmpty());
-
         // First treasure
         add(createTreasureDisplay(treasures.get(0)));
 
@@ -59,51 +53,35 @@ public class BoardPanel extends JPanel {
         // Second treasure
         add(createTreasureDisplay(treasures.get(1)));
 
-        add(createEmpty());
+        // *** Line 1 ***
 
-        // *** Line 2 ***
-
-        add(createEmpty());
         add(createEmpty());
 
         for (int i = 1; i <= 4; ++i)
             add(createCellButton(cells.get(Location.from(i, 1))));
 
         add(createEmpty());
-        add(createEmpty());
 
-        // *** Line 3 ***
-
-        add(createEmpty());
+        // *** Line 2 ***
 
         for (int i = 0; i <= 5; ++i)
             add(createCellButton(cells.get(Location.from(i, 2))));
 
-        add(createEmpty());
-
-        // *** Line 4 ***
-
-        add(createEmpty());
+        // *** Line 3 ***
 
         for (int i = 0; i <= 5; ++i)
             add(createCellButton(cells.get(Location.from(i, 3))));
 
-        add(createEmpty());
+        // *** Line 4 ***
 
-        // *** Line 5 ***
-
-        add(createEmpty());
         add(createEmpty());
 
         for (int i = 1; i <= 4; ++i)
             add(createCellButton(cells.get(Location.from(i, 4))));
 
         add(createEmpty());
-        add(createEmpty());
 
-        // *** Line 6 ***
-
-        add(createEmpty());
+        // *** Line 5 ***
 
         // Third treasure
         add(createTreasureDisplay(treasures.get(2)));
@@ -117,13 +95,6 @@ public class BoardPanel extends JPanel {
 
         // Fourth treasure
         add(createTreasureDisplay(treasures.get(3)));
-
-        add(createEmpty());
-
-        // *** Line 7 ***
-
-        for (int i = 0; i < 8; ++i)
-            add(createEmpty());
     }
 
     private void update() {

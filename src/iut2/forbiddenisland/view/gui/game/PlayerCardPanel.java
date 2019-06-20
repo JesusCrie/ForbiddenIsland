@@ -1,61 +1,104 @@
 package iut2.forbiddenisland.view.gui.game;
 
 import iut2.forbiddenisland.model.adventurer.Adventurer;
+import iut2.forbiddenisland.model.card.TreasureCard;
 import iut2.forbiddenisland.view.TreasureCardGraphicalMetadata;
-import iut2.forbiddenisland.view.gui.components.AutoResizeImageButton;
+import iut2.forbiddenisland.view.gui.components.AdventurerCardButton;
+import iut2.forbiddenisland.view.gui.components.AutoResizePreserveRatioImagePanel;
 import iut2.forbiddenisland.view.gui.components.CardButton;
-import iut2.forbiddenisland.view.gui.utils.AdventurerCard;
 
 import javax.swing.*;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerCardPanel extends JPanel {
-    private final AdventurerCard type;
-    private final JLabel name;
-    private final JButton[] cards;
 
-    private final JComponent topPanel;
-    private final JComponent botPanel;
+    private static final double CARD_IMAGE_RATIO = 501.0 / 699.0;
 
-    private final Font biggerFont;
+    private JComponent bottomPanel;
 
     public PlayerCardPanel(final Adventurer adventurer, final int width, final int height) {
-        topPanel = Box.createHorizontalBox();
-        topPanel.setPreferredSize(new Dimension(width, height - 140));
-        botPanel = new JPanel(new GridLayout(1, 5, 0, 5));
-        botPanel.setPreferredSize(new Dimension(width, 140));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBorder(BorderFactory.createEmptyBorder(1, 0, 1, 0));
 
-        name = new JLabel();
-        name.setText(adventurer.getName());
-        type = new AdventurerCard(adventurer);
+        final double widthPerCard = width / 5.0;
+        final int heightBottomPanel = (int) (widthPerCard / CARD_IMAGE_RATIO);
 
-        cards = new JButton[5];
+        final JComponent topPanel = createTopPanel(adventurer, width, height - heightBottomPanel);
+        topPanel.setPreferredSize(new Dimension(width, heightBottomPanel));
 
-        int k = 0;
-        for (int i = 0; i < adventurer.getCards().size(); i++) {
-            cards[i] = new CardButton(adventurer.getCards().get(i));
-            k++;
+        bottomPanel = createBottomPanel(adventurer);
+        bottomPanel.setPreferredSize(new Dimension(width, 140));
+
+        add(topPanel);
+        add(bottomPanel);
+    }
+
+    public void updateCards(final List<TreasureCard> cards) {
+        bottomPanel.removeAll();
+
+        for (JComponent btn : generateCardButtons(cards)) {
+            bottomPanel.add(btn);
         }
 
-        for (int j = k; j < 5; j++) {
-            cards[j] = new AutoResizeImageButton(TreasureCardGraphicalMetadata.EMPTY_CARD.getImage());
+        repaint();
+    }
+
+    private JComponent createTopPanel(final Adventurer adv, final int width, final int height) {
+        final Box panel = Box.createHorizontalBox();
+        panel.setPreferredSize(new Dimension(width, height));
+        panel.setMaximumSize(new Dimension(width, height));
+
+
+        // To force the image to take the whole space available
+        final JPanel cardPanel = new JPanel(new GridLayout(1, 1));
+        cardPanel.setPreferredSize(new Dimension((int) (height * CARD_IMAGE_RATIO), height));
+        final AdventurerCardButton cardImage = new AdventurerCardButton(adv);
+        cardPanel.add(cardImage);
+
+        final JLabel name = new JLabel(adv.getName());
+
+        name.setFont(name.getFont().deriveFont(20f));
+
+        panel.add(cardPanel);
+        panel.add(name);
+        panel.add(Box.createHorizontalGlue());
+
+        return panel;
+    }
+
+    private JComponent createBottomPanel(final Adventurer adv) {
+        final JPanel panel = new JPanel(new GridLayout(1, 5));
+
+        for (JComponent button : generateCardButtons(adv.getCards())) {
+            panel.add(button);
         }
 
-        biggerFont = name.getFont().deriveFont(name.getFont().getSize() * 2f);
-        name.setFont(biggerFont);
+        return panel;
+    }
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    private List<JComponent> generateCardButtons(final List<TreasureCard> cards) {
+        final List<JComponent> buttons = new ArrayList<>(5);
 
-        topPanel.add(type);
-        topPanel.add(name);
+        for (TreasureCard card : cards) {
+            final CardButton btn = new CardButton(card);
+            btn.addActionListener(e -> {
+                // TODO notify controller
+            });
 
-        for (int i = 0; i < 5; i++) {
-            botPanel.add(cards[i]);
+            buttons.add(btn);
         }
 
-        this.add(topPanel);
-        this.add(botPanel);
+        for (int i = cards.size(); i < 5; ++i) {
+            buttons.add(createEmptyCardPlaceholder());
+        }
+
+        return buttons;
+    }
+
+    private JComponent createEmptyCardPlaceholder() {
+        return new AutoResizePreserveRatioImagePanel(TreasureCardGraphicalMetadata.EMPTY_CARD.getImage());
     }
 }

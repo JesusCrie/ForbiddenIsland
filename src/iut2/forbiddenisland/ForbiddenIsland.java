@@ -2,10 +2,14 @@ package iut2.forbiddenisland;
 
 import iut2.forbiddenisland.controller.Controller;
 import iut2.forbiddenisland.controller.DummyController;
+import iut2.forbiddenisland.model.BoardGenerator;
+import iut2.forbiddenisland.model.card.TreasureCard;
+import iut2.forbiddenisland.model.card.TreasureDeck;
 import iut2.forbiddenisland.view.gui.game.GameFrame;
 import iut2.forbiddenisland.view.gui.game.StartingFrame;
 
 import javax.swing.*;
+import java.util.Arrays;
 import java.util.List;
 
 public class ForbiddenIsland {

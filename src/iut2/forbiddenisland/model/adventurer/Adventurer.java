@@ -29,7 +29,7 @@ public abstract class Adventurer {
     }
 
     public String getName() {
-        return name + " " + metadata.getName();
+        return name + " (" + metadata.getName() + ")";
     }
 
     public AdventurerGraphicalMetadata getMetadata() {

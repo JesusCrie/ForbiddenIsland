@@ -7,6 +7,9 @@ import iut2.forbiddenisland.view.DemoBoard;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Fake controller for testing purpose.
+ */
 public class DummyController extends Controller {
 
     private static List<Adventurer> DUMMY_ADVENTURERS = Arrays.asList(
