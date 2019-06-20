@@ -10,12 +10,14 @@ import iut2.forbiddenisland.view.gui.game.StartingFrame;
 
 import javax.swing.*;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ForbiddenIsland {
 
     public static void main(String[] args) {
-        startWelcomeFrame();
+        //startWelcomeFrame();
+        startGameFrame(Collections.emptyList());
     }
 
     public static void startWelcomeFrame() {

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BoardPanel extends JPanel {
 
@@ -27,6 +28,7 @@ public class BoardPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
 
         controller.observeClickCell(cellClickNotifier);
+        controller.getHighlightedCells().subscribe(this::onHighlightedCells);
 
         setup(controller.getCells().get(), controller.getTreasures().get());
         update();
@@ -95,6 +97,15 @@ public class BoardPanel extends JPanel {
 
         // Fourth treasure
         add(createTreasureDisplay(treasures.get(3)));
+    }
+
+    private void onHighlightedCells(final List<Cell> highlightedCells) {
+        // TODO if time: only update cells that changes
+
+        // Reset highlight status
+        cellsPanels.values().forEach(cell -> cell.setHighlighted(false));
+        // Highlight
+        highlightedCells.forEach(cell -> cellsPanels.get(cell.getLocation()).setHighlighted(true));
     }
 
     private void update() {

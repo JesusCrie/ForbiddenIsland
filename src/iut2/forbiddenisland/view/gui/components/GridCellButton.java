@@ -4,17 +4,20 @@ import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.CellState;
 
-import java.awt.Graphics;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.List;
 
 public class GridCellButton extends AutoResizeImageButton {
 
     private final Cell cell;
+    private boolean highlighted = false;
 
     public GridCellButton(final Cell cell) {
         super(cell.getMetadata().getGridDryImage());
         this.cell = cell;
+
+        // Need to be highlighted to be clickable
+        setEnabled(false);
     }
 
     public void update() {
@@ -27,6 +30,14 @@ public class GridCellButton extends AutoResizeImageButton {
                 background = cell.getMetadata().getGridDryImage();
             else
                 background = cell.getMetadata().getGridWetImage();
+        }
+    }
+
+    public void setHighlighted(final boolean highlighted) {
+        if (this.highlighted != highlighted) {
+            this.highlighted = highlighted;
+            setEnabled(highlighted);
+            repaint();
         }
     }
 
@@ -69,11 +80,24 @@ public class GridCellButton extends AutoResizeImageButton {
 
                         // Show a warning if more than 4 adventurers
                         if (advs.size() > 4) {
-                            System.err.println("RENDER WARNING: There are more than 4 adventurers on the same cell ! " + cell.getLocation());
+                            System.err.println("RENDER WARNING: There are more than 4 adventurers on the same cell: " + cell.getLocation());
                         }
                     }
                 }
             }
+        }
+
+        // Draw highlight
+        if (highlighted) {
+            final Graphics2D g2d = (Graphics2D) g;
+
+            final Stroke prevStroke = g2d.getStroke();
+            g2d.setStroke(new BasicStroke(10));
+
+            g2d.setColor(new Color(0, 255, 0));
+            g2d.drawRect(0, 0, getWidth(), getHeight());
+
+            g2d.setStroke(prevStroke);
         }
     }
 }
