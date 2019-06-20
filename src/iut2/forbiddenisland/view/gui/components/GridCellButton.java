@@ -94,7 +94,7 @@ public class GridCellButton extends AutoResizeImageButton {
             final Stroke prevStroke = g2d.getStroke();
             g2d.setStroke(new BasicStroke(10));
 
-            g2d.setColor(new Color(0, 255, 0));
+            g2d.setColor(Color.GREEN);
             g2d.drawRect(0, 0, getWidth(), getHeight());
 
             g2d.setStroke(prevStroke);

@@ -14,15 +14,19 @@ public class PlayerCardsPanel extends JPanel {
     public PlayerCardsPanel(final Controller controller, final int width, final int height) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // TODO data binding
         for (Adventurer adventurer : controller.getAdventurers().get()) {
             final PlayerCardPanel panel = new PlayerCardPanel(controller, adventurer, width, height / 4);
             panels.add(panel);
             add(panel);
         }
+
+        controller.getAdventurers().subscribe(this::onUpdateAdventurers);
+
+        panels.get(0).setHighlighted(false);
+        panels.get(1).setHighlighted(true);
     }
 
-    private void updateCards(final List<Adventurer> adventurers) {
+    private void onUpdateAdventurers(final List<Adventurer> adventurers) {
         for (int i = 0; i < adventurers.size(); i++) {
             panels.get(i).updateCards(adventurers.get(i).getCards());
         }

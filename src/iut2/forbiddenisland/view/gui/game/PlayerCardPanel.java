@@ -11,20 +11,24 @@ import iut2.forbiddenisland.view.gui.components.AutoResizePreserveRatioImagePane
 import iut2.forbiddenisland.view.gui.components.CardButton;
 
 import javax.swing.*;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerCardPanel extends JPanel {
 
+    private static final double CARD_IMAGE_RATIO = 501.0 / 699.0;
+    private static final Color TRANSPARENT = new Color(0, true);
+
+    private boolean highlighted = false;
+    private final JComponent bottomPanel;
+
     private final Observable<TreasureCard> cardClickNotifier = new Observable<>();
     private final Observable<Adventurer> adventurerClickNotifier = new Observable<>();
-    private static final double CARD_IMAGE_RATIO = 501.0 / 699.0;
 
-    private JComponent bottomPanel;
 
     public PlayerCardPanel(final Controller controller, final Adventurer adventurer, final int width, final int height) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -44,6 +48,14 @@ public class PlayerCardPanel extends JPanel {
 
         controller.observeClickCard(cardClickNotifier);
         controller.observeClickPlayer(adventurerClickNotifier);
+    }
+
+    public void setHighlighted(final boolean highlighted) {
+        if (this.highlighted != highlighted) {
+            this.highlighted = highlighted;
+            setBorder(highlighted ? BorderFactory.createLineBorder(Color.RED, 5) : null);
+            repaint();
+        }
     }
 
     public void updateCards(final List<TreasureCard> cards) {

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class BoardPanel extends JPanel {
 
@@ -27,11 +26,11 @@ public class BoardPanel extends JPanel {
         setLayout(new GridLayout(6, 7));
         setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
 
+        setup(controller.getCells().get(), controller.getTreasures().get());
+
         controller.observeClickCell(cellClickNotifier);
         controller.getHighlightedCells().subscribe(this::onHighlightedCells);
-
-        setup(controller.getCells().get(), controller.getTreasures().get());
-        update();
+        controller.getCells().subscribe(cells -> update());
     }
 
     private void setup(final Map<Location, Cell> cells, final List<Treasure> treasures) {

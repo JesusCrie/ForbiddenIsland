@@ -222,6 +222,7 @@ public class Controller {
                         feedbackObs.set("Vous ne pouvez pas envoyer cette carte à cet aventurier !");
                 }
             } else if (card instanceof SpecialCard) {
+                // TODO special card logic
                 if (!engine.useCard((SpecialCard) card))
                     feedbackObs.set("Vous ne pouvez pas utiliser cette carte !");
             }
