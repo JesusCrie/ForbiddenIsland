@@ -48,13 +48,12 @@ public class PlayerCardPanel extends JPanel {
 
     private JComponent createTopPanel(final Adventurer adv, final int width, final int height) {
         final Box panel = Box.createHorizontalBox();
-        panel.setPreferredSize(new Dimension(width, height));
         panel.setMaximumSize(new Dimension(width, height));
 
 
         // To force the image to take the whole space available
         final JPanel cardPanel = new JPanel(new GridLayout(1, 1));
-        cardPanel.setPreferredSize(new Dimension((int) (height * CARD_IMAGE_RATIO), height));
+        cardPanel.setMaximumSize(new Dimension((int) (height / CARD_IMAGE_RATIO), height));
         final AdventurerCardButton cardImage = new AdventurerCardButton(adv);
         cardPanel.add(cardImage);
 
@@ -64,7 +63,6 @@ public class PlayerCardPanel extends JPanel {
 
         panel.add(cardPanel);
         panel.add(name);
-        panel.add(Box.createHorizontalGlue());
 
         return panel;
     }
