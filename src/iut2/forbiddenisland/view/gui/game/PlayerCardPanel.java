@@ -13,12 +13,15 @@ import iut2.forbiddenisland.view.gui.components.CardButton;
 import javax.swing.*;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerCardPanel extends JPanel {
 
     private final Observable<TreasureCard> cardClickNotifier = new Observable<>();
+    private final Observable<Adventurer> adventurerClickNotifier = new Observable<>();
     private static final double CARD_IMAGE_RATIO = 501.0 / 699.0;
 
     private JComponent bottomPanel;
@@ -40,6 +43,7 @@ public class PlayerCardPanel extends JPanel {
         add(bottomPanel);
 
         controller.observeClickCard(cardClickNotifier);
+        controller.observeClickPlayer(adventurerClickNotifier);
     }
 
     public void updateCards(final List<TreasureCard> cards) {
@@ -62,6 +66,7 @@ public class PlayerCardPanel extends JPanel {
         cardPanel.setMaximumSize(new Dimension((int) (height / CARD_IMAGE_RATIO), height));
         final AdventurerCardButton cardImage = new AdventurerCardButton(adv);
         cardPanel.add(cardImage);
+        cardImage.addActionListener(e -> adventurerClickNotifier.set(adv));
 
         final JLabel name = new JLabel(adv.getName());
 
