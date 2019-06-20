@@ -16,7 +16,7 @@ public class PlayerCardsPanel extends JPanel {
 
         // TODO data binding
         for (Adventurer adventurer : controller.getAdventurers().get()) {
-            final PlayerCardPanel panel = new PlayerCardPanel(adventurer, width, height / 4);
+            final PlayerCardPanel panel = new PlayerCardPanel(controller, adventurer, width, height / 4);
             panels.add(panel);
             add(panel);
         }
