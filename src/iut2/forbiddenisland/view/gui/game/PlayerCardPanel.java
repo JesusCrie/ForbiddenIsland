@@ -23,6 +23,7 @@ public class PlayerCardPanel extends JPanel {
     private static final double CARD_IMAGE_RATIO = 501.0 / 699.0;
     private static final Color TRANSPARENT = new Color(0, true);
 
+    private Adventurer adventurer;
     private boolean highlighted = false;
     private final JComponent bottomPanel;
 
@@ -31,9 +32,13 @@ public class PlayerCardPanel extends JPanel {
 
 
     public PlayerCardPanel(final Controller controller, final Adventurer adventurer, final int width, final int height) {
+        this.adventurer = adventurer;
+
+        // Setup container
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(1, 0, 1, 0));
 
+        // Create children
         final double widthPerCard = width / 5.0;
         final int heightBottomPanel = (int) (widthPerCard / CARD_IMAGE_RATIO);
 
@@ -58,10 +63,10 @@ public class PlayerCardPanel extends JPanel {
         }
     }
 
-    public void updateCards(final List<TreasureCard> cards) {
+    public void updateCards() {
         bottomPanel.removeAll();
 
-        for (JComponent btn : generateCardButtons(cards)) {
+        for (JComponent btn : generateCardButtons(adventurer.getCards())) {
             bottomPanel.add(btn);
         }
 
@@ -85,6 +90,7 @@ public class PlayerCardPanel extends JPanel {
         name.setFont(name.getFont().deriveFont(20f));
 
         panel.add(cardPanel);
+        panel.add(Box.createRigidArea(new Dimension(10, 0)));
         panel.add(name);
 
         return panel;
