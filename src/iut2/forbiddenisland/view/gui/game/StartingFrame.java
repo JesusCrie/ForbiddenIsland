@@ -11,7 +11,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+
+import static java.awt.event.KeyEvent.VK_ENTER;
+import static java.awt.event.KeyEvent.VK_ESCAPE;
 
 /**
  * @author jogak
@@ -134,6 +141,20 @@ public class StartingFrame extends JFrame {
             name[i] = new JTextField();
             name[i].setFont(font);
             name[i].setColumns(10);
+            name[i].addKeyListener(new KeyListener() {
+                @Override
+                public void keyTyped(KeyEvent e) {}
+
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyChar() == VK_ENTER){
+                        start.doClick();
+                    }
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {}
+            });
             unAventurier[i].add(name[i]);
 
             unAventurier[i].add(new JLabel(""));
@@ -191,6 +212,21 @@ public class StartingFrame extends JFrame {
                 ForbiddenIsland.startGameFrame(Arrays.asList(adventurerNames));
             }
         });
+        start.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {}
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyChar() == VK_ENTER){
+                    start.doClick();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {}
+        });
+
     }
 
     public String[] getAdventurerNames() {
