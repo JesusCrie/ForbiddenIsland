@@ -1,12 +1,15 @@
 package iut2.forbiddenisland.view.gui.game;
 
 import iut2.forbiddenisland.controller.Controller;
+import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.view.IconGraphicalMetadata;
 
 import javax.swing.*;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class ActionPanel extends JPanel {
 
@@ -20,24 +23,46 @@ public class ActionPanel extends JPanel {
     private final JButton btnClaim;
     private final JButton btnEndRound;
 
+    private final Observable<Void> obsModeMove = new Observable<>();
+    private final Observable<Void> obsModeDry = new Observable<>();
+    private final Observable<Void> obsModeSend = new Observable<>();
+    private final Observable<Void> obsModeClaim = new Observable<>();
+    private final Observable<Void> obsEndRound = new Observable<>();
+
     public ActionPanel(final Controller controller, final int width, final int height) {
         this.width = width;
         this.height = height;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
+        controller.observeModeMove(obsModeMove);
+        controller.observeModeDry(obsModeDry);
+        controller.observeModeSend(obsModeSend);
+        controller.observeModeTreasureClaim(obsModeClaim);
+
         remainingActionsText = new JLabel("", SwingConstants.CENTER);
+
         btnMove = new JButton();
+        btnMove.addActionListener(e -> obsModeMove.notifyChanges());
+
         btnDry = new JButton();
+        btnDry.addActionListener(e -> obsModeDry.notifyChanges());
+
         btnSend = new JButton();
+        btnSend.addActionListener(e -> obsModeSend.notifyChanges());
+
         btnClaim = new JButton();
+        btnClaim.addActionListener(e -> obsModeClaim.notifyChanges());
+
         btnEndRound = new JButton();
+        btnEndRound.addActionListener((e -> obsEndRound.notifyChanges()));
+
     }
 
     public void setup() {
 
         final int heightPerButton = height / 6;
 
-        remainingActionsText.setText("32 actions restantes");
+        remainingActionsText.setText("3 actions restantes");
 
         final Dimension dim = new Dimension(width, heightPerButton);
         remainingActionsText.setMinimumSize(dim);
