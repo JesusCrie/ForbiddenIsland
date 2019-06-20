@@ -62,7 +62,7 @@ public class ActionPanel extends JPanel {
 
         final int heightPerButton = height / 6;
 
-        remainingActionsText.setText("32 actions restantes");
+        remainingActionsText.setText("3 actions restantes");
 
         final Dimension dim = new Dimension(width, heightPerButton);
         remainingActionsText.setMinimumSize(dim);
