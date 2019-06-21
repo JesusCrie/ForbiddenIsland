@@ -9,10 +9,7 @@ import iut2.forbiddenisland.model.Location;
 import iut2.forbiddenisland.model.Treasure;
 import iut2.forbiddenisland.model.WaterLevel;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
-import iut2.forbiddenisland.model.card.Card;
-import iut2.forbiddenisland.model.card.HelicopterCard;
-import iut2.forbiddenisland.model.card.SpecialCard;
-import iut2.forbiddenisland.model.card.TreasureCard;
+import iut2.forbiddenisland.model.card.*;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.CellState;
 import iut2.forbiddenisland.model.cell.TreasureCell;
@@ -93,6 +90,13 @@ public class Controller {
                             value = engine.getCells().get().values();
                         }
 
+                        break;
+
+                    case SPECIAL_CARD_SANDBAG:
+                        // Get every wet cell
+                        value = engine.getCells().get().values().stream()
+                                .filter(cell -> cell.getState() == CellState.WET)
+                                .collect(Collectors.toList());
                         break;
 
                     case SEND:
@@ -233,9 +237,11 @@ public class Controller {
                 case MOVE:
                     if (!engine.movePlayer(selectedAdventurer, cell))
                         feedbackObs.set("Vous n'avez pas le droit de vous deplacer ici !");
-                    else
-                        gameMode.set(GameMode.IDLE);
+
+                    // Note: Stays in the movement mode unlike other modes who get back to idle mode.
+
                     break;
+
                 case DRY:
                     if (!engine.dryCell(cell))
                         feedbackObs.set("Vous n'avez pas le droit d'assecher cette tuile !");
@@ -278,7 +284,14 @@ public class Controller {
 
                         gameMode.set(GameMode.IDLE);
                     }
+                    break;
 
+                case SPECIAL_CARD_SANDBAG:
+                    if (!engine.useCardSandbag(selectedAdventurer, (SandBagCard) selectedCard, cell)) {
+                        feedbackObs.set("Vous ne pouvez pas utiliser cette carte !");
+                    }
+
+                    gameMode.set(GameMode.IDLE);
                     break;
             }
 
@@ -334,7 +347,7 @@ public class Controller {
      */
     public void observeClickCard(final Observable<Pair<Adventurer, TreasureCard>> o) {
         o.subscribe(adventurerCardPair -> {
-            if (gameMode.get() == GameMode.SEND && adventurerCardPair.getLeft() == engine.getCurrentPlayer().get()) {
+            if (gameMode.get() == GameMode.SEND && adventurerCardPair.getLeft() != engine.getCurrentPlayer().get()) {
                 selectedCard = adventurerCardPair.getRight();
 
                 if (selectedAdventurer != null) {
@@ -351,6 +364,10 @@ public class Controller {
                 if (card instanceof HelicopterCard) {
                     feedbackObs.set("Veuillez sélectionnez une tuile de départ");
                     gameMode.set(GameMode.SPECIAL_CARD_HELICOPTER);
+
+                } else if (card instanceof SandBagCard) {
+                    feedbackObs.set("Veuillez sélectionnez une tuile à assecher");
+                    gameMode.set(GameMode.SPECIAL_CARD_SANDBAG);
                 }
             }
         });
@@ -363,7 +380,7 @@ public class Controller {
      * @param o - The observable to observe.
      */
     public void observeTrashCard(final Observable<Pair<Adventurer, TreasureCard>> o) {
-        o.subscribe(pair -> engine.useCard(pair.getLeft(), pair.getRight()));
+        o.subscribe(pair -> engine.trashCard(pair.getLeft(), pair.getRight()));
     }
 
     /**

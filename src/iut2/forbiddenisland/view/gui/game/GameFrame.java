@@ -158,7 +158,7 @@ public class GameFrame extends JFrame {
         // Remaining action reminder
         controller.getRemainingActions().subscribe(actions -> {
             if (actions <= 0)
-                JOptionPane.showMessageDialog(null, "Vous n'avez plus d'actions restantes ! Considérez à finir votre tour.");
+                JOptionPane.showMessageDialog(null, "C'était votre dernière action, pensez à finir votre tour.");
         });
     }
 

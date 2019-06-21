@@ -58,15 +58,7 @@ public enum RequestType {
     CARD_DRAW,
 
     /**
-     * Used to make a player use a specific card of its hand.
-     * - DATA_PLAYER: Adventurer
-     * - DATA_CARD: TreasureCard
-     * = void
-     */
-    CARD_USE,
-
-    /**
-     * Used to allow a player to throw away one of its cards when its hand is full.
+     * Used to put the card out of the adventurer's deck and put it in the discarding deck.
      * - DATA_PLAYER: Adventurer
      * - DATA_CARD: TreasureCard
      * = void

@@ -13,6 +13,7 @@ import iut2.forbiddenisland.model.WaterLevel;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.*;
 import iut2.forbiddenisland.model.cell.Cell;
+import iut2.forbiddenisland.model.cell.CellState;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
 import java.util.ArrayList;
@@ -25,13 +26,17 @@ public class GameEngine {
     private final PlayerManagement players;
     private final ModelProxy modelProxy;
 
+    // Game data observables
     private final Observable<Map<Location, Cell>> cells;
     private final Observable<List<Adventurer>> adventurers;
     private final Observable<WaterLevel> waterLevel;
     private final Observable<List<Treasure>> treasures;
     private final Observable<Boolean> endGame;
     private final Observable<Integer> remainingActions;
+
+    // Event related observables
     private final Observable<Adventurer> tooManyCards;
+    private final Observable<Adventurer> emergencyRescue;
 
     public GameEngine(final Board board, final List<Adventurer> players) {
         this.players = new PlayerManagement(players);
@@ -43,10 +48,12 @@ public class GameEngine {
         waterLevel = createWaterLevelObs();
         treasures = createTreasureObs();
         endGame = createEndGameObs();
-        tooManyCards = new Observable<>();
-
         remainingActions = new NotifyOnSubscribeObservable<>(0);
 
+        tooManyCards = new Observable<>();
+        emergencyRescue = new Observable<>();
+
+        initGame();
         newPlayerRound();
     }
 
@@ -219,6 +226,25 @@ public class GameEngine {
     // *** More getters that will trigger a request to the board ***
 
     /**
+     * Get the observable that will be used to tell the user to discard a card.
+     *
+     * @return When a user need to get rid of a card.
+     */
+    public Observable<Adventurer> getTooManyCards() {
+        return tooManyCards;
+    }
+
+    /**
+     * Get the observable that will be used to notify that a player can be saved
+     * in-extremis.
+     *
+     * @return When an emergency rescue is needed.
+     */
+    public Observable<Adventurer> getEmergencyRescue() {
+        return emergencyRescue;
+    }
+
+    /**
      * Get all cells reachable by the player from the board.
      * The player can move to any of them successfully.
      *
@@ -260,16 +286,24 @@ public class GameEngine {
         return sendablePlayers.getData();
     }
 
-    /**
-     * Get the observable that will be use to tell the user to discard a card.
-     *
-     * @return When a user need to get rid of a card.
-     */
-    public Observable<Adventurer> getTooManyCards() {
-        return tooManyCards;
-    }
-
     // *** Player round related methods ***
+
+    public void initGame() {
+        for (Adventurer player : players.players) {
+            while (player.getCards().size() < 2) {
+
+                final Response<TreasureCard> res = modelProxy.request(
+                        new Request(RequestType.CARD_DRAW, getCurrentPlayer().get())
+                                .putData(Request.DATA_PLAYER, player)
+                );
+
+                // If rising waters card, throw it away
+                if (res.getData() instanceof RisingWatersCard) {
+                    trashCard(player, res.getData());
+                }
+            }
+        }
+    }
 
     /**
      * Start a new player round by settings up the needed variables of the engine.
@@ -372,9 +406,9 @@ public class GameEngine {
      * @param source - The owner of the card.
      * @param card   - The card to use.
      */
-    public boolean useCard(final Adventurer source, final TreasureCard card) {
+    public boolean trashCard(final Adventurer source, final TreasureCard card) {
         final Response<Void> res = modelProxy.request(
-                new Request(RequestType.CARD_USE, getCurrentPlayer().get())
+                new Request(RequestType.CARD_TRASH, getCurrentPlayer().get())
                         .putData(Request.DATA_PLAYER, source)
                         .putData(Request.DATA_CARD, card)
         );
@@ -395,16 +429,43 @@ public class GameEngine {
     public boolean useCardHelicopter(final Adventurer source, final HelicopterCard card,
                                      final Cell departure, final Cell destination) {
 
-        // Consume de card
-        if (useCard(source, card)) {
-            // Apply the effect of the card
+        if (departure.getAdventurers().size() == 0 || destination.getState() == CellState.FLOODED)
+            return false;
 
-            // Force move without using the board
+        // Consume the card
+        if (trashCard(source, card)) {
 
             // Make shallow copy of the adventurers to avoid concurrent modifications
             final List<Adventurer> adventurers = new ArrayList<>(departure.getAdventurers());
+
+            // Directly alter the model (not a regular move operation)
             adventurers.forEach(adv -> adv.move(destination));
 
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Use a sandbag card.
+     * Will dry out the clicked cell for free.
+     *
+     * @param source - The owner of the card.
+     * @param card   - The card.
+     * @param toDry  - The cell to dry.
+     * @return
+     */
+    public boolean useCardSandbag(final Adventurer source, final SandBagCard card, final Cell toDry) {
+
+        if (toDry.getState() != CellState.WET)
+            return false;
+
+        // Consume the card
+        if (trashCard(source, card)) {
+
+            // Directly alter the cell (not a regular dry operation)
+            toDry.setState(CellState.DRY);
             return true;
         }
 
@@ -428,7 +489,7 @@ public class GameEngine {
 
             if (res.getData() instanceof RisingWatersCard) {
                 // Discard card
-                useCard(getCurrentPlayer().get(), (RisingWatersCard) res.getData());
+                trashCard(getCurrentPlayer().get(), (RisingWatersCard) res.getData());
 
                 // Water level +1 and reshuffle cards
                 modelProxy.request(new Request(RequestType.ISLAND_WATER_UP, getCurrentPlayer().get()));
@@ -458,11 +519,42 @@ public class GameEngine {
 
         for (int i = 0; i < drawAmount; i++) {
             // Draw a card
-            final Response<FloodCard> floodCard = modelProxy.request(new Request(RequestType.ISLAND_DRAW, null));
+            final Response<FloodCard> floodCardRes = modelProxy.request(new Request(RequestType.ISLAND_DRAW, null));
 
             // Use the card
-            modelProxy.request(new Request(RequestType.ISLAND_APPLY, null).putData(Request.DATA_CARD, floodCard.getData()));
+            modelProxy.request(new Request(RequestType.ISLAND_APPLY, null).putData(Request.DATA_CARD, floodCardRes.getData()));
+
+            final Cell cell = floodCardRes.getData().getTargetedCell();
+
+            // If the cell is now flooded and there are adventurers on it
+            if (cell.getState() == CellState.FLOODED && !cell.getAdventurers().isEmpty()) {
+                // Make a shallow copy of the adventurers to rescue
+                final List<Adventurer> adventurers = new ArrayList<>(cell.getAdventurers());
+
+                // Check if the game is rescueable
+                for (Adventurer adventurer : adventurers) {
+                    if (!isSaveable(adventurer)) {
+                        endGame.set(false);
+                        return;
+                    }
+                }
+
+                // Rescue each adventurers
+                adventurers.forEach(emergencyRescue::set);
+            }
         }
+    }
+
+    private boolean isSaveable(final Adventurer adventurer) {
+
+        // Get reachable cells for this adventurer
+        final Response<List<Cell>> reachableRes = modelProxy.request(
+                new Request(RequestType.CELLS_REACHABLE, adventurer)
+                        .putData(Request.DATA_CELL, adventurer.getPosition())
+        );
+
+        // If there are no reachable cells, the game is lost
+        return !reachableRes.getData().isEmpty();
     }
 
     /**

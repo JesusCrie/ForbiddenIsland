@@ -10,5 +10,6 @@ public enum GameMode {
 	// Other
 	SPECIAL_CARD_HELICOPTER,
 	SPECIAL_CARD_SANDBAG,
+	EMERGENCY_MOVE,
 	IDLE
 }

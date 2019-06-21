@@ -22,7 +22,9 @@ public class Board {
     private final Map<Location, Cell> cells;
     private final List<Adventurer> adventurers;
     private final List<Treasure> treasures;
+
     private final WaterLevel waterLevel;
+
     private final FloodDeck floodDeck;
     private final TreasureDeck treasureDeck;
 
@@ -66,13 +68,13 @@ public class Board {
                         .setData(getCells());
             case CELLS_REACHABLE:
                 return (Response<T>) new Response<List<Cell>>(r, true)
-                        .setData(getReachableCells(r.getData(Request.DATA_CELL)));
+                        .setData(getReachableCells(r));
             case CELLS_DRAINABLE:
                 return (Response<T>) new Response<List<Cell>>(r, true)
-                        .setData(getCellsDryable(r.getData(Request.DATA_CELL)));
+                        .setData(getCellsDryable(r));
             case CELLS_CLAIMABLE:
                 return (Response<T>) new Response<List<Treasure>>(r, true)
-                        .setData(getTreasuresClaimable(r.getCurrentPlayer()));
+                        .setData(getTreasuresClaimable(r));
 
             // *** Cards related requests ***
             case CARD_DRAW_AMOUNT:
@@ -81,10 +83,8 @@ public class Board {
             case CARD_DRAW:
                 return (Response<T>) new Response<TreasureCard>(r, true)
                         .setData(drawCard(r));
-            case CARD_USE:
-                return (Response<T>) new Response<Void>(r, useCard(r));
             case CARD_TRASH:
-                return (Response<T>) new Response<Void>(r, trashCard(r));
+                return (Response<T>) new Response<Void>(r, useCard(r));
 
             // *** Player related requests ***
             case PLAYER_MOVE:
@@ -97,7 +97,7 @@ public class Board {
                 return (Response<T>) new Response<Integer>(r, sendCard(r)).setData(1);
             case PLAYERS_SENDABLE:
                 return (Response<T>) new Response<List<Adventurer>>(r, true)
-                        .setData(getPlayersSendable(r.getCurrentPlayer()));
+                        .setData(getPlayersSendable(r));
 
             // *** Island related requests ***
             case TREASURES_ALL:
@@ -107,12 +107,12 @@ public class Board {
                 return (Response<T>) new Response<FloodCard>(r, true)
                         .setData(islandDrawCard());
             case ISLAND_APPLY:
-                return (Response<T>) new Response<Void>(r, islandUseCard(r.getData(Request.DATA_CARD)));
+                return (Response<T>) new Response<Void>(r, islandUseCard(r));
             case ISLAND_WATER_LEVEL:
                 return (Response<T>) new Response<WaterLevel>(r, true)
                         .setData(getWaterLevel());
             case ISLAND_WATER_UP:
-                return (Response<T>) new Response<Void>(r, incrementWaterLevel(r.getData(Request.DATA_AMOUNT)));
+                return (Response<T>) new Response<Void>(r, incrementWaterLevel(r));
 
             // *** Game related requests ***
             case GAME_NEW_ROUND:
@@ -143,14 +143,17 @@ public class Board {
         return 2;
     }
 
-    public List<Cell> getReachableCells(final Cell c) {
+    public List<Cell> getReachableCells(final Request r) {
+        final Cell c = r.getData(Request.DATA_CELL);
+
         return Stream.of(Utils.getCrossCells(c.getLocation()))
                 .map(this::getCellIfNotFlooded)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    public List<Cell> getCellsDryable(final Cell c) {
+    public List<Cell> getCellsDryable(final Request r) {
+        final Cell c = r.getData(Request.DATA_CELL);
         final Location loc = c.getLocation();
 
         final List<Cell> data = Stream.of(Utils.getCrossCells(loc))
@@ -163,13 +166,16 @@ public class Board {
         return data;
     }
 
-    public List<Adventurer> getPlayersSendable(final Adventurer p) {
+    public List<Adventurer> getPlayersSendable(final Request r) {
+        final Adventurer p = r.getData(Request.DATA_PLAYER);
+
         return p.getPosition().getAdventurers().stream()
                 .filter(anAdventurer -> anAdventurer != p)
                 .collect(Collectors.toList());
     }
 
-    public List<Treasure> getTreasuresClaimable(final Adventurer p) {
+    public List<Treasure> getTreasuresClaimable(final Request r) {
+        final Adventurer p = r.getData(Request.DATA_PLAYER);
         final List<Treasure> treasures = new ArrayList<>(1);
 
         if (p.getPosition() instanceof TreasureCell) {
@@ -274,30 +280,26 @@ public class Board {
         return false;
     }
 
-    public boolean trashCard(final Request r) {
-        final Adventurer adv = r.getData(Request.DATA_PLAYER);
-        final TreasureCard card = r.getData(Request.DATA_CARD);
-
-        if (adv.removeCard(card)) {
-            treasureDeck.discardCard(card);
-            return true;
-        }
-
-        return false;
-    }
-
     public FloodCard islandDrawCard() {
         return floodDeck.drawCard();
     }
 
-    public boolean islandUseCard(final FloodCard card) {
+    public boolean islandUseCard(final Request r) {
+        final FloodCard card = r.getData(Request.DATA_CARD);
+
         card.getTargetedCell().waterUp();
-        floodDeck.discardCard(card);
+
+        // If cell is not yet flooded, keep the card in the discarding deck
+        if (card.getTargetedCell().getState() != CellState.FLOODED) {
+            floodDeck.discardCard(card);
+        }
 
         return true;
     }
 
-    public boolean incrementWaterLevel(final int amount) {
+    public boolean incrementWaterLevel(final Request r) {
+        final int amount = r.getData(Request.DATA_AMOUNT);
+
         for (int i = 0; i < amount; ++i)
             getWaterLevel().incrementWater();
 
