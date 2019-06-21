@@ -53,15 +53,14 @@ public enum RequestType {
      * Used to draw a card from the treasure deck and place it in the given
      * player's hand.
      * - DATA_PLAYER: Adventurer
-     * - DATA_AMOUNT: int
-     * = void
+     * = TreasureCard
      */
     CARD_DRAW,
 
     /**
      * Used to make a player use a specific card of its hand.
      * - DATA_PLAYER: Adventurer
-     * - DATA_CARD: SpecialCard
+     * - DATA_CARD: TreasureCard
      * = void
      */
     CARD_USE,

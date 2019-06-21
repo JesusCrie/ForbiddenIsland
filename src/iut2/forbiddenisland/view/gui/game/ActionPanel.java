@@ -1,8 +1,6 @@
 package iut2.forbiddenisland.view.gui.game;
 
-import iut2.forbiddenisland.controller.Controller;
 import iut2.forbiddenisland.controller.GameMode;
-import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.view.IconGraphicalMetadata;
 
 import javax.swing.*;
@@ -13,88 +11,81 @@ import java.awt.Image;
 public class ActionPanel extends JPanel {
 
     private final JLabel remainingActionsText;
-    private final JButton btnMove;
-    private final JButton btnDry;
-    private final JButton btnSend;
-    private final JButton btnClaim;
-    private final JButton btnEndRound;
+    private final JButton buttonMove;
+    private final JButton buttonDry;
+    private final JButton buttonSend;
+    private final JButton buttonClaim;
+    private final JButton buttonEndRound;
 
-    private final Observable<Void> obsModeMove = new Observable<>();
-    private final Observable<Void> obsModeDry = new Observable<>();
-    private final Observable<Void> obsModeSend = new Observable<>();
-    private final Observable<Void> obsModeClaim = new Observable<>();
-    private final Observable<Void> obsEndRound = new Observable<>();
-
-    public ActionPanel(final Controller controller, final int width, final int height) {
+    public ActionPanel(final int width, final int height) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        remainingActionsText = new JLabel("", SwingConstants.CENTER);
-
 
         final int heightPerButton = height / 6;
 
+        remainingActionsText = new JLabel("", SwingConstants.CENTER);
         remainingActionsText.setText("3 actions restantes");
-
-        final Dimension dim = new Dimension(width, heightPerButton);
-        remainingActionsText.setMinimumSize(dim);
-        remainingActionsText.setPreferredSize(dim);
-        remainingActionsText.setMaximumSize(dim);
-
+        remainingActionsText.setMaximumSize(new Dimension(width, heightPerButton));
         add(remainingActionsText);
 
-        btnMove = createButton("Se Déplacer", IconGraphicalMetadata.ICON_MOVE.getImage(), width, heightPerButton);
-        btnMove.addActionListener(e -> obsModeMove.notifyChanges());
-        add(btnMove);
+        buttonMove = createButton("Se Déplacer", IconGraphicalMetadata.ICON_MOVE.getImage(), width, heightPerButton);
+        add(buttonMove);
 
-        btnDry = createButton("Assecher", IconGraphicalMetadata.ICON_DRY.getImage(), width, heightPerButton);
-        btnDry.addActionListener(e -> obsModeDry.notifyChanges());
-        add(btnDry);
+        buttonDry = createButton("Assecher", IconGraphicalMetadata.ICON_DRY.getImage(), width, heightPerButton);
+        add(buttonDry);
 
-        btnSend = createButton("Envoyer Carte", IconGraphicalMetadata.ICON_SEND.getImage(), width, heightPerButton);
-        btnSend.addActionListener(e -> obsModeSend.notifyChanges());
-        add(btnSend);
+        buttonSend = createButton("Envoyer Carte", IconGraphicalMetadata.ICON_SEND.getImage(), width, heightPerButton);
+        add(buttonSend);
 
-        btnClaim = createButton("Récupérer Trésor", IconGraphicalMetadata.ICON_CLAIM.getImage(), width, heightPerButton);
-        btnClaim.addActionListener(e -> obsModeClaim.notifyChanges());
-        add(btnClaim);
+        buttonClaim = createButton("Récupérer Trésor", IconGraphicalMetadata.ICON_CLAIM.getImage(), width, heightPerButton);
+        add(buttonClaim);
 
-        btnEndRound = createButton("Fin du tour", IconGraphicalMetadata.ICON_DONE.getImage(), width, heightPerButton);
-        btnEndRound.addActionListener((e -> obsEndRound.notifyChanges()));
-        btnEndRound.setBackground(Color.ORANGE);
-        add(btnEndRound);
-
-        controller.observeModeMove(obsModeMove);
-        controller.observeModeDry(obsModeDry);
-        controller.observeModeSend(obsModeSend);
-        controller.observeModeTreasureClaim(obsModeClaim);
-        controller.observeClickEndRound(obsEndRound);
-
-        controller.getRemainingActions().subscribe(remaining ->
-                SwingUtilities.invokeLater(() -> remainingActionsText.setText(remaining + " actions restantes"))
-        );
-        controller.getGameMode().subscribe(gameMode ->
-            SwingUtilities.invokeLater(() -> highlightGameMode(gameMode))
-        );
+        buttonEndRound = createButton("Fin du tour", IconGraphicalMetadata.ICON_DONE.getImage(), width, heightPerButton);
+        buttonEndRound.setBackground(Color.ORANGE);
+        add(buttonEndRound);
     }
 
-    private void highlightGameMode(final GameMode gameMode) {
-        btnMove.setBackground(Color.WHITE);
-        btnDry.setBackground(Color.WHITE);
-        btnSend.setBackground(Color.WHITE);
-        btnClaim.setBackground(Color.WHITE);
+    public JButton getButtonMove() {
+        return buttonMove;
+    }
+
+    public JButton getButtonDry() {
+        return buttonDry;
+    }
+
+    public JButton getButtonSend() {
+        return buttonSend;
+    }
+
+    public JButton getButtonClaim() {
+        return buttonClaim;
+    }
+
+    public JButton getButtonEndRound() {
+        return buttonEndRound;
+    }
+
+    public void setRemainingActions(final int amount) {
+        remainingActionsText.setText(amount + " actions restantes");
+    }
+
+    public void highlightGameMode(final GameMode gameMode) {
+        buttonMove.setBackground(Color.WHITE);
+        buttonDry.setBackground(Color.WHITE);
+        buttonSend.setBackground(Color.WHITE);
+        buttonClaim.setBackground(Color.WHITE);
 
         switch (gameMode) {
             case MOVE:
-                btnMove.setBackground(Color.GREEN);
+                buttonMove.setBackground(Color.GREEN);
                 break;
             case DRY:
-                btnDry.setBackground(Color.GREEN);
+                buttonDry.setBackground(Color.GREEN);
                 break;
             case SEND:
-                btnSend.setBackground(Color.GREEN);
+                buttonSend.setBackground(Color.GREEN);
                 break;
             case TREASURE:
-                btnClaim.setBackground(Color.GREEN);
+                buttonClaim.setBackground(Color.GREEN);
                 break;
             case IDLE:
             default:
@@ -112,6 +103,7 @@ public class ActionPanel extends JPanel {
         btn.setIconTextGap(10);
         btn.setIcon(new ImageIcon(icon));
         btn.setText(label);
+        btn.setBackground(Color.WHITE);
 
         return btn;
     }

@@ -17,7 +17,7 @@ public class CliView {
 
     private final Observable<Cell> obsClickCell = new Observable<>();
     private final Observable<Adventurer> obsClickPlayer = new Observable<>();
-    private final Observable<TreasureCard> obsClickCard = new Observable<>();
+    private final Observable<Pair<Adventurer, TreasureCard>> obsClickCard = new Observable<>();
     private final Observable<Void> obsEndRound = new Observable<>();
 
     private final Observable<Void> obsModeMove = new Observable<>();
@@ -145,7 +145,7 @@ public class CliView {
         System.out.println("== Quelle carte voulez vous envoyer ? ==");
 
         final Pair<String, Runnable>[] actionCards = currentPlayer.getCards().stream()
-                .map(card -> Pair.of(card.getName(), (Runnable) () -> obsClickCard.set(card)))
+                .map(card -> Pair.of(card.getName(), (Runnable) () -> obsClickCard.set(Pair.of(currentPlayer, card))))
                 .toArray(Pair[]::new);
 
         CliPrompter.createMenu("Selectionnez une carte", actionCards);

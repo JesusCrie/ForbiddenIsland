@@ -1,6 +1,6 @@
 package iut2.forbiddenisland.view.gui.game;
 
-import iut2.forbiddenisland.controller.Controller;
+import iut2.forbiddenisland.Pair;
 import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.TreasureCard;
@@ -16,20 +16,20 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerCardPanel extends JPanel {
+public class AdventurerCardPanel extends JPanel {
 
     private static final double CARD_IMAGE_RATIO = 501.0 / 699.0;
-    private static final Color TRANSPARENT = new Color(0, true);
 
     private Adventurer adventurer;
-    private boolean highlighted = false;
+    private boolean isCurrentPlayer = false;
+    private AdventurerCardButton cardButton;
     private final JComponent bottomPanel;
 
-    private final Observable<TreasureCard> cardClickNotifier = new Observable<>();
+    private Observable<Pair<Adventurer, TreasureCard>> cardClickNotifier = new Observable<>();
     private final Observable<Adventurer> adventurerClickNotifier = new Observable<>();
 
 
-    public PlayerCardPanel(final Controller controller, final Adventurer adventurer, final int width, final int height) {
+    public AdventurerCardPanel(final Adventurer adventurer, final int width, final int height) {
         this.adventurer = adventurer;
 
         // Setup container
@@ -43,32 +43,41 @@ public class PlayerCardPanel extends JPanel {
         final JComponent topPanel = createTopPanel(adventurer, width, height - heightBottomPanel);
         topPanel.setPreferredSize(new Dimension(width, heightBottomPanel));
 
-        bottomPanel = createBottomPanel(adventurer);
+        bottomPanel = new JPanel(new GridLayout(1, 5));
         bottomPanel.setPreferredSize(new Dimension(width, 140));
 
         add(topPanel);
         add(bottomPanel);
-
-        controller.observeClickCard(cardClickNotifier);
-        controller.observeClickPlayer(adventurerClickNotifier);
     }
 
-    public void setHighlighted(final boolean highlighted) {
-        if (this.highlighted != highlighted) {
-            this.highlighted = highlighted;
-            setBorder(highlighted ? BorderFactory.createLineBorder(Color.RED, 5) : null);
-            repaint();
+    public AdventurerCardButton getCardButton() {
+        return cardButton;
+    }
+
+    public void setCardClickNotifier(final Observable<Pair<Adventurer, TreasureCard>> cardClickNotifier) {
+        this.cardClickNotifier = cardClickNotifier;
+        updateCards();
+    }
+
+    public void setIsCurrentPlayer(final boolean isCurrentPlayer) {
+        if (this.isCurrentPlayer != isCurrentPlayer) {
+            this.isCurrentPlayer = isCurrentPlayer;
+            setBorder(isCurrentPlayer ? BorderFactory.createLineBorder(Color.RED, 5) : null);
         }
+    }
+
+    public void setSelectable(final boolean selectable) {
+        // If current player, keep disable
+        cardButton.setEnabled(!isCurrentPlayer && selectable);
     }
 
     public void updateCards() {
         bottomPanel.removeAll();
 
+        // Regenerate buttons from the changed set of cards
         for (JComponent btn : generateCardButtons(adventurer.getCards())) {
             bottomPanel.add(btn);
         }
-
-        repaint();
     }
 
     private JComponent createTopPanel(final Adventurer adv, final int width, final int height) {
@@ -79,9 +88,9 @@ public class PlayerCardPanel extends JPanel {
         // To force the image to take the whole space available
         final JPanel cardPanel = new JPanel(new GridLayout(1, 1));
         cardPanel.setMaximumSize(new Dimension((int) (height / CARD_IMAGE_RATIO), height));
-        final AdventurerCardButton cardImage = new AdventurerCardButton(adv);
-        cardPanel.add(cardImage);
-        cardImage.addActionListener(e -> adventurerClickNotifier.set(adv));
+        cardButton = new AdventurerCardButton(adv);
+        cardPanel.add(cardButton);
+        cardButton.addActionListener(e -> adventurerClickNotifier.set(adv));
 
         final JLabel name = new JLabel(adv.getName());
 
@@ -94,22 +103,12 @@ public class PlayerCardPanel extends JPanel {
         return panel;
     }
 
-    private JComponent createBottomPanel(final Adventurer adv) {
-        final JPanel panel = new JPanel(new GridLayout(1, 5));
-
-        for (JComponent button : generateCardButtons(adv.getCards())) {
-            panel.add(button);
-        }
-
-        return panel;
-    }
-
     private List<JComponent> generateCardButtons(final List<TreasureCard> cards) {
         final List<JComponent> buttons = new ArrayList<>(5);
 
         for (TreasureCard card : cards) {
             final CardButton btn = new CardButton(card);
-            btn.addActionListener(e -> cardClickNotifier.set(card));
+            btn.addActionListener(e -> cardClickNotifier.set(Pair.of(adventurer, card)));
 
             buttons.add(btn);
         }

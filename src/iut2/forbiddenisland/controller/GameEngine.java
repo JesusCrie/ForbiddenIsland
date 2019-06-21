@@ -15,6 +15,7 @@ import iut2.forbiddenisland.model.card.*;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class GameEngine {
     private final Observable<List<Treasure>> treasures;
     private final Observable<Boolean> endGame;
     private final Observable<Integer> remainingActions;
+    private final Observable<Adventurer> tooManyCards;
 
     public GameEngine(final Board board, final List<Adventurer> players) {
         this.players = new PlayerManagement(players);
@@ -41,6 +43,7 @@ public class GameEngine {
         waterLevel = createWaterLevelObs();
         treasures = createTreasureObs();
         endGame = createEndGameObs();
+        tooManyCards = new Observable<>();
 
         remainingActions = new NotifyOnSubscribeObservable<>(0);
 
@@ -257,6 +260,15 @@ public class GameEngine {
         return sendablePlayers.getData();
     }
 
+    /**
+     * Get the observable that will be use to tell the user to discard a card.
+     *
+     * @return When a user need to get rid of a card.
+     */
+    public Observable<Adventurer> getTooManyCards() {
+        return tooManyCards;
+    }
+
     // *** Player round related methods ***
 
     /**
@@ -273,8 +285,6 @@ public class GameEngine {
                 new Request(RequestType.GAME_MOVE_AMOUNT, getCurrentPlayer().get())
         );
         remainingActions.set(res.getData());
-
-        adventurers.notifyChanges();
     }
 
     /**
@@ -293,8 +303,6 @@ public class GameEngine {
 
         if (res.isOk()) {
             decrementActions(res.getData());
-
-            cells.notifyChanges();
         }
 
         return res.isOk();
@@ -314,7 +322,6 @@ public class GameEngine {
 
         if (res.isOk()) {
             decrementActions(res.getData());
-            cells.notifyChanges();
         }
 
         return res.isOk();
@@ -333,9 +340,6 @@ public class GameEngine {
 
         if (res.isOk()) {
             decrementActions(res.getData());
-            adventurers.notifyChanges();
-            treasures.notifyChanges();
-            cells.notifyChanges();
         }
 
         return res.isOk();
@@ -357,7 +361,6 @@ public class GameEngine {
 
         if (res.isOk()) {
             decrementActions(res.getData());
-            adventurers.notifyChanges();
         }
 
         return res.isOk();
@@ -366,21 +369,46 @@ public class GameEngine {
     /**
      * Use a card.
      *
-     * @param card - The card to use.
+     * @param source - The owner of the card.
+     * @param card   - The card to use.
      */
-    public boolean useCard(final SpecialCard card) {
+    public boolean useCard(final Adventurer source, final TreasureCard card) {
         final Response<Void> res = modelProxy.request(
                 new Request(RequestType.CARD_USE, getCurrentPlayer().get())
-                        .putData(Request.DATA_PLAYER, getCurrentPlayer().get())
+                        .putData(Request.DATA_PLAYER, source)
                         .putData(Request.DATA_CARD, card)
         );
 
-        if (res.isOk()) {
-            adventurers.notifyChanges();
-            cells.notifyChanges();
+        return res.isOk();
+    }
+
+    /**
+     * Use an helicopter card.
+     * Will move every adventurer on the departure cell to the destination cell.
+     *
+     * @param source      - The owner of the card.
+     * @param card        - The card.
+     * @param departure   - The departure cell.
+     * @param destination - The destination cell.
+     * @return True if the operation succeeds, otherwise false.
+     */
+    public boolean useCardHelicopter(final Adventurer source, final HelicopterCard card,
+                                     final Cell departure, final Cell destination) {
+
+        // Consume de card
+        if (useCard(source, card)) {
+            // Apply the effect of the card
+
+            // Force move without using the board
+
+            // Make shallow copy of the adventurers to avoid concurrent modifications
+            final List<Adventurer> adventurers = new ArrayList<>(departure.getAdventurers());
+            adventurers.forEach(adv -> adv.move(destination));
+
+            return true;
         }
 
-        return res.isOk();
+        return false;
     }
 
     /**
@@ -396,18 +424,24 @@ public class GameEngine {
             final Response<TreasureCard> res = modelProxy.request(
                     new Request(RequestType.CARD_DRAW, getCurrentPlayer().get())
                             .putData(Request.DATA_PLAYER, getCurrentPlayer().get())
-                            .putData(Request.DATA_AMOUNT, 1) // Only one because the rising water card need to be applied immediately
             );
 
             if (res.getData() instanceof RisingWatersCard) {
+                // Discard card
+                useCard(getCurrentPlayer().get(), (RisingWatersCard) res.getData());
+
+                // Water level +1 and reshuffle cards
                 modelProxy.request(new Request(RequestType.ISLAND_WATER_UP, getCurrentPlayer().get()));
-                waterLevel.notifyChanges();
+
+                // Trigger island turn to draw flood cards
                 startIslandTurn();
             }
+
         }
 
-        cells.notifyChanges();
-        adventurers.notifyChanges();
+        if (getCurrentPlayer().get().getCards().size() >= 6) {
+            tooManyCards.set(getCurrentPlayer().get());
+        }
     }
 
     private void decrementActions(final int amount) {
@@ -429,8 +463,6 @@ public class GameEngine {
             // Use the card
             modelProxy.request(new Request(RequestType.ISLAND_APPLY, null).putData(Request.DATA_CARD, floodCard.getData()));
         }
-
-        cells.notifyChanges();
     }
 
     /**

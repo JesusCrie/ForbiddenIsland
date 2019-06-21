@@ -10,40 +10,37 @@ import iut2.forbiddenisland.view.gui.components.TreasureImage;
 
 import javax.swing.*;
 import java.awt.GridLayout;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BoardPanel extends JPanel {
 
-    private final Observable<Cell> cellClickNotifier = new Observable<>();
+    private Observable<Cell> cellClickNotifier = new Observable<>();
 
     private final List<TreasureImage> treasurePanels = new ArrayList<>(4);
     private final Map<Location, GridCellButton> cellsPanels = new HashMap<>();
 
-    public BoardPanel(final Controller controller) {
+    public BoardPanel() {
         setLayout(new GridLayout(6, 7));
         setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
-
-        setup(controller.getCells().get(), controller.getTreasures().get());
-
-        controller.observeClickCell(cellClickNotifier);
-
-        controller.getHighlightedCells().subscribe(highlightedCells ->
-                SwingUtilities.invokeLater(() -> onHighlightedCells(highlightedCells))
-        );
-
-        controller.getCells().subscribe(cells -> SwingUtilities.invokeLater(this::update));
-        controller.getTreasures().subscribe(treasures -> SwingUtilities.invokeLater(this::update));
-        controller.getEndGameObservable().subscribe(win -> SwingUtilities.invokeLater(this::update));
     }
 
-    private void setup(final Map<Location, Cell> cells, final List<Treasure> treasures) {
+    public void setup(final Map<Location, Cell> cells, final List<Treasure> treasures) {
         if (treasures.size() != 4)
             throw new IllegalArgumentException("There need to be exactly 4 treasures !");
 
-        // Line by line
+        /* Line by line
+         *
+         * X = Treasure
+         * O = Cell
+         * _ = Empty
+         *
+         * X_OO_X
+         * _OOOO_
+         * OOOOOO
+         * OOOOOO
+         * _OOOO_
+         * X_OO_X
+         */
 
         // *** Line 0 ***
 
@@ -104,18 +101,24 @@ public class BoardPanel extends JPanel {
         add(createTreasureDisplay(treasures.get(3)));
     }
 
-    private void onHighlightedCells(final List<Cell> highlightedCells) {
-        // TODO if time: only update cells that changes
+    public void setCellClickNotifier(final Observable<Cell> cellClickNotifier) {
+        this.cellClickNotifier = cellClickNotifier;
+    }
 
+    public void highlightedCells(final Collection<Cell> highlightedCells) {
         // Reset highlight status
         cellsPanels.values().forEach(cell -> cell.setHighlighted(false));
         // Highlight
         highlightedCells.forEach(cell -> cellsPanels.get(cell.getLocation()).setHighlighted(true));
+
+        // Update the cells
+        cellsPanels.values().forEach(GridCellButton::update);
     }
 
-    private void update() {
+    public void update() {
         treasurePanels.forEach(TreasureImage::update);
         cellsPanels.values().forEach(GridCellButton::update);
+        repaint();
     }
 
     private JPanel createEmpty() {

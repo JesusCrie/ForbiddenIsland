@@ -30,12 +30,24 @@ public class Board {
                  final List<Adventurer> adventurers,
                  final List<Treasure> treasures,
                  final WaterLevel waterLevel) {
+
+        this(cells, adventurers, treasures, waterLevel,
+                new FloodDeck(cells.values()), new TreasureDeck(treasures));
+    }
+
+    public Board(final Map<Location, Cell> cells,
+                 final List<Adventurer> adventurers,
+                 final List<Treasure> treasures,
+                 final WaterLevel waterLevel,
+                 final FloodDeck floodDeck,
+                 final TreasureDeck treasureDeck) {
+
         this.cells = cells;
         this.adventurers = adventurers;
         this.treasures = treasures;
         this.waterLevel = waterLevel;
-        this.floodDeck = new FloodDeck(cells.values());
-        this.treasureDeck = new TreasureDeck(treasures);
+        this.floodDeck = floodDeck;
+        this.treasureDeck = treasureDeck;
     }
 
     /**
@@ -67,7 +79,8 @@ public class Board {
                 return (Response<T>) new Response<Integer>(r, true)
                         .setData(getDrawAmount());
             case CARD_DRAW:
-                return (Response<T>) new Response<Void>(r, drawCard(r));
+                return (Response<T>) new Response<TreasureCard>(r, true)
+                        .setData(drawCard(r));
             case CARD_USE:
                 return (Response<T>) new Response<Void>(r, useCard(r));
             case CARD_TRASH:
@@ -239,20 +252,18 @@ public class Board {
         return true;
     }
 
-    public boolean drawCard(final Request r) {
+    public TreasureCard drawCard(final Request r) {
         final Adventurer adv = r.getData(Request.DATA_PLAYER);
-        final int amount = r.getData(Request.DATA_AMOUNT);
 
-        for (int i = 1; i <= amount; ++i) {
-            adv.addCard(treasureDeck.drawCard());
-        }
+        final TreasureCard card = treasureDeck.drawCard();
+        adv.addCard(card);
 
-        return true;
+        return card;
     }
 
     public boolean useCard(final Request r) {
         final Adventurer adv = r.getData(Request.DATA_PLAYER);
-        final SpecialCard card = r.getData(Request.DATA_CARD);
+        final TreasureCard card = r.getData(Request.DATA_CARD);
 
         if (r.canBypass() || adv.getCards().contains(card)) {
             adv.removeCard(card);

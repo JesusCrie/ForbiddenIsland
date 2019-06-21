@@ -8,5 +8,7 @@ public enum GameMode {
 	SEND,
 
 	// Other
+	SPECIAL_CARD_HELICOPTER,
+	SPECIAL_CARD_SANDBAG,
 	IDLE
 }

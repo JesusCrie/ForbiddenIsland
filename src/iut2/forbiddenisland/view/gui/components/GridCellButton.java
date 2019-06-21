@@ -15,12 +15,12 @@ public class GridCellButton extends AutoResizeImageButton {
     public GridCellButton(final Cell cell) {
         super(cell.getMetadata().getGridDryImage());
         this.cell = cell;
-
-        // Need to be highlighted to be clickable
-        setEnabled(false);
+        update();
     }
 
     public void update() {
+        setEnabled(highlighted);
+
         if (cell.getState() == CellState.FLOODED) {
             setVisible(false);
         } else {
@@ -34,11 +34,7 @@ public class GridCellButton extends AutoResizeImageButton {
     }
 
     public void setHighlighted(final boolean highlighted) {
-        if (this.highlighted != highlighted) {
-            this.highlighted = highlighted;
-            setEnabled(highlighted);
-            repaint();
-        }
+        this.highlighted = highlighted;
     }
 
     @Override

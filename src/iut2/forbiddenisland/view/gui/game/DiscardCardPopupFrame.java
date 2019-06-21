@@ -2,10 +2,11 @@ package iut2.forbiddenisland.view.gui.game;
 
 import iut2.forbiddenisland.model.card.TreasureCard;
 import iut2.forbiddenisland.view.gui.components.CardButton;
-import iut2.forbiddenisland.view.gui.utils.ConstraintFactory;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -37,29 +38,16 @@ public class DiscardCardPopupFrame extends JDialog {
         c.gridwidth = 1;
         c.gridy = 1;
 
-        for (int i = 0; i < treasureCards.size() - 1; i++) {
+        for (int i = 0; i < treasureCards.size(); i++) {
             final TreasureCard card = treasureCards.get(i);
-            final CardButton button = createCardButton(card, future);
+            final CardButton button = new CardButton(card);
+            button.addActionListener(e -> {
+                dispose();
+                future.complete(card);
+            });
+
             c.gridx = i;
             add(button, c);
         }
-
-        final TreasureCard card = treasureCards.get(treasureCards.size() - 1);
-        final JButton button = createCardButton(card, future);
-        c.gridx = treasureCards.size() - 1;
-        c.insets = new Insets(0, 35, 0, 5);
-        add(button, c);
-    }
-
-    private CardButton createCardButton(final TreasureCard card, final CompletableFuture<TreasureCard> future) {
-
-        final CardButton btn = new CardButton(card);
-
-        btn.addActionListener(e -> {
-            dispose();
-            future.complete(card);
-        });
-
-        return btn;
     }
 }

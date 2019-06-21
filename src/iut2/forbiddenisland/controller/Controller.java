@@ -1,5 +1,6 @@
 package iut2.forbiddenisland.controller;
 
+import iut2.forbiddenisland.Pair;
 import iut2.forbiddenisland.controller.observer.NotifyOnSubscribeObservable;
 import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.controller.observer.OneTimeObservable;
@@ -9,14 +10,18 @@ import iut2.forbiddenisland.model.Treasure;
 import iut2.forbiddenisland.model.WaterLevel;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.Card;
+import iut2.forbiddenisland.model.card.HelicopterCard;
 import iut2.forbiddenisland.model.card.SpecialCard;
 import iut2.forbiddenisland.model.card.TreasureCard;
 import iut2.forbiddenisland.model.cell.Cell;
+import iut2.forbiddenisland.model.cell.CellState;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Controller {
 
@@ -24,10 +29,11 @@ public class Controller {
     private final Observable<GameMode> gameMode;
     private final Observable<String> feedbackObs;
     private final Observable<List<Adventurer>> sendableAdventurers;
-    private final Observable<List<Cell>> highlightedCells;
+    private final Observable<Collection<Cell>> highlightedCells;
 
     private Adventurer selectedAdventurer;
     private Card selectedCard;
+    private Cell selectedCell;
 
     public Controller(final Board board, final List<Adventurer> adventurers) {
         engine = new GameEngine(board, adventurers);
@@ -36,33 +42,60 @@ public class Controller {
         sendableAdventurers = new Observable<List<Adventurer>>() {
             @Override
             public void notifyChanges() {
-                value = engine.getPlayersSendable();
+                value = gameMode.get() == GameMode.SEND ? engine.getPlayersSendable() : Collections.emptyList();
                 super.notifyChanges();
             }
         };
         highlightedCells = createHighlightedCellsObs();
+
+        gameMode.subscribe(mode -> {
+            // Update everything
+            sendableAdventurers.notifyChanges();
+            engine.getCells().notifyChanges();
+            highlightedCells.notifyChanges();
+            engine.getAdventurers().notifyChanges();
+        });
     }
 
-    private Observable<List<Cell>> createHighlightedCellsObs() {
-        return new NotifyOnSubscribeObservable<List<Cell>>() {
+    private Observable<Collection<Cell>> createHighlightedCellsObs() {
+        return new NotifyOnSubscribeObservable<Collection<Cell>>() {
             @Override
             public void notifyChanges() {
                 switch (gameMode.get()) {
                     case MOVE:
                         value = engine.getReachableCells();
                         break;
+
                     case DRY:
                         value = engine.getDryableCells();
                         break;
-                    case SEND:
-                        value = Collections.emptyList();
-                        break;
+
                     case TREASURE:
                         final Cell current = getCurrentAdventurer().get().getPosition();
                         if (current instanceof TreasureCell)
                             value = Collections.singletonList(current);
                         else
                             value = Collections.emptyList();
+                        break;
+
+                    case SPECIAL_CARD_HELICOPTER:
+                        // Selecting the departure cell
+                        if (selectedCell == null) {
+                            // Get every cell with an adventurer
+                            value = engine.getAdventurers().get().stream()
+                                    .map(Adventurer::getPosition)
+                                    .distinct()
+                                    .collect(Collectors.toList());
+
+                            // Selecting the destination cell
+                        } else {
+                            // Every cell
+                            value = engine.getCells().get().values();
+                        }
+
+                        break;
+
+                    case SEND:
                     case IDLE:
                     default:
                         value = Collections.emptyList();
@@ -85,7 +118,7 @@ public class Controller {
         return engine.getCells();
     }
 
-    public Observable<List<Cell>> getHighlightedCells() {
+    public Observable<Collection<Cell>> getHighlightedCells() {
         return highlightedCells;
     }
 
@@ -117,6 +150,10 @@ public class Controller {
         return engine.getEndGame();
     }
 
+    public Observable<Adventurer> getTooManyCardsObservable() {
+        return engine.getTooManyCards();
+    }
+
     /**
      * The controller will subscribe to the provided observable
      * and enable the move mode of the engine when triggered.
@@ -125,9 +162,8 @@ public class Controller {
      */
     public void observeModeMove(final Observable<Void> o) {
         o.subscribe(value -> {
-            gameMode.set(GameMode.MOVE);
             selectedAdventurer = engine.getCurrentPlayer().get();
-            highlightedCells.notifyChanges();
+            gameMode.set(GameMode.MOVE);
         });
     }
 
@@ -139,9 +175,8 @@ public class Controller {
      */
     public void observeModeDry(final Observable<Void> o) {
         o.subscribe(value -> {
-            gameMode.set(GameMode.DRY);
             selectedAdventurer = engine.getCurrentPlayer().get();
-            highlightedCells.notifyChanges();
+            gameMode.set(GameMode.DRY);
         });
     }
 
@@ -153,12 +188,15 @@ public class Controller {
      */
     public void observeModeTreasureClaim(final Observable<Void> o) {
         o.subscribe(value -> {
-            // With the current set of rules, the only way to claim
-            // a treasure is to be exactly on his cell so this gamemode is useless
+            // With the current set of rules, the only way to claim a treasure
+            // is to be exactly on his cell so this gamemode is pretty useless
             gameMode.set(GameMode.TREASURE);
 
             // Act like the player clicked the cell he is standing on
             observeClickCell(new OneTimeObservable<>(engine.getCurrentPlayer().get().getPosition()));
+
+            // Reset game mode
+            gameMode.set(GameMode.IDLE);
         });
     }
 
@@ -170,15 +208,15 @@ public class Controller {
      */
     public void observeModeSend(final Observable<Void> o) {
         o.subscribe(value -> {
+            // Check if any card to send
             if (engine.getCurrentPlayer().get().getCards().isEmpty()) {
                 feedbackObs.set("Vous n'avez aucune carte à envoyer !");
+
             } else {
                 selectedAdventurer = null;
                 selectedCard = null;
 
                 gameMode.set(GameMode.SEND);
-                highlightedCells.notifyChanges();
-
             }
         });
     }
@@ -195,11 +233,16 @@ public class Controller {
                 case MOVE:
                     if (!engine.movePlayer(selectedAdventurer, cell))
                         feedbackObs.set("Vous n'avez pas le droit de vous deplacer ici !");
+                    else
+                        gameMode.set(GameMode.IDLE);
                     break;
                 case DRY:
                     if (!engine.dryCell(cell))
                         feedbackObs.set("Vous n'avez pas le droit d'assecher cette tuile !");
+                    else
+                        gameMode.set(GameMode.IDLE);
                     break;
+
                 case TREASURE:
                     // If someone was able to claim a treasure from another cell
                     if (cell instanceof TreasureCell) {
@@ -209,12 +252,42 @@ public class Controller {
                         feedbackObs.set("Ce n'est pas une tuile trésor !");
                     }
                     break;
-                default:
+
+                case SPECIAL_CARD_HELICOPTER:
+                    // If selecting the start cell
+                    if (selectedCell == null) {
+                        if (cell.getAdventurers().isEmpty()) {
+                            feedbackObs.set("Il n'y a aucun joueur a déplacer ici !");
+                            break;
+                        }
+
+                        selectedCell = cell;
+
+                    } else { // If selecting the destination cell
+
+                        if (cell.getState() == CellState.FLOODED) {
+                            feedbackObs.set("Vous ne pouvez pas vous déplacer sur une case inondée !");
+                            break;
+                        }
+
+                        // Apply the card
+                        if (!engine.useCardHelicopter(selectedAdventurer, (HelicopterCard) selectedCard, selectedCell, cell)) {
+                            feedbackObs.set("Vous ne pouvez pas utiliser cette carte !");
+                            break;
+                        }
+
+                        gameMode.set(GameMode.IDLE);
+                    }
+
                     break;
             }
 
+            // Update cells
             highlightedCells.notifyChanges();
+            engine.getCells().notifyChanges();
+            // Update adventurers
             engine.getAdventurers().notifyChanges();
+            sendableAdventurers.notifyChanges();
         });
     }
 
@@ -233,6 +306,8 @@ public class Controller {
                     if (selectedCard != null) {
                         if (!engine.sendCard(selectedAdventurer, selectedCard))
                             feedbackObs.set("Vous ne pouvez pas envoyer cette carte à cet aventurier !");
+                        else
+                            gameMode.set(GameMode.IDLE);
                     }
                     break;
                 case MOVE:
@@ -242,8 +317,12 @@ public class Controller {
                     break;
             }
 
-            engine.getAdventurers().notifyChanges();
+            // Update cells
             highlightedCells.notifyChanges();
+            engine.getCells().notifyChanges();
+            // Update adventurers
+            engine.getAdventurers().notifyChanges();
+            sendableAdventurers.notifyChanges();
         });
     }
 
@@ -253,21 +332,38 @@ public class Controller {
      *
      * @param o - The observable to observe.
      */
-    public void observeClickCard(final Observable<TreasureCard> o) {
-        o.subscribe(card -> {
-            if (gameMode.get() == GameMode.SEND) {
-                selectedCard = card;
+    public void observeClickCard(final Observable<Pair<Adventurer, TreasureCard>> o) {
+        o.subscribe(adventurerCardPair -> {
+            if (gameMode.get() == GameMode.SEND && adventurerCardPair.getLeft() == engine.getCurrentPlayer().get()) {
+                selectedCard = adventurerCardPair.getRight();
 
                 if (selectedAdventurer != null) {
                     if (!engine.sendCard(selectedAdventurer, selectedCard))
                         feedbackObs.set("Vous ne pouvez pas envoyer cette carte à cet aventurier !");
                 }
-            } else if (card instanceof SpecialCard) {
-                // TODO special card logic
-                if (!engine.useCard((SpecialCard) card))
-                    feedbackObs.set("Vous ne pouvez pas utiliser cette carte !");
+
+            } else if (adventurerCardPair.getRight() instanceof SpecialCard) {
+                selectedCard = adventurerCardPair.getRight();
+                selectedAdventurer = adventurerCardPair.getLeft();
+
+                final SpecialCard card = (SpecialCard) adventurerCardPair.getRight();
+
+                if (card instanceof HelicopterCard) {
+                    feedbackObs.set("Veuillez sélectionnez une tuile de départ");
+                    gameMode.set(GameMode.SPECIAL_CARD_HELICOPTER);
+                }
             }
         });
+    }
+
+    /**
+     * The controller will subscribe to the provided observable
+     * and trash the card provided for the provided player when triggered.
+     *
+     * @param o - The observable to observe.
+     */
+    public void observeTrashCard(final Observable<Pair<Adventurer, TreasureCard>> o) {
+        o.subscribe(pair -> engine.useCard(pair.getLeft(), pair.getRight()));
     }
 
     /**

@@ -9,6 +9,7 @@ public class TreasureImage extends AutoResizePreserveRatioImagePanel {
     public TreasureImage(final Treasure treasure) {
         super(treasure.getMetadata().getImage());
         this.treasure = treasure;
+        update();
     }
 
     public void update() {
