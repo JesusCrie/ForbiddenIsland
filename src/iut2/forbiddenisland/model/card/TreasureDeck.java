@@ -12,6 +12,10 @@ import java.util.stream.Stream;
  */
 public class TreasureDeck extends Deck<TreasureCard> {
 
+    protected TreasureDeck(final List<TreasureCard> customCards, final Object ignoreMe) {
+        super(customCards);
+    }
+
     public TreasureDeck(final List<Treasure> treasures) {
         super(
                 // Concatenate the two streams of cards, one of TreasurePartCards, the other one of SpecialCards

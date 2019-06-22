@@ -6,5 +6,6 @@ public class CardButton extends AutoResizePreserveRatioImageButton {
 
     public CardButton(final TreasureCard card) {
         super(card.getMetadata().getImage());
+        setOpaque(false);
     }
 }

@@ -16,7 +16,7 @@ public class AdventurerCardButton extends AutoResizePreserveRatioImageButton {
     public void setHighlighted(final boolean highlighted) {
         if (this.highlighted != highlighted) {
             this.highlighted = highlighted;
-            setBorder(highlighted ? BorderFactory.createLineBorder(Color.GREEN, 10) : null);
+            setBorder(highlighted ? BorderFactory.createLineBorder(Color.GREEN, 5) : null);
         }
     }
 }

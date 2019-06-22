@@ -146,7 +146,9 @@ public class Board {
     public List<Cell> getReachableCells(final Request r) {
         final Cell c = r.getData(Request.DATA_CELL);
 
-        return Stream.of(Utils.getCrossCells(c.getLocation()))
+        return Stream.of(
+                Utils.getCrossCells(
+                        c.getLocation()))
                 .map(this::getCellIfNotFlooded)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -167,7 +169,7 @@ public class Board {
     }
 
     public List<Adventurer> getPlayersSendable(final Request r) {
-        final Adventurer p = r.getData(Request.DATA_PLAYER);
+        final Adventurer p = r.getCurrentPlayer();
 
         return p.getPosition().getAdventurers().stream()
                 .filter(anAdventurer -> anAdventurer != p)
@@ -237,10 +239,10 @@ public class Board {
     }
 
     public boolean claimTreasure(final Request r) {
-        final Adventurer adv = r.getData(Request.DATA_PLAYER);
+        final Adventurer adv = r.getCurrentPlayer();
         final Treasure treasure = r.<TreasureCell>getData(Request.DATA_CELL).getTreasure();
 
-        if (!r.canBypass() || !treasure.isClaimable())
+        if (!r.canBypass() && !treasure.isClaimable())
             return false;
 
         final List<TreasurePartCard> cards = adv.getCards().stream()
@@ -249,7 +251,7 @@ public class Board {
                 .filter(card -> card.getTreasure().equals(treasure))
                 .collect(Collectors.toList());
 
-        if (cards.size() < 4 && !r.canBypass())
+        if (!r.canBypass() && cards.size() < 4)
             return false;
 
         cards.forEach(adv::removeCard);

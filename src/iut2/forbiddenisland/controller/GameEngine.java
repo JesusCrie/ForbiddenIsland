@@ -35,6 +35,7 @@ public class GameEngine {
     private final Observable<Integer> remainingActions;
 
     // Event related observables
+    private final Observable<Void> risingWatersCardDrawn;
     private final Observable<Adventurer> tooManyCards;
     private final Observable<Adventurer> emergencyRescue;
 
@@ -50,6 +51,7 @@ public class GameEngine {
         endGame = createEndGameObs();
         remainingActions = new NotifyOnSubscribeObservable<>(0);
 
+        risingWatersCardDrawn = new Observable<>();
         tooManyCards = new Observable<>();
         emergencyRescue = new Observable<>();
 
@@ -226,6 +228,16 @@ public class GameEngine {
     // *** More getters that will trigger a request to the board ***
 
     /**
+     * Get the observable that will be used to tell the user he just
+     * got a rising waters card.
+     *
+     * @return When a rising water card is picked.
+     */
+    public Observable<Void> getRisingWatersCardDrawn() {
+        return risingWatersCardDrawn;
+    }
+
+    /**
      * Get the observable that will be used to tell the user to discard a card.
      *
      * @return When a user need to get rid of a card.
@@ -251,9 +263,13 @@ public class GameEngine {
      * @return The list of cells where the player is able to move.
      */
     public List<Cell> getReachableCells() {
+        return getReachableCells(getCurrentPlayer().get());
+    }
+
+    public List<Cell> getReachableCells(final Adventurer target) {
         final Response<List<Cell>> reachableCells = modelProxy.request(
-                new Request(RequestType.CELLS_REACHABLE, getCurrentPlayer().get())
-                        .putData(Request.DATA_CELL, getCurrentPlayer().get().getPosition())
+                new Request(RequestType.CELLS_REACHABLE, target)
+                        .putData(Request.DATA_CELL, target.getPosition())
         );
 
         return reachableCells.getData();
@@ -290,7 +306,8 @@ public class GameEngine {
 
     public void initGame() {
         for (Adventurer player : players.players) {
-            while (player.getCards().size() < 2) {
+            // 2 cards for each players
+            for (int i = 0; i < 2; ) {
 
                 final Response<TreasureCard> res = modelProxy.request(
                         new Request(RequestType.CARD_DRAW, getCurrentPlayer().get())
@@ -300,6 +317,8 @@ public class GameEngine {
                 // If rising waters card, throw it away
                 if (res.getData() instanceof RisingWatersCard) {
                     trashCard(player, res.getData());
+                } else {
+                    ++i;
                 }
             }
         }
@@ -338,6 +357,27 @@ public class GameEngine {
         if (res.isOk()) {
             decrementActions(res.getData());
         }
+
+        return res.isOk();
+    }
+
+    /**
+     * Try to move the desired player to the desired cell but in the
+     * emergency mode.
+     * From the point of view of the engine, the only difference with
+     * {@link #movePlayer(Adventurer, Cell)} is that no actions will
+     * be consumed for the current player.
+     *
+     * @param player - The player to move.
+     * @param cell   - The cell to move the player to.
+     * @return True if the action was successful, otherwise false.
+     */
+    public boolean emergencyMovePlayer(final Adventurer player, final Cell cell) {
+        final Response<Integer> res = modelProxy.request(
+                new Request(RequestType.PLAYER_MOVE, getCurrentPlayer().get())
+                        .putData(Request.DATA_PLAYER, player)
+                        .putData(Request.DATA_CELL, cell)
+        );
 
         return res.isOk();
     }
@@ -392,6 +432,10 @@ public class GameEngine {
                         .putData(Request.DATA_PLAYER_EXTRA, to)
                         .putData(Request.DATA_CARD, card)
         );
+
+        if (to.getCards().size() > 5) {
+            tooManyCards.set(to);
+        }
 
         if (res.isOk()) {
             decrementActions(res.getData());
@@ -489,10 +533,13 @@ public class GameEngine {
 
             if (res.getData() instanceof RisingWatersCard) {
                 // Discard card
-                trashCard(getCurrentPlayer().get(), (RisingWatersCard) res.getData());
+                trashCard(getCurrentPlayer().get(), res.getData());
 
                 // Water level +1 and reshuffle cards
-                modelProxy.request(new Request(RequestType.ISLAND_WATER_UP, getCurrentPlayer().get()));
+                modelProxy.request(
+                        new Request(RequestType.ISLAND_WATER_UP, getCurrentPlayer().get())
+                                .putData(Request.DATA_AMOUNT, 1)
+                );
 
                 // Trigger island turn to draw flood cards
                 startIslandTurn();
@@ -500,7 +547,7 @@ public class GameEngine {
 
         }
 
-        if (getCurrentPlayer().get().getCards().size() >= 6) {
+        if (getCurrentPlayer().get().getCards().size() > 5) {
             tooManyCards.set(getCurrentPlayer().get());
         }
     }
@@ -533,7 +580,7 @@ public class GameEngine {
 
                 // Check if the game is rescueable
                 for (Adventurer adventurer : adventurers) {
-                    if (!isSaveable(adventurer)) {
+                    if (!isRescueable(adventurer)) {
                         endGame.set(false);
                         return;
                     }
@@ -545,7 +592,7 @@ public class GameEngine {
         }
     }
 
-    private boolean isSaveable(final Adventurer adventurer) {
+    private boolean isRescueable(final Adventurer adventurer) {
 
         // Get reachable cells for this adventurer
         final Response<List<Cell>> reachableRes = modelProxy.request(

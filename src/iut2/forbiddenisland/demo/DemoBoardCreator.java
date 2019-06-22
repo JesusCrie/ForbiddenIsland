@@ -1,27 +1,90 @@
-package iut2.forbiddenisland.view;
+package iut2.forbiddenisland.demo;
 
-import iut2.forbiddenisland.model.Board;
-import iut2.forbiddenisland.model.Location;
-import iut2.forbiddenisland.model.Treasure;
-import iut2.forbiddenisland.model.WaterLevel;
+import iut2.forbiddenisland.demo.scenario1.FloodDeckDemo1;
+import iut2.forbiddenisland.demo.scenario1.TreasureDeckDemo1;
+import iut2.forbiddenisland.demo.scenario2.FloodDeckDemo2;
+import iut2.forbiddenisland.demo.scenario2.TreasureDeckDemo2;
+import iut2.forbiddenisland.model.*;
 import iut2.forbiddenisland.model.adventurer.*;
+import iut2.forbiddenisland.model.card.FloodDeck;
+import iut2.forbiddenisland.model.card.TreasureDeck;
 import iut2.forbiddenisland.model.cell.*;
+import iut2.forbiddenisland.view.CellGraphicalMetadata;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DemoBoard {
+public class DemoBoardCreator {
 
-    public static Board createAndGet(final List<Adventurer> adventurers) {
-        final List<Treasure> treasures = Arrays.asList(
-                new Treasure(TreasureGraphicalMetadata.SACRED_STONE),
-                new Treasure(TreasureGraphicalMetadata.ZEPHYR_STATUE),
-                new Treasure(TreasureGraphicalMetadata.ARDENT_CRYSTAL),
-                new Treasure(TreasureGraphicalMetadata.WAVE_CHALICE)
+    public static Board createAndGet(final List<Adventurer> adventurers, final int waterLevel) {
+        final List<Treasure> treasures = BoardGenerator.createTreasures();
+
+        final Map<Location, Cell> map = createMap(treasures);
+        spawnPlayers(map, adventurers);
+
+        return new Board(map, adventurers, treasures, new WaterLevel(waterLevel));
+    }
+
+    public static Board createScenario1(final List<String> names) {
+        final List<Adventurer> adventurers = Arrays.asList(
+                new Pilot(names.get(0)),
+                new Diver(names.get(1)),
+                new Engineer(names.get(2)),
+                new Messenger(names.get(3))
         );
 
+        final List<Treasure> treasures = BoardGenerator.createTreasures();
+
+        final Map<Location, Cell> map = createMap(treasures);
+
+        final FloodDeck floodDeck = new FloodDeckDemo1(map);
+        final TreasureDeck treasureDeck = new TreasureDeckDemo1(treasures.get(0), treasures.get(1), treasures.get(2), treasures.get(3));
+
+        // Some players need to start with more than 2 cards
+
+        // Pilot
+        for (int i = 0; i < 2; i++)
+            adventurers.get(0).addCard(treasureDeck.drawCard());
+
+        // Diver
+        for (int i = 0; i < 2; ++i)
+            adventurers.get(1).addCard(treasureDeck.drawCard());
+
+        // Messenger
+        for (int i = 0; i < 3; ++i)
+            adventurers.get(2).addCard(treasureDeck.drawCard());
+
+        // Engineer
+        for (int i = 0; i < 2; ++i)
+            adventurers.get(3).addCard(treasureDeck.drawCard());
+
+        // Spawn players
+        spawnPlayers(map, adventurers);
+
+        return new Board(map, adventurers, treasures, new WaterLevel(0), floodDeck, treasureDeck);
+    }
+
+    public static Board createScenario2(final List<String> names) {
+        final List<Adventurer> adventurers = Arrays.asList(
+                new Navigator(names.get(0)),
+                new Explorer(names.get(1))
+        );
+
+        final List<Treasure> treasures = BoardGenerator.createTreasures();
+
+        final Map<Location, Cell> map = createMap(treasures);
+
+        final FloodDeck floodDeck = new FloodDeckDemo2(map);
+        final TreasureDeck treasureDeck = new TreasureDeckDemo2();
+
+        spawnPlayers(map, adventurers);
+
+        return new Board(map, adventurers, treasures, new WaterLevel(2), floodDeck, treasureDeck);
+    }
+
+    private static Map<Location, Cell> createMap(final List<Treasure> treasures) {
         final Map<Location, Cell> map = new HashMap<>();
 
         add(map, new Cell(CellGraphicalMetadata.ABYSS_BRIDGE, Location.from(2, 0)));
@@ -64,6 +127,10 @@ public class DemoBoard {
         map.get(Location.from(2, 4)).setState(CellState.FLOODED);
         map.get(Location.from(3, 5)).setState(CellState.WET);
 
+        return map;
+    }
+
+    private static void spawnPlayers(final Map<Location, Cell> map, final List<Adventurer> adventurers) {
         for (Adventurer adventurer : adventurers) {
             if (adventurer instanceof Pilot)
                 adventurer.move(map.get(Location.from(3, 2)));
@@ -83,11 +150,9 @@ public class DemoBoard {
             else if (adventurer instanceof Navigator)
                 adventurer.move(map.get(Location.from(3, 1)));
         }
-
-        return new Board(map, adventurers, treasures, new WaterLevel(3));
     }
 
-    private static void add(Map<Location, Cell> map, Cell cell) {
+    private static void add(final Map<Location, Cell> map, final Cell cell) {
         map.put(cell.getLocation(), cell);
     }
 }

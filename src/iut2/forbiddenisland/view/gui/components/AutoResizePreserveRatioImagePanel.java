@@ -14,6 +14,8 @@ public class AutoResizePreserveRatioImagePanel extends JPanel {
         this.image = image;
         aspectRatio = (double) image.getWidth(null) / (double) image.getHeight(null);
         isHorizontal = aspectRatio > 1.0;
+
+        setOpaque(false);
     }
 
     @Override

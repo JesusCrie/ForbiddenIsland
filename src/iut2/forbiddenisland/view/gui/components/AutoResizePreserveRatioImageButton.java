@@ -18,6 +18,8 @@ public class AutoResizePreserveRatioImageButton extends JButton {
         this.image = image;
         aspectRatio = (double) image.getWidth(null) / (double) image.getHeight(null);
         isHorizontal = aspectRatio > 1.0;
+
+        setOpaque(false);
     }
 
     @Override

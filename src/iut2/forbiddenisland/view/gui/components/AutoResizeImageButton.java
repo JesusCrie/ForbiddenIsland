@@ -10,6 +10,7 @@ public class AutoResizeImageButton extends JButton {
 
     public AutoResizeImageButton(final Image background) {
         this.background = background;
+        setOpaque(false);
     }
 
     @Override

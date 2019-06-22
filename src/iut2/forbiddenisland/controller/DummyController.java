@@ -2,7 +2,7 @@ package iut2.forbiddenisland.controller;
 
 import iut2.forbiddenisland.model.Board;
 import iut2.forbiddenisland.model.adventurer.*;
-import iut2.forbiddenisland.view.DemoBoard;
+import iut2.forbiddenisland.demo.DemoBoardCreator;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,8 +19,7 @@ public class DummyController extends Controller {
             new Messenger("Batman")
     );
 
-    //private static Board DUMMY_BOARD = BoardGenerator.createRandomBoard(DUMMY_ADVENTURERS, 0);
-    private static Board DUMMY_BOARD = DemoBoard.createAndGet(DUMMY_ADVENTURERS);
+    private static Board DUMMY_BOARD = DemoBoardCreator.createAndGet(DUMMY_ADVENTURERS, 0);
 
     public DummyController() {
         super(DUMMY_BOARD, DUMMY_ADVENTURERS);

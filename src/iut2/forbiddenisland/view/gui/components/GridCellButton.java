@@ -11,6 +11,7 @@ public class GridCellButton extends AutoResizeImageButton {
 
     private final Cell cell;
     private boolean highlighted = false;
+    private boolean drawCell = true;
 
     public GridCellButton(final Cell cell) {
         super(cell.getMetadata().getGridDryImage());
@@ -22,9 +23,9 @@ public class GridCellButton extends AutoResizeImageButton {
         setEnabled(highlighted);
 
         if (cell.getState() == CellState.FLOODED) {
-            setVisible(false);
+            drawCell = false;
         } else {
-            setVisible(true);
+            drawCell = true;
 
             if (cell.getState() == CellState.DRY)
                 background = cell.getMetadata().getGridDryImage();
@@ -40,7 +41,8 @@ public class GridCellButton extends AutoResizeImageButton {
     @Override
     protected void paintComponent(final Graphics g) {
         // Paint the background
-        super.paintComponent(g);
+        if (drawCell)
+            super.paintComponent(g);
 
         final List<Adventurer> advs = cell.getAdventurers();
 

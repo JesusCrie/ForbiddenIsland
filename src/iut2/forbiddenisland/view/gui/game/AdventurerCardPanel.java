@@ -23,11 +23,9 @@ public class AdventurerCardPanel extends JPanel {
     private Adventurer adventurer;
     private boolean isCurrentPlayer = false;
     private AdventurerCardButton cardButton;
-    private final JComponent bottomPanel;
+    private final JPanel bottomPanel;
 
     private Observable<Pair<Adventurer, TreasureCard>> cardClickNotifier = new Observable<>();
-    private final Observable<Adventurer> adventurerClickNotifier = new Observable<>();
-
 
     public AdventurerCardPanel(final Adventurer adventurer, final int width, final int height) {
         this.adventurer = adventurer;
@@ -69,6 +67,7 @@ public class AdventurerCardPanel extends JPanel {
     public void setSelectable(final boolean selectable) {
         // If current player, keep disable
         cardButton.setEnabled(!isCurrentPlayer && selectable);
+        cardButton.setHighlighted(!isCurrentPlayer && selectable);
     }
 
     public void updateCards() {
@@ -90,7 +89,6 @@ public class AdventurerCardPanel extends JPanel {
         cardPanel.setMaximumSize(new Dimension((int) (height / CARD_IMAGE_RATIO), height));
         cardButton = new AdventurerCardButton(adv);
         cardPanel.add(cardButton);
-        cardButton.addActionListener(e -> adventurerClickNotifier.set(adv));
 
         final JLabel name = new JLabel(adv.getName());
 

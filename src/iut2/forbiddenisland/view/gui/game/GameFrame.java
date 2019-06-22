@@ -69,6 +69,7 @@ public class GameFrame extends JFrame {
         // Setup board
         boardPanel.setup(controller.getCells().get(), controller.getTreasures().get());
 
+        // Delegate the role of the main container to the box container
         setContentPane(container);
     }
 
@@ -126,15 +127,28 @@ public class GameFrame extends JFrame {
 
         // *** Too many cards trigger ***
 
-        controller.getTooManyCardsObservable().subscribe(adventurer -> {
-            final TreasureCard cardToDiscard = askCardToDiscard(adventurer.getCards());
-            trashCardObservable.set(Pair.of(adventurer, cardToDiscard));
+        controller.getTooManyCards().subscribe(adventurer -> {
+
+            // Need to start it in another thread because this operation is blocking
+            final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    while (adventurer.getCards().size() > 5) {
+                        final TreasureCard cardToDiscard = askCardToDiscard(adventurer.getCards());
+                        trashCardObservable.set(Pair.of(adventurer, cardToDiscard));
+                    }
+
+                    return null;
+                }
+            };
+
+            worker.execute();
         });
 
         // *** Notices ***
 
         // Engine notices
-        controller.getFeedbackObservable().subscribe(msg ->
+        controller.getFeedback().subscribe(msg ->
                 invokeLater(() -> JOptionPane.showMessageDialog(null, msg))
         );
 
@@ -156,10 +170,22 @@ public class GameFrame extends JFrame {
         }));
 
         // Remaining action reminder
-        controller.getRemainingActions().subscribe(actions -> {
+        controller.getRemainingActions().subscribe(actions -> invokeLater(() -> {
+            // If 0 actions remaining, force the round to end
+            // TODO: Improvement: support engineer power with the last action
             if (actions <= 0)
-                JOptionPane.showMessageDialog(null, "C'était votre dernière action, pensez à finir votre tour.");
-        });
+                actionPanel.getButtonEndRound().doClick();
+        }));
+
+        // Rising waters card
+        controller.getRisingWatersCardDrawn().subscribe(ignore -> invokeLater(() ->
+                JOptionPane.showMessageDialog(null, "Vous venez de tirer une carte inondation !")
+        ));
+
+        // Emergency rescue notifier
+        controller.getEmergencyRescue().subscribe(adv -> invokeLater(() ->
+                JOptionPane.showMessageDialog(null, adv.getName() + " est en train de se noyer !")
+        ));
     }
 
     private void setupViewToControllerBindings(final Controller controller) {

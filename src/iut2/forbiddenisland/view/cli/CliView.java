@@ -43,7 +43,7 @@ public class CliView {
         controller.observeModeSend(obsModeSend);
         controller.observeModeTreasureClaim(obsModeClaim);
 
-        controller.getFeedbackObservable().subscribe(val -> System.out.println("\n" + val + "\n"));
+        controller.getFeedback().subscribe(val -> System.out.println("\n" + val + "\n"));
 
         controller.getCells().subscribe(val -> cells = val);
         controller.getAdventurers().subscribe(val -> players = val);
