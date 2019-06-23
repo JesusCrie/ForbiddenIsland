@@ -14,6 +14,7 @@ import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.CellState;
 import iut2.forbiddenisland.model.cell.HeliportCell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
+import javafx.concurrent.Worker;
 
 import javax.swing.*;
 import java.util.Collection;
@@ -411,11 +412,27 @@ public class Controller {
 
                 if (selectedAdventurer != null) {
 
-                    if (!engine.sendCard(selectedAdventurer, selectedCard))
-                        feedbackObs.set("Vous ne pouvez pas envoyer cette carte à cet aventurier !");
-                    else {
-                        gameMode.set(GameMode.IDLE);
-                    }
+                    // Send card can trigger a too many card event that will block the thread
+                    // Thus we need to execute it outside of the event thread
+
+                    final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                        @Override
+                        protected Void doInBackground() {
+                            final boolean success = engine.sendCard(selectedAdventurer, selectedCard);
+
+                            SwingUtilities.invokeLater(() -> {
+                                if (success) {
+                                    gameMode.set(GameMode.IDLE);
+                                } else {
+                                    feedbackObs.set("Vous ne pouvez pas envoyer cette carte à cet aventurier !");
+                                }
+                            });
+
+                            return null;
+                        }
+                    };
+
+                    worker.execute();
 
                 } else {
                     feedbackObs.set("Veuillez selectionnez un aventurier");
