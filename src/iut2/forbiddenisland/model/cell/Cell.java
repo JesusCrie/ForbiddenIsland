@@ -6,6 +6,7 @@ import iut2.forbiddenisland.view.CellGraphicalMetadata;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Cell {
 
@@ -60,5 +61,18 @@ public class Cell {
 
     public void addAdventurer(final Adventurer player) {
         adventurers.add(player);
+    }
+
+    // Equality methods
+
+
+    @Override
+    public boolean equals(final Object obj) {
+        return obj instanceof Cell && metadata == ((Cell) obj).metadata;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(metadata);
     }
 }

@@ -8,7 +8,7 @@ public class TreasureDeckDemo2 extends TreasureDeck {
 
     public TreasureDeckDemo2() {
         super(Arrays.asList(
-                // Starting card
+                // Starting cards
                 new SandBagCard(),
                 new SandBagCard(),
                 new SandBagCard(),
@@ -17,11 +17,12 @@ public class TreasureDeckDemo2 extends TreasureDeck {
                 // Game cards
                 new HelicopterCard(),
                 new RisingWatersCard(),
-                new RisingWatersCard(),
-                new RisingWatersCard(),
-                new RisingWatersCard(),
-                new RisingWatersCard(),
-                new RisingWatersCard()
+
+                new SandBagCard(),
+                new SandBagCard(),
+
+                new HelicopterCard(),
+                new SandBagCard()
         ), null);
     }
 

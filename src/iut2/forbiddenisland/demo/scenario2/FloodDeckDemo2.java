@@ -12,10 +12,17 @@ public class FloodDeckDemo2 extends FloodDeck {
 
     public FloodDeckDemo2(final Map<Location, Cell> map) {
         super(Arrays.asList(
+                map.get(Location.from(3, 0)),
                 map.get(Location.from(1, 1)),
+                map.get(Location.from(0, 3)),
+
                 map.get(Location.from(5, 3)),
+                map.get(Location.from(3, 2)),
+                map.get(Location.from(1, 3)),
+
                 map.get(Location.from(1, 1)),
-                map.get(Location.from(3, 2))
+                map.get(Location.from(1, 4)),
+                map.get(Location.from(2, 5))
         ));
     }
 

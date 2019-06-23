@@ -42,7 +42,7 @@ public class WelcomeFrame extends JFrame {
 
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setSize((int) (screenSize.getWidth() / 3.0), (int) (screenSize.getHeight() / 2.0));
-        setLocation((int) (screenSize.getWidth() / 3.0), (int) (screenSize.getHeight() / 4.0));
+        setLocationRelativeTo(null);
 
         setLayout(new BorderLayout());
 

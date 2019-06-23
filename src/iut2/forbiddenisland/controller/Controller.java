@@ -12,8 +12,10 @@ import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.*;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.CellState;
+import iut2.forbiddenisland.model.cell.HeliportCell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
+import javax.swing.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +27,7 @@ public class Controller {
     private final GameEngine engine;
     private final Observable<GameMode> gameMode;
     private final Observable<String> feedbackObs;
-    private final Observable<List<Adventurer>> sendableAdventurers;
+    private final Observable<List<Adventurer>> highlightedAdventurers;
     private final Observable<Collection<Cell>> highlightedCells;
 
     private Adventurer selectedAdventurer;
@@ -36,13 +38,7 @@ public class Controller {
         engine = new GameEngine(board, adventurers);
         gameMode = new NotifyOnSubscribeObservable<>(GameMode.IDLE);
         feedbackObs = new Observable<>();
-        sendableAdventurers = new Observable<List<Adventurer>>() {
-            @Override
-            public void notifyChanges() {
-                value = gameMode.get() == GameMode.SEND ? engine.getPlayersSendable() : Collections.emptyList();
-                super.notifyChanges();
-            }
-        };
+        highlightedAdventurers = createHighlightedAdventurersObs();
         highlightedCells = createHighlightedCellsObs();
 
         gameMode.subscribe(mode -> triggerUpdate());
@@ -57,9 +53,30 @@ public class Controller {
     private void triggerUpdate() {
         // TODO: Improvement: Update only the necessary in the corresponding method
         highlightedCells.notifyChanges();
-        sendableAdventurers.notifyChanges();
+        highlightedAdventurers.notifyChanges();
         engine.getAdventurers().notifyChanges();
         engine.getCells().notifyChanges();
+    }
+
+    private Observable<List<Adventurer>> createHighlightedAdventurersObs() {
+        return new NotifyOnSubscribeObservable<List<Adventurer>>() {
+            @Override
+            public void notifyChanges() {
+                switch (gameMode.get()) {
+                    case MOVE:
+                        value = engine.getPlayersMoveable();
+                        break;
+                    case SEND:
+                        value = engine.getPlayersSendable();
+                        break;
+                    default:
+                        value = Collections.emptyList();
+                        break;
+                }
+
+                super.notifyChanges();
+            }
+        };
     }
 
     private Observable<Collection<Cell>> createHighlightedCellsObs() {
@@ -68,9 +85,6 @@ public class Controller {
             public void notifyChanges() {
                 switch (gameMode.get()) {
                     case MOVE:
-                        value = engine.getReachableCells();
-                        break;
-
                     case EMERGENCY_MOVE:
                         value = engine.getReachableCells(selectedAdventurer);
                         break;
@@ -156,8 +170,8 @@ public class Controller {
         return engine.getCurrentPlayer();
     }
 
-    public Observable<List<Adventurer>> getSendableAdventurers() {
-        return sendableAdventurers;
+    public Observable<List<Adventurer>> getHighlightedAdventurers() {
+        return highlightedAdventurers;
     }
 
     public Observable<List<Treasure>> getTreasures() {
@@ -414,11 +428,24 @@ public class Controller {
                 final SpecialCard card = (SpecialCard) adventurerCardPair.getRight();
 
                 if (card instanceof HelicopterCard) {
+                    // Special case: check for win
+                    if (selectedAdventurer.getPosition() instanceof HeliportCell
+                            && selectedAdventurer.getPosition().getAdventurers().size() == engine.getAdventurers().get().size()
+                            && engine.getTreasures().get().stream().noneMatch(Treasure::isClaimable)) {
+
+                        // Heliport cell && everybody is here && no treasure is claimable
+                        // Guess its a win
+                        engine.getEndGame().set(true);
+                        return;
+                    }
+
                     feedbackObs.set("Veuillez sélectionnez une tuile de départ");
+                    selectedCell = null;
                     gameMode.set(GameMode.SPECIAL_CARD_HELICOPTER);
 
                 } else if (card instanceof SandBagCard) {
                     feedbackObs.set("Veuillez sélectionnez une tuile à assecher");
+                    selectedCell = null;
                     gameMode.set(GameMode.SPECIAL_CARD_SANDBAG);
                 }
 
@@ -454,16 +481,32 @@ public class Controller {
             if (gameMode.get() == GameMode.EMERGENCY_MOVE)
                 return;
 
-            gameMode.set(GameMode.IDLE);
-            engine.endPlayerRound();
+            // Execute everything in a worker to avoid blocking the thread
 
-            engine.startIslandTurn();
+            final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    gameMode.set(GameMode.IDLE);
 
-            engine.newPlayerRound();
-            engine.getEndGame().set(null);
+                    // End the current player's round
+                    if (engine.endPlayerRound()) {
 
-            // TODO 22/06/2019 notify ?
-            triggerUpdate();
+                        // Do the island turn, aka drawing flood cards
+                        if (engine.startIslandTurn()) {
+
+                            // New round
+                            engine.newPlayerRound();
+
+                            // TODO 22/06/2019 notify ?
+                            triggerUpdate();
+                        }
+                    }
+
+                    return null;
+                }
+            };
+
+            worker.execute();
         });
     }
 

@@ -66,8 +66,8 @@ public class AdventurerCardPanel extends JPanel {
 
     public void setSelectable(final boolean selectable) {
         // If current player, keep disable
-        cardButton.setEnabled(!isCurrentPlayer && selectable);
-        cardButton.setHighlighted(!isCurrentPlayer && selectable);
+        cardButton.setEnabled(selectable);
+        cardButton.setHighlighted(selectable);
     }
 
     public void updateCards() {

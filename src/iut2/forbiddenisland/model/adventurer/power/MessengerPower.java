@@ -29,12 +29,11 @@ public class MessengerPower implements Power {
         if (res.getOriginRequest().getType() == RequestType.PLAYERS_SENDABLE) {
             final Response<List<Adventurer>> castedRes = (Response<List<Adventurer>>) res;
 
-            final List<Adventurer> players = board.getCells().values().stream()
-                    .flatMap(c -> c.getAdventurers().stream())
-                    .filter(pl -> !pl.equals(res.getOriginRequest().getCurrentPlayer()))
+            final List<Adventurer> adventurers = board.getAdventurers().stream()
+                    .filter(adv -> !adv.equals(res.getOriginRequest().getCurrentPlayer()))
                     .collect(Collectors.toList());
 
-            castedRes.setData(players);
+            castedRes.setData(adventurers);
         }
     }
 }

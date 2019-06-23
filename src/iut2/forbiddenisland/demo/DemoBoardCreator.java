@@ -31,8 +31,8 @@ public class DemoBoardCreator {
         final List<Adventurer> adventurers = Arrays.asList(
                 new Pilot(names.get(0)),
                 new Diver(names.get(1)),
-                new Engineer(names.get(2)),
-                new Messenger(names.get(3))
+                new Messenger(names.get(3)),
+                new Engineer(names.get(2))
         );
 
         final List<Treasure> treasures = BoardGenerator.createTreasures();
@@ -81,7 +81,7 @@ public class DemoBoardCreator {
 
         spawnPlayers(map, adventurers);
 
-        return new Board(map, adventurers, treasures, new WaterLevel(2), floodDeck, treasureDeck);
+        return new Board(map, adventurers, treasures, new WaterLevel(1), floodDeck, treasureDeck);
     }
 
     private static Map<Location, Cell> createMap(final List<Treasure> treasures) {

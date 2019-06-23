@@ -15,6 +15,7 @@ public class DiscardCardPopupFrame extends JDialog {
     public DiscardCardPopupFrame(final List<TreasureCard> treasureCards, final CompletableFuture<TreasureCard> future) {
 
         setSize(100 * treasureCards.size() + 185, 250);
+        setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setAlwaysOnTop(true);

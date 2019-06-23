@@ -29,20 +29,35 @@ public class NavigatorPower implements Power {
                 )
         ) {
             req.bypassChecks();
+
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void alterResponse(final Response res, final Board board) {
-        if (res.getOriginRequest().getType() == RequestType.CELLS_REACHABLE) {
+        if (res.getOriginRequest().getType() == RequestType.PLAYERS_MOVEABLE) {
+            final Response<List<Adventurer>> castedRes = (Response<List<Adventurer>>) res;
+            castedRes.getData().addAll(board.getAdventurers());
+
+        } else if (res.getOriginRequest().getType() == RequestType.CELLS_REACHABLE) {
+
+            if (res.getOriginRequest().getCurrentPlayer().equals(res.getOriginRequest().getData(Request.DATA_PLAYER)))
+                return;
+
             final Response<List<Cell>> castedRes = (Response<List<Cell>>) res;
 
+            // Get the cells computed by the board and add the adjacent cells of these
+            // then clean it up by removing the flooded ones
             final List<Cell> newCells = castedRes.getData().stream()
                     .map(Cell::getLocation)
-                    .flatMap(loc -> Arrays.stream(Utils.getCornerCells(loc)))
+                    .flatMap(loc -> {
+                        final Location[] locations = Arrays.copyOf(Utils.getCrossCells(loc), 5);
+                        locations[4] = loc;
+                        return Arrays.stream(locations);
+                    })
                     .distinct()
-                    .map(board::getCell)
+                    .map(board::getCellIfNotFlooded)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 

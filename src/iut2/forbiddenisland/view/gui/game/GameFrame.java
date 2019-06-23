@@ -3,7 +3,9 @@ package iut2.forbiddenisland.view.gui.game;
 import iut2.forbiddenisland.ForbiddenIsland;
 import iut2.forbiddenisland.Pair;
 import iut2.forbiddenisland.controller.Controller;
+import iut2.forbiddenisland.controller.GameMode;
 import iut2.forbiddenisland.controller.observer.Observable;
+import iut2.forbiddenisland.controller.observer.Observer;
 import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.TreasureCard;
 import iut2.forbiddenisland.model.cell.Cell;
@@ -28,6 +30,7 @@ public class GameFrame extends JFrame {
 
     public GameFrame(final Controller controller) {
         setSize(1900, 1000);
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         // Yes, every size is hardcoded and its not responsive
@@ -102,8 +105,8 @@ public class GameFrame extends JFrame {
         );
 
         // Sendable adventurer
-        controller.getSendableAdventurers().subscribe(sendableAdventurers -> invokeLater(() ->
-                adventurerCardsPanel.setSendableAdventurers(sendableAdventurers))
+        controller.getHighlightedAdventurers().subscribe(sendableAdventurers -> invokeLater(() ->
+                adventurerCardsPanel.setHighlightedAdventurers(sendableAdventurers))
         );
 
         // *** Water level display ***
@@ -128,46 +131,57 @@ public class GameFrame extends JFrame {
         // *** Too many cards trigger ***
 
         controller.getTooManyCards().subscribe(adventurer -> {
-
-            // Need to start it in another thread because this operation is blocking
-            final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-                @Override
-                protected Void doInBackground() {
-                    while (adventurer.getCards().size() > 5) {
-                        final TreasureCard cardToDiscard = askCardToDiscard(adventurer.getCards());
-                        trashCardObservable.set(Pair.of(adventurer, cardToDiscard));
-                    }
-
-                    return null;
-                }
-            };
-
-            worker.execute();
+            while (adventurer.getCards().size() > 5) {
+                final TreasureCard cardToDiscard = askCardToDiscard(adventurer.getCards());
+                trashCardObservable.set(Pair.of(adventurer, cardToDiscard));
+            }
         });
 
         // *** Notices ***
 
         // Engine notices
-        controller.getFeedback().subscribe(msg ->
-                invokeLater(() -> JOptionPane.showMessageDialog(null, msg))
-        );
+        controller.getFeedback().subscribe(msg -> invokeLater(() ->
+                JOptionPane.showMessageDialog(null, msg)
+        ));
 
         // End round/game notices
-        controller.getEndGameObservable().subscribe(win -> invokeLater(() -> {
+        controller.getEndGameObservable().subscribe(win -> {
             if (win == null) {
-                JOptionPane.showMessageDialog(null, "Au joueur suivant !");
+                // The new round is called in a worker thread so we need to wait to no
+                // spam the user with popups
+                waitForRunnable(() ->
+                        JOptionPane.showMessageDialog(null, "Au joueur suivant !")
+                );
+
             } else {
+                // The win is called in the event thread so no need to wait for anything
                 if (win) {
-                    JOptionPane.showMessageDialog(null, "Vous avez gagner !", "Victoire", JOptionPane.INFORMATION_MESSAGE);
+                    // Close window before
+                    dispose();
+                    JOptionPane.showMessageDialog(null,
+                            "<html>" +
+                                    "<h1>Victoire !!!</h1>" +
+                                    "<p>Vous avez triomphés de l'Île !</p>" +
+                                    "</html>",
+                            "Victoire", JOptionPane.PLAIN_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(null, "Vous avez perdu !", "Défaite", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null,
+                            "<html>" +
+                                    "<h1>Vous avez perdus !</h1>" +
+                                    "<p>L'Île a eu raison de vous.</p>" +
+                                    "</html>",
+                            "Défaite", JOptionPane.PLAIN_MESSAGE);
+                    // Close window after
+                    dispose();
                 }
 
-                // If game is over, discard the frame and restart the game
-                dispose();
+                // Close window
+                //dispose();
+
+                // Restart the game
                 ForbiddenIsland.startWelcomeFrame();
             }
-        }));
+        });
 
         // Remaining action reminder
         controller.getRemainingActions().subscribe(actions -> invokeLater(() -> {
@@ -178,14 +192,42 @@ public class GameFrame extends JFrame {
         }));
 
         // Rising waters card
-        controller.getRisingWatersCardDrawn().subscribe(ignore -> invokeLater(() ->
-                JOptionPane.showMessageDialog(null, "Vous venez de tirer une carte inondation !")
+        controller.getRisingWatersCardDrawn().subscribe(ignoreMe -> waitForRunnable(() ->
+                JOptionPane.showMessageDialog(null,
+                        "Vous venez de tirer une carte Montée des Eaux !", "Montée des eaux", JOptionPane.WARNING_MESSAGE)
         ));
 
         // Emergency rescue notifier
-        controller.getEmergencyRescue().subscribe(adv -> invokeLater(() ->
-                JOptionPane.showMessageDialog(null, adv.getName() + " est en train de se noyer !")
-        ));
+        controller.getEmergencyRescue().subscribe(adv -> {
+            // Do not return before the event has been treated
+            final CompletableFuture<Void> future = new CompletableFuture<>();
+
+            // Show the popup
+            invokeLater(() ->
+                    JOptionPane.showMessageDialog(null,
+                            "<html><h3>" + adv.getName() + " est en train de se noyer !<br />Sauvez le !</h3></html>",
+                            "Noyade en cours", JOptionPane.ERROR_MESSAGE)
+            );
+
+            // Will complete the future only the game mode will change, aka when the move has been made
+            final Observer<GameMode> emergencyGameMode = gameMode -> {
+                if (gameMode != GameMode.EMERGENCY_MOVE) {
+                    future.complete(null);
+                }
+            };
+
+            // Register the observer
+            controller.getGameMode().subscribe(emergencyGameMode);
+
+            try {
+                // Wait for the future to complete
+                future.get();
+                // And unregister the observer
+                controller.getGameMode().unsubscribe(emergencyGameMode);
+            } catch (InterruptedException | ExecutionException ignore) {
+                /* no-op */
+            }
+        });
     }
 
     private void setupViewToControllerBindings(final Controller controller) {
@@ -244,7 +286,24 @@ public class GameFrame extends JFrame {
         controller.observeTrashCard(trashCardObservable);
     }
 
-    public static TreasureCard askCardToDiscard(final List<TreasureCard> cards) {
+    private static void waitForRunnable(final Runnable runnable) {
+        final CompletableFuture<Void> future = new CompletableFuture<>();
+
+        // Schedule the task to the event thread
+        invokeLater(() -> {
+            runnable.run();
+            future.complete(null);
+        });
+
+        try {
+            // Block until the future is complete
+            future.get();
+        } catch (InterruptedException | ExecutionException ignore) {
+            /* no-op */
+        }
+    }
+
+    private static TreasureCard askCardToDiscard(final List<TreasureCard> cards) {
         final CompletableFuture<TreasureCard> future = new CompletableFuture<>();
 
         invokeLater(() -> {

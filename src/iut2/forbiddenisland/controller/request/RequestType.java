@@ -21,6 +21,7 @@ public enum RequestType {
     /**
      * Used to query the reachable cells of another cell (aka the cells on top, left, down, right).
      * - DATA_CELL: Cell
+     * - DATA_PLAYER: Adventurer
      * = List&lt;Cell&gt;
      */
     CELLS_REACHABLE,
@@ -106,6 +107,13 @@ public enum RequestType {
      */
     PLAYERS_SENDABLE,
 
+    /**
+     * Used to query the players that the current player is able
+     * to move.
+     * = List&lt;Adventurer&gt;
+     */
+    PLAYERS_MOVEABLE,
+
     // *** Island related requests ***
 
     /**
@@ -152,11 +160,5 @@ public enum RequestType {
      * Used to get the amount of movements allowed per player in one round.
      * = int
      */
-    GAME_MOVE_AMOUNT,
-
-    /**
-     * Used to check whether the game is over or not.
-     * = boolean
-     */
-    GAME_CHECK_WIN
+    GAME_MOVE_AMOUNT
 }

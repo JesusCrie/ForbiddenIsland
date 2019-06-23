@@ -14,18 +14,30 @@ public class FloodDeckDemo1 extends FloodDeck {
         super(Arrays.asList(
                 map.get(Location.from(0, 3)),
                 map.get(Location.from(1, 3)),
+
                 map.get(Location.from(1, 4)),
                 map.get(Location.from(2, 5)),
+
                 map.get(Location.from(5, 2)),
                 map.get(Location.from(4, 4)),
+
                 map.get(Location.from(3, 4)),
                 map.get(Location.from(2, 0)),
+
                 map.get(Location.from(5, 3)),
                 map.get(Location.from(1, 1)),
+
                 map.get(Location.from(4, 2)),
                 map.get(Location.from(2, 1)),
+
                 map.get(Location.from(4, 1)),
-                map.get(Location.from(3, 3))
+                map.get(Location.from(3, 3)),
+
+                map.get(Location.from(1, 1)),
+                map.get(Location.from(1, 2)),
+
+                map.get(Location.from(3, 5)),
+                map.get(Location.from(3, 2))
         ));
     }
 

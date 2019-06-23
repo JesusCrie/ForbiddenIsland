@@ -1,6 +1,5 @@
 package iut2.forbiddenisland.controller;
 
-import iut2.forbiddenisland.controller.observer.NotifyOnCreateObservable;
 import iut2.forbiddenisland.controller.observer.NotifyOnSubscribeObservable;
 import iut2.forbiddenisland.controller.observer.Observable;
 import iut2.forbiddenisland.controller.request.Request;
@@ -14,6 +13,7 @@ import iut2.forbiddenisland.model.adventurer.Adventurer;
 import iut2.forbiddenisland.model.card.*;
 import iut2.forbiddenisland.model.cell.Cell;
 import iut2.forbiddenisland.model.cell.CellState;
+import iut2.forbiddenisland.model.cell.HeliportCell;
 import iut2.forbiddenisland.model.cell.TreasureCell;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class GameEngine {
         adventurers = createAdventurersObs();
         waterLevel = createWaterLevelObs();
         treasures = createTreasureObs();
-        endGame = createEndGameObs();
+        endGame = new Observable<>();
         remainingActions = new NotifyOnSubscribeObservable<>(0);
 
         risingWatersCardDrawn = new Observable<>();
@@ -128,27 +128,6 @@ public class GameEngine {
                 );
 
                 value = treasures.getData();
-
-                super.notifyChanges();
-            }
-        };
-    }
-
-    /**
-     * Create an observable that will keep the current win status of the game.
-     * True for a win, False for a defeat, and null if the game is still running.
-     *
-     * @return An observable of the game state.
-     */
-    private Observable<Boolean> createEndGameObs() {
-        return new NotifyOnCreateObservable<Boolean>() {
-            @Override
-            public void notifyChanges() {
-                final Response<Boolean> res = modelProxy.request(
-                        new Request(RequestType.GAME_CHECK_WIN, getCurrentPlayer().get())
-                );
-
-                value = res.getData();
 
                 super.notifyChanges();
             }
@@ -268,8 +247,9 @@ public class GameEngine {
 
     public List<Cell> getReachableCells(final Adventurer target) {
         final Response<List<Cell>> reachableCells = modelProxy.request(
-                new Request(RequestType.CELLS_REACHABLE, target)
+                new Request(RequestType.CELLS_REACHABLE, getCurrentPlayer().get())
                         .putData(Request.DATA_CELL, target.getPosition())
+                        .putData(Request.DATA_PLAYER, target)
         );
 
         return reachableCells.getData();
@@ -300,6 +280,20 @@ public class GameEngine {
         );
 
         return sendablePlayers.getData();
+    }
+
+    /**
+     * Get all adventurers who are moveable by the
+     * current player.
+     *
+     * @return The list of players moveable.
+     */
+    public List<Adventurer> getPlayersMoveable() {
+        final Response<List<Adventurer>> moveablePlayers = modelProxy.request(
+                new Request(RequestType.PLAYERS_MOVEABLE, getCurrentPlayer().get())
+        );
+
+        return moveablePlayers.getData();
     }
 
     // *** Player round related methods ***
@@ -337,7 +331,11 @@ public class GameEngine {
         final Response<Integer> res = modelProxy.request(
                 new Request(RequestType.GAME_MOVE_AMOUNT, getCurrentPlayer().get())
         );
+
         remainingActions.set(res.getData());
+
+        // Notify new round
+        endGame.set(null);
     }
 
     /**
@@ -473,7 +471,7 @@ public class GameEngine {
     public boolean useCardHelicopter(final Adventurer source, final HelicopterCard card,
                                      final Cell departure, final Cell destination) {
 
-        if (departure.getAdventurers().size() == 0 || destination.getState() == CellState.FLOODED)
+        if (departure.getAdventurers().isEmpty() || destination.getState() == CellState.FLOODED)
             return false;
 
         // Consume the card
@@ -518,8 +516,10 @@ public class GameEngine {
 
     /**
      * End the 'manual' part of the current player's round.
+     *
+     * @return True if the sequence should continue, otherwise false.
      */
-    public void endPlayerRound() {
+    public boolean endPlayerRound() {
         // Draw treasure cards
         final int drawAmount = modelProxy.<Integer>request(
                 new Request(RequestType.CARD_DRAW_AMOUNT, getCurrentPlayer().get())
@@ -535,14 +535,23 @@ public class GameEngine {
                 // Discard card
                 trashCard(getCurrentPlayer().get(), res.getData());
 
+                // In the real rules, if we draw 2 rising waters card, we shuffle only one time
+                // but it doesn't really bother a computer to shuffle it 2 times
+
                 // Water level +1 and reshuffle cards
                 modelProxy.request(
                         new Request(RequestType.ISLAND_WATER_UP, getCurrentPlayer().get())
                                 .putData(Request.DATA_AMOUNT, 1)
                 );
 
-                // Trigger island turn to draw flood cards
-                startIslandTurn();
+                waterLevel.notifyChanges();
+                risingWatersCardDrawn.notifyChanges();
+
+                // If the water level is now at 10, game is lost
+                if (waterLevel.get().getLevel() >= 10) {
+                    endGame.set(false);
+                    return false;
+                }
             }
 
         }
@@ -550,6 +559,8 @@ public class GameEngine {
         if (getCurrentPlayer().get().getCards().size() > 5) {
             tooManyCards.set(getCurrentPlayer().get());
         }
+
+        return true;
     }
 
     private void decrementActions(final int amount) {
@@ -558,7 +569,12 @@ public class GameEngine {
 
     // *** Island turn related methods ***
 
-    public void startIslandTurn() {
+    /**
+     * Play the island turn by drawing flood cards.
+     *
+     * @return True if the sequence should continue, otherwise false.
+     */
+    public boolean startIslandTurn() {
         // Draw flood card
         final int drawAmount = modelProxy.<WaterLevel>request(
                 new Request(RequestType.ISLAND_WATER_LEVEL, null)
@@ -573,23 +589,61 @@ public class GameEngine {
 
             final Cell cell = floodCardRes.getData().getTargetedCell();
 
-            // If the cell is now flooded and there are adventurers on it
-            if (cell.getState() == CellState.FLOODED && !cell.getAdventurers().isEmpty()) {
-                // Make a shallow copy of the adventurers to rescue
-                final List<Adventurer> adventurers = new ArrayList<>(cell.getAdventurers());
+            // If the cell is flooded
+            if (cell.getState() == CellState.FLOODED) {
 
-                // Check if the game is rescueable
-                for (Adventurer adventurer : adventurers) {
-                    if (!isRescueable(adventurer)) {
+                // If a flooded treasure cell
+                if (cell instanceof TreasureCell) {
+                    final TreasureCell treasureCell = (TreasureCell) cell;
+
+                    // If the treasure has already been claimed, we don't care
+                    if (!treasureCell.getTreasure().isClaimable())
+                        return true;
+
+                    // Check for the sibling cell
+                    final TreasureCell siblingCell = cells.get().values().stream()
+                            .filter(c -> c instanceof TreasureCell)
+                            // For convenience
+                            .map(c -> (TreasureCell) c)
+                            .filter(c -> c.getTreasure().equals(treasureCell.getTreasure()))
+                            .filter(c -> !c.equals(treasureCell))
+                            .findAny()
+                            .get(); // The cell exist, no need to null-check it
+
+                    // If the sibling cell is also flooded and the treasure isn't claimed, well, the game is lost
+                    if (siblingCell.getState() == CellState.FLOODED) {
                         endGame.set(false);
-                        return;
+                        return false;
                     }
+
+                    // If the heliport is flooded
+                } else if (cell instanceof HeliportCell) {
+                    // Game is lost
+                    endGame.set(false);
+                    return false;
                 }
 
-                // Rescue each adventurers
-                adventurers.forEach(emergencyRescue::set);
+                // If the cell is now flooded and there are adventurers on it
+                if (!cell.getAdventurers().isEmpty()) {
+                    // Make a shallow copy of the adventurers to rescue
+                    final List<Adventurer> adventurers = new ArrayList<>(cell.getAdventurers());
+
+                    // Check if the game is rescueable
+                    for (Adventurer adventurer : adventurers) {
+                        if (!isRescueable(adventurer)) {
+                            endGame.set(false);
+                            return false;
+                        }
+                    }
+
+                    // Rescue each adventurers
+                    adventurers.forEach(emergencyRescue::set);
+
+                }
             }
         }
+
+        return true;
     }
 
     private boolean isRescueable(final Adventurer adventurer) {
